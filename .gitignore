@@ -16,10 +16,10 @@ dist/
 .eggs/
 *.egg
 
-# Training artifacts
-checkpoints/
-results/
-analysis/
+# Training artifacts (ignore root level, keep src/env/)
+/checkpoints/
+/results/
+/analysis/
 *.pt
 *.pth
 *.ckpt
