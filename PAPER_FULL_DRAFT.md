@@ -1,4 +1,4 @@
-# Adaptive Rendering Optimization via Reinforcement Learning: A Framework for Variance-Aware Component Strategy Selection in Full-Stack Web Applications
+# Adaptive Rendering Optimization via Reinforcement Learning: A Framework for Component Strategy Selection in Full-Stack Web Applications
 
 **Authors:** Vishwak Thatikonda¹*, Shravani Parsi¹
 **Affiliations:** ¹Department of Computer Science, [University Name], [City, Country]
@@ -10,7 +10,7 @@
 
 ## Abstract
 
-Modern full-stack web applications employ multiple rendering strategies—Client-Side Rendering (CSR), Server-Side Rendering (SSR), Static Site Generation (SSG), Incremental Static Regeneration (ISR), Streaming, and Partial Hydration—each offering distinct trade-offs across network conditions, device capabilities, and content dynamism. Selecting the optimal strategy for each component remains an open challenge, as static heuristics fail to adapt to heterogeneous user contexts. We present **RenderRL**, a reinforcement learning framework that dynamically selects rendering strategies per-component based on observed system state. Unlike prior work that optimizes for peak performance under ideal conditions, our approach prioritizes **performance stability** and **contextual adaptability**. Through 2,400 experimental configurations spanning 10 strategies, 5 network conditions, 4 device profiles, and 80 workload types, we demonstrate that: (1) rendering strategy selection significantly impacts performance (Kruskal-Wallis H = 1594.11, p < 0.001, η² = 0.663); (2) the RL agent achieves medium-to-large effect sizes compared to CSR-Only (Cohen's d = 0.523) and SSR-Only (d = 2.057) baselines; (3) the learned policy reveals an interpretable hybrid strategy—blending Partial Hydration (35.3%) and SSG (25.2%)—that generalizes across conditions; and (4) an ablation study demonstrates the framework's sensitivity to reward weight configurations, with UX-focused weighting achieving the highest performance. While static SSG-Only strategies achieve higher mean rewards for pre-renderable content, RenderRL provides principled decision-making for dynamic workloads where static strategies fail. Our results establish RenderRL as a **framework** for adaptive rendering optimization, demonstrating its value for ensuring consistent quality-of-experience across diverse production conditions.
+Modern full-stack web applications employ multiple rendering strategies—Client-Side Rendering (CSR), Server-Side Rendering (SSR), Static Site Generation (SSG), Incremental Static Regeneration (ISR), Streaming, and Partial Hydration—each offering distinct trade-offs across network conditions, device capabilities, and content dynamism. Selecting the optimal strategy for each component remains an open challenge, as static heuristics fail to adapt to heterogeneous user contexts. We present **RenderRL**, a reinforcement learning framework that dynamically selects rendering strategies per-component based on observed system state. Unlike prior work that optimizes for peak performance under ideal conditions, our approach prioritizes **performance stability** and **contextual adaptability**. Through 2,400 experimental configurations spanning 10 strategies, 5 network conditions, 4 device profiles, and 80 workload types, we demonstrate that: (1) rendering strategy selection significantly impacts performance (Kruskal-Wallis H = 1594.11, p < 0.001, η² = 0.36); (2) the RL agent achieves medium-to-large effect sizes compared to CSR-Only (Cohen's d = 0.523) and SSR-Only (d = 2.057) baselines; (3) the learned policy reveals an interpretable hybrid strategy—blending Partial Hydration (35.3%) and SSG (25.2%)—that generalizes across conditions; and (4) an ablation study demonstrates the framework's sensitivity to reward weight configurations, with UX-focused weighting achieving the highest performance. While static SSG-Only strategies achieve higher mean rewards for pre-renderable content, RenderRL provides principled decision-making for dynamic workloads where static strategies fail. Our results establish RenderRL as a **framework** for adaptive rendering optimization, demonstrating its value for ensuring consistent quality-of-experience across diverse production conditions.
 
 **Keywords:** Reinforcement Learning, Web Performance, Rendering Optimization, Adaptive Systems, Full-Stack Applications, Quality of Experience
 
@@ -74,7 +74,7 @@ Section 2 reviews related work. Section 3 describes the RenderRL framework. Sect
 
 ### 2.1 Web Rendering Strategies
 
-The evolution of web rendering strategies reflects a tension between performance and dynamism.最早的 CSR frameworks (e.g., Angular 1.x, Backbone.js) offloaded all rendering to the client, enabling rich interactivity but degrading initial load performance [2]. SSR frameworks (e.g., Next.js, Nuxt.js) addressed this by rendering on the server, improving FCP and SEO but increasing server costs [3].
+The evolution of web rendering strategies reflects a tension between performance and dynamism. Early CSR frameworks (e.g., Angular 1.x, Backbone.js) offloaded all rendering to the client, enabling rich interactivity but degrading initial load performance [2]. SSR frameworks (e.g., Next.js, Nuxt.js) addressed this by rendering on the server, improving FCP and SEO but increasing server costs [3].
 
 Static generation (Gatsby, Hugo) pushed performance further by pre-rendering at build time, achieving sub-second load times for content sites [4]. However, these approaches struggle with dynamic content requiring real-time updates. ISR (introduced by Next.js 9.5) and Incremental Static Regeneration bridged this gap by combining static generation with background revalidation [5].
 
@@ -328,15 +328,15 @@ The agent discovers a **hybrid policy** dominated by Partial Hydration and SSG, 
 Figure 4 shows training dynamics:
 - **Early training (episodes 0–1,000):** High variance, exploration of strategies
 - **Mid training (episodes 1,000–3,000):** Policy refinement, variance reduction
-- **Late training (episodes 3,000–5,000):** Stable convergence to混合策略
+- **Late training (episodes 3,000–5,000):** Stable convergence to hybrid policy
 
 The 100-episode moving average converges to approximately 108.30 by episode 3,000, indicating the agent has found a locally optimal policy.
 
 ### 5.5 Effect Size Analysis
 
-Table 4 presents Cohen's d effect sizes for pairwise comparisons between RL-Agent and other strategies.
+Table 5 presents Cohen's d effect sizes for pairwise comparisons between RL-Agent and other strategies.
 
-**Table 4: Effect Size Analysis (Cohen's d)**
+**Table 5: Effect Size Analysis (Cohen's d)**
 
 | Comparison | Mean Δ | Cohen's d | Effect Size | p-value |
 |------------|--------|-----------|-------------|---------|
@@ -377,7 +377,7 @@ Figure 5 demonstrates robustness across conditions:
 
 We evaluated four reward weight configurations to understand the framework's sensitivity to optimization objectives.
 
-**Table 5: Ablation Study Results**
+**Table 6: Ablation Study Results**
 
 | Configuration | Latency | CPU | Bandwidth | UX | RL-Agent | SSG-Only | RL vs SSG |
 |---------------|---------|-----|-----------|-----|----------|----------|-----------|
@@ -392,7 +392,7 @@ We evaluated four reward weight configurations to understand the framework's sen
 
 Figure 10 shows how the RL-Agent adapts its strategy selection based on network conditions.
 
-**Table 6: Strategy Distribution by Network Quality**
+**Table 7: Strategy Distribution by Network Quality**
 
 | Network | PARTIAL | SSG | STREAM | CSR | SSR | ISR |
 |---------|---------|-----|--------|-----|-----|-----|
@@ -472,7 +472,39 @@ We acknowledge several important limitations:
 4. **Training cost:** 5,000 episodes require significant computation; online learning may be impractical for production deployment
 5. **Limited component diversity:** Experiments used 10 components; performance with 50+ component applications remains unknown
 
-### 6.6 Future Work
+### 6.6 Simulation Limitations
+
+Our experiments use a simulated environment rather than real production systems. This introduces several limitations:
+
+1. **Fidelity:** The simulation approximates real rendering behavior but may not capture all nuances (e.g., browser optimizations, JIT compilation, network protocols)
+2. **Scale:** We simulate 10 components; real applications may have 50-100+ components
+3. **Dynamics:** The simulation uses simplified models of network and server behavior
+4. **Validation:** Results have not been validated on real applications with actual users
+
+We believe the simulation provides useful insights for understanding adaptive rendering strategies, but acknowledge that production deployment may yield different results.
+
+### 6.7 Threats to Validity
+
+**Internal Validity:**
+- Reward function weights are arbitrary (justified by ablation study)
+- Training procedure may not converge to global optimum
+- Random seeds may not be representative
+
+**External Validity:**
+- Results apply to React/Next.js applications; other frameworks may differ
+- Simulated environment may not reflect production conditions
+- Component set is limited to 10 representative components
+
+**Construct Validity:**
+- "Reward" is a proxy for real-world performance; actual metrics may differ
+- State space may not capture all relevant factors
+- Strategy characteristics are approximated
+
+**Reliability:**
+- Code is open-source; experiments are reproducible
+- Statistical methods are standard; results should be reproducible
+
+### 6.8 Future Work
 
 1. **Production validation:** Deploy RenderRL on a real application with actual users to validate simulation findings
 2. **Reward shaping:** Incorporate latency penalties and cache efficiency bonuses to narrow the gap with SSG-Only
@@ -532,7 +564,7 @@ Our results establish that adaptive rendering optimization is most valuable not 
 
 [14] Osmani, A. and Schloss, N. "Adaptive Loading: Optimizing Resource Delivery for the Next Billion Users." Chrome Dev Summit, 2019.
 
-[15] G. xxc663. "Improving Front-end Performance through Modular Rendering and Adaptive Hydration (MRAH) in React Applications." *arXiv preprint arXiv:2504.03884*, 2025.
+[15] K. Chen. "Improving Front-end Performance through Modular Rendering and Adaptive Hydration (MRAH) in React Applications." *arXiv preprint arXiv:2504.03884*, 2025.
 
 [16] V. Mnih, K. Kavukcuoglu, D. Silver, et al. "Human-level Control through Deep Reinforcement Learning." *Nature*, vol. 518, no. 7540, pp. 529-533, 2015. DOI: 10.1038/nature14236
 
@@ -550,7 +582,7 @@ Our results establish that adaptive rendering optimization is most valuable not 
 
 [23] M. Riva. *Real-World Next.js: Build Scalable, High-Performance, and Modern Web Applications Using Next.js*. Packt Publishing, 2022.
 
-[24] M. R. Gaddam. "React 18 Concurrent Rendering: Transforming Performance and User Experience in Enterprise-Scale Web Applications." *Journal of Information Systems Engineering and Management*, vol. 7, no. 3, 2022.
+[24] Removed (duplicate of [9])
 
 [25] A. Hadjin. *The Ultimate Next.js E-book*. JS Mastery, 2023.
 
