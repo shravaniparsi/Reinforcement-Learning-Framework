@@ -1,8 +1,8 @@
 # Adaptive Rendering Optimization via Reinforcement Learning: A Framework for Variance-Aware Component Strategy Selection in Full-Stack Web Applications
 
-**Authors:** [Author Names]
-**Affiliations:** [Affiliations]
-**Corresponding Author:** [Email]
+**Authors:** Vishwak Thatikonda¹*, Shravani Parsi¹
+**Affiliations:** ¹Department of Computer Science, [University Name], [City, Country]
+**Corresponding Author:** shravaniparsi@university.edu
 
 ---
 
@@ -422,41 +422,55 @@ Our results establish that the primary value of adaptive rendering optimization 
 
 ## References
 
-[1] Google. "Mobile Page Speed Benchmarks." Think with Google, 2023.
+[1] Google. "Mobile Page Speed Benchmarks and Their Impact on Conversion Rates." Think with Google, 2023. Available: https://www.thinkwithgoogle.com/
 
-[2] P. Baeza-Yates and J. Nepomuceno. "Client-Side Rendering: A Comprehensive Survey." ACM Computing Surveys, vol. 54, no. 8, 2022.
+[2] R. Hanafi, A. Haq, N. Agustin, and F. Azizah. "Comparison of Web Page Rendering Methods Based on Next.js Framework Using Page Loading Time Test." *TEKNIKA*, vol. 13, no. 1, pp. 102-108, 2024. DOI: 10.34148/teknika.v13i1.769
 
-[3] V. Nttre. "Next.js: The React Framework for Production." Vercel Documentation, 2023.
+[3] Vercel. "Next.js: The React Framework for Production." Next.js Documentation, 2024. Available: https://nextjs.org/docs
 
-[4] K. Agafonov. "Gatsby: Build Blazing Fast, Modern Apps And Websites With React." Gatsby Documentation, 2023.
+[4] R. Ollila, N. Mäkitalo, and T. Mikkonen. "Modern Web Frameworks: A Comparison of Rendering Performance." *Journal of Web Engineering*, vol. 21, no. 3, pp. 789-813, 2022. DOI: 10.13052/jwe1540-9589.21311
 
-[5] A. DAN. "Incremental Static Regeneration in Next.js." Next.js Blog, 2023.
+[5] M. F. S. Lazuardy and D. Anggraini. "Modern Frontend Web Architectures with React.js and Next.js." *International Research Journal of Advanced Engineering Science*, vol. 7, no. 1, pp. 132-141, 2022.
 
-[6] F. K. Druid. "Astro: Build Faster Websites." Astro Documentation, 2023.
+[6] J. Miller. "Islands Architecture." Jason Miller Blog, 2019. Available: https://jasonformat.com/islands-architecture/
 
-[7] React Team. "React 18: Server Components and Streaming." React Blog, 2022.
+[7] Astro. "Islands Architecture." Astro Documentation, 2024. Available: https://docs.astro.build/en/concepts/islands
 
-[8] T. Kraska et al. "SageDB: A Learned Database System." CIDR, 2019.
+[8] React Team. "React 18: Server Components and Streaming." React Blog, 2022. Available: https://react.dev/blog/2022/03/29/react-v18
 
-[9] M. Mao et al. "Reinforcement Learning for Resource Management in Cloud Computing." MLSys, 2020.
+[9] Gaddam, R. R. "React 18 Concurrent Rendering: Transforming Performance and User Experience in Enterprise-Scale Web Applications." *Journal of Information Systems Engineering and Management*, vol. 7, no. 3, 2022.
 
-[10] L. Zhou et al. "Deep Reinforcement Learning for Network Routing." IEEE/ACM Transactions on Networking, 2020.
+[10] Su, X. "Exploration and Real-time Rendering Optimization Path Using Deep Learning Methods." *ICCSMT '24: Proceedings of the 2024 5th International Conference on Computer Science and Management Technology*, pp. 606-610, 2025. DOI: 10.1145/3708036.3708139
 
-[11] A. Handy et al. "Learning Cache Access Patterns for Web Applications." NSDI, 2021.
+[11] J. Schulman, F. Wolski, P. Dhariwal, A. Radford, and O. Klimov. "Proximal Policy Optimization Algorithms." *arXiv preprint arXiv:1707.06347*, 2017.
 
-[12] Z. Wang et al. "Reinforcement Learning for Web Prefetching." KDD, 2019.
+[12] M. Ghasemi, A. H. Moosavi, and D. Ebrahimi. "A Comprehensive Survey of Reinforcement Learning: From Algorithms to Practical Challenges." *arXiv preprint arXiv:2411.18892*, 2024.
 
-[13] H. Mao et al. "Reinforcement Learning for Interactive Machine Learning—A Survey." arXiv:2112.11256, 2021.
+[13] Farooq, A. and Iqbal, K. "A Survey of Reinforcement Learning for Optimization in Automation." *IEEE 20th International Conference on Automation Science and Engineering (CASE)*, 2024.
 
-[14] Google Developers. "Adaptive Serving Using Network Information." web.dev, 2023.
+[14] Osmani, A. and Schloss, N. "Adaptive Loading: Optimizing Resource Delivery for the Next Billion Users." Chrome Dev Summit, 2019.
 
-[15] A. Andronov et al. "Adaptive Image Optimization with Machine Learning." WebPerf Workshop, 2022.
+[15] G. xxc663. "Improving Front-end Performance through Modular Rendering and Adaptive Hydration (MRAH) in React Applications." *arXiv preprint arXiv:2504.03884*, 2025.
 
-[16] N. Lee et al. "Adaptive Code Splitting for Progressive Web Apps." ICSE-SEIS, 2021.
+[16] V. Mnih, K. Kavukcuoglu, D. Silver, et al. "Human-level Control through Deep Reinforcement Learning." *Nature*, vol. 518, no. 7540, pp. 529-533, 2015. DOI: 10.1038/nature14236
 
-[17] Mozilla. "Service Worker Caching Strategies." MDN Web Docs, 2023.
+[17] Kober, J., Bagnell, J. A., and Peters, J. "Reinforcement Learning in Robotics: A Survey." *The International Journal of Robotics Research*, vol. 32, no. 11, pp. 1238-1274, 2013.
 
-[18] J. Schulman et al. "Proximal Policy Optimization Algorithms." arXiv:1707.06347, 2017.
+[18] T. Kraska, A. Beutel, E. H. Chi, J. Dean, and N. Polyzotis. "The Case for Learned Index Structures." *Proceedings of the 2018 International Conference on Management of Data (SIGMOD)*, pp. 489-504, 2018.
+
+[19] Mao, H., Alizadeh, M., Menache, I., and Kandula, S. "Reinforcement Learning for Traffic Engineering: A Survey." *arXiv preprint arXiv:2112.11256*, 2021.
+
+[20] Google Developers. "Adaptive Serving Using Network Information." web.dev, 2024. Available: https://web.dev/articles/adaptive-serving
+
+[21] Mozilla. "Service Worker Caching Strategies." MDN Web Docs, 2024. Available: https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API
+
+[22] D. Bui. "Next.js for Front-End and Compatible Backend Solutions." South-Eastern Finland University of Applied Sciences, 2023.
+
+[23] M. Riva. *Real-World Next.js: Build Scalable, High-Performance, and Modern Web Applications Using Next.js*. Packt Publishing, 2022.
+
+[24] M. R. Gaddam. "React 18 Concurrent Rendering: Transforming Performance and User Experience in Enterprise-Scale Web Applications." *Journal of Information Systems Engineering and Management*, vol. 7, no. 3, 2022.
+
+[25] A. Hadjin. *The Ultimate Next.js E-book*. JS Mastery, 2023.
 
 ---
 
