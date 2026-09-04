@@ -1,0 +1,109 @@
+name: Run RL Experiments
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Experiment mode'
+        required: true
+        default: 'quick'
+        type: choice
+        options:
+          - quick
+          - full
+          - train
+      n_episodes:
+        description: 'Number of episodes per experiment'
+        required: false
+        default: '100'
+      max_steps:
+        description: 'Max steps per episode'
+        required: false
+        default: '500'
+      n_seeds:
+        description: 'Number of random seeds'
+        required: false
+        default: '3'
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  run-experiments:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350  # ~6 hours max per job
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run training
+        if: inputs.mode == 'train' || inputs.mode == 'full'
+        run: |
+          cd src/env
+          python train_ppo.py \
+            --mode train \
+            --episodes 5000 \
+            --max-steps 1000 \
+            --save-dir checkpoints
+        env:
+          PYTHONUNBUFFERED: '1'
+
+      - name: Run experiments
+        if: inputs.mode == 'quick' || inputs.mode == 'full'
+        run: |
+          cd src/env
+          python experiment_runner.py \
+            --mode ${{ inputs.mode }} \
+            --n-seeds ${{ inputs.n_seeds }} \
+            --n-episodes ${{ inputs.n_episodes }} \
+            --max-steps ${{ inputs.max_steps }}
+        env:
+          PYTHONUNBUFFERED: '1'
+
+      - name: Run statistical analysis
+        if: inputs.mode == 'quick' || inputs.mode == 'full'
+        run: |
+          cd src/env
+          RESULTS_FILE="results/quick_experiment_results.json"
+          if [ "${{ inputs.mode }}" = "full" ]; then
+            RESULTS_FILE="results/full_experiment_results.json"
+          fi
+          if [ -f "$RESULTS_FILE" ]; then
+            python analyze_results.py \
+              --results-file "$RESULTS_FILE" \
+              --output-dir analysis
+          fi
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: experiment-results-${{ inputs.mode }}
+          path: |
+            src/env/checkpoints/
+            src/env/results/
+            src/env/analysis/
+          retention-days: 90
+
+      - name: Print summary
+        if: always()
+        run: |
+          echo "=== Experiment Summary ==="
+          echo "Mode: ${{ inputs.mode }}"
+          echo "Episodes: ${{ inputs.n_episodes }}"
+          echo "Max Steps: ${{ inputs.max_steps }}"
+          echo "Seeds: ${{ inputs.n_seeds }}"
+          echo ""
+          echo "Results will be available in the Artifacts section."

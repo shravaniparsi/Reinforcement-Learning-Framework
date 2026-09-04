@@ -1,0 +1,51 @@
+name: Train RL Agent
+
+on:
+  workflow_dispatch:
+    inputs:
+      episodes:
+        description: 'Number of training episodes'
+        required: false
+        default: '5000'
+      max_steps:
+        description: 'Max steps per episode'
+        required: false
+        default: '1000'
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350  # ~6 hours
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Train PPO agent
+        run: |
+          cd src/env
+          python train_ppo.py \
+            --mode train \
+            --episodes ${{ inputs.episodes }} \
+            --max-steps ${{ inputs.max_steps }} \
+            --save-dir checkpoints
+        env:
+          PYTHONUNBUFFERED: '1'
+
+      - name: Upload checkpoint
+        uses: actions/upload-artifact@v4
+        with:
+          name: rl-checkpoint
+          path: src/env/checkpoints/
+          retention-days: 90
