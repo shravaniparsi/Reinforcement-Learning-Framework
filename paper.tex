@@ -1,0 +1,387 @@
+\documentclass[10pt,twocolumn]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{url}
+\usepackage{cite}
+\usepackage{enumitem}
+\usepackage{multirow}
+\usepackage{xcolor}
+
+\newcommand{\method}{RenderRL}
+\newcommand{\reals}{\mathbb{R}}
+
+\title{Adaptive Rendering Optimization via Reinforcement Learning: A Framework for Component Strategy Selection in Full-Stack Web Applications}
+
+\author{
+Vishwak Thatikonda$^{1}$\thanks{Corresponding author: shravaniparsi@university.edu} \and
+Shravani Parsi$^{1}$\\[1em]
+$^{1}$Department of Computer Science\\
+[University Name]\\
+[City, Country]
+}
+
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Modern full-stack web applications employ multiple rendering strategies---Client-Side Rendering (CSR), Server-Side Rendering (SSR), Static Site Generation (SSG), Incremental Static Regeneration (ISR), Streaming, and Partial Hydration---each offering distinct trade-offs across network conditions, device capabilities, and content dynamism. Selecting the optimal strategy for each component remains an open challenge, as static heuristics fail to adapt to heterogeneous user contexts. We present \method{}, a reinforcement learning framework that dynamically selects rendering strategies per-component based on observed system state. Unlike prior work that optimizes for peak performance under ideal conditions, our approach prioritizes \textbf{performance stability} and \textbf{contextual adaptability}. Through 2,400 experimental configurations spanning 10 strategies, 5 network conditions, 4 device profiles, and 80 workload types, we demonstrate that: (1) rendering strategy selection significantly impacts performance (Kruskal-Wallis $H = 1594.11$, $p < 0.001$, $\eta^2 = 0.36$); (2) the RL agent achieves medium-to-large effect sizes compared to CSR-Only (Cohen's $d = 0.523$) and SSR-Only ($d = 2.057$) baselines; (3) the learned policy reveals an interpretable hybrid strategy---blending Partial Hydration (35.3\%) and SSG (25.2\%)---that generalizes across conditions; and (4) an ablation study demonstrates the framework's sensitivity to reward weight configurations, with UX-focused weighting achieving the highest performance. While static SSG-Only strategies achieve higher mean rewards for pre-renderable content, \method{} provides principled decision-making for dynamic workloads where static strategies fail. Our results establish \method{} as a \textbf{framework} for adaptive rendering optimization, demonstrating its value for ensuring consistent quality-of-experience across diverse production conditions.
+
+\vspace{1em}
+\noindent\textbf{Keywords:} Reinforcement Learning, Web Performance, Rendering Optimization, Adaptive Systems, Full-Stack Applications, Quality of Experience
+\end{abstract}
+
+\section{Introduction}
+
+\subsection{Background and Motivation}
+
+Web application performance directly impacts user engagement, conversion rates, and search engine rankings. Google reports that 53\% of mobile users abandon sites that take longer than 3 seconds to load, and a 100ms delay in load time can reduce conversions by 7\%~\cite{google2023mobile}. As modern web applications grow in complexity---incorporating dynamic data, personalization, real-time updates, and rich interactive UIs---choosing the appropriate rendering strategy becomes a critical architectural decision.
+
+The React ecosystem offers six primary rendering strategies, each with distinct performance characteristics:
+
+\begin{itemize}[nosep]
+\item \textbf{Client-Side Rendering (CSR):} Minimal server load, but high Time-to-Interactive (TTI) and poor SEO
+\item \textbf{Server-Side Rendering (SSR):} Fast First Contentful Paint (FCP), but high server compute and latency
+\item \textbf{Static Site Generation (SSG):} Optimal performance via pre-rendering, but unsuitable for dynamic content
+\item \textbf{Incremental Static Regeneration (ISR):} Balances freshness and performance, but complex cache invalidation
+\item \textbf{Streaming (STREAM):} Progressive rendering, but requires careful chunk boundaries
+\item \textbf{Partial Hydration (PARTIAL):} Selective interactivity, but complex implementation
+\end{itemize}
+
+Current approaches rely on developer intuition or simple heuristics. However, these fail to account for:
+
+\begin{enumerate}[nosep]
+\item \textbf{Runtime context:} Network quality, device capabilities, and server load vary dramatically across users
+\item \textbf{Component heterogeneity:} Different components within the same page may benefit from different strategies
+\item \textbf{Dynamic workloads:} Content freshness requirements change over time
+\end{enumerate}
+
+\subsection{Problem Statement}
+
+Given a web application with $N$ components, each characterized by a feature vector $\mathbf{s}_t \in \reals^{15}$ at time $t$, select rendering strategy $a_t \in \{\text{CSR}, \text{SSR}, \text{SSG}, \text{ISR}, \text{STREAM}, \text{PARTIAL}\}$ that optimizes a composite objective:
+
+\begin{equation}
+\max_{\pi} \mathbb{E}\left[\sum_{t=0}^{T} \gamma^t R(s_t, a_t)\right]
+\end{equation}
+
+where $R(s_t, a_t)$ balances latency, resource usage, cache efficiency, and user experience.
+
+\subsection{Contributions}
+
+This paper makes the following contributions:
+
+\begin{enumerate}[nosep]
+\item \textbf{\method{} Framework:} We formalize rendering strategy selection as an MDP and propose a PPO agent that learns adaptive strategies from runtime observations.
+
+\item \textbf{Interpretable Learned Policy:} We show the RL agent discovers an interpretable hybrid strategy---blending Partial Hydration (35.3\%) and SSG (25.2\%)---that provides a practical blueprint for manual optimization.
+
+\item \textbf{Empirical Analysis:} We conduct 2,400 experiments across 10 strategies, 80 workload conditions, and 3 random seeds, with rigorous statistical analysis including effect sizes and post-hoc tests.
+
+\item \textbf{Ablation Study:} We analyze the framework's sensitivity to reward weight configurations, showing UX-focused weighting achieves the highest performance.
+
+\item \textbf{Open-Source Framework:} We release the complete framework to facilitate reproducibility and future research.
+\end{enumerate}
+
+\section{Related Work}
+\label{sec:related}
+
+\subsection{Web Rendering Strategies}
+
+The evolution of web rendering strategies reflects a tension between performance and dynamism. Early CSR frameworks (e.g., Angular 1.x, Backbone.js) offloaded all rendering to the client~\cite{hanafi2024comparison}. SSR frameworks (e.g., Next.js, Nuxt.js) addressed this by rendering on the server~\cite{vercel2024nextjs}.
+
+Static generation (Gatsby, Hugo) pushed performance further by pre-rendering at build time~\cite{ollila2022modern}. ISR bridged the gap between static and dynamic content~\cite{lazuardy2022modern}. Partial hydration, popularized by Astro and Qwik, enables selective client-side JavaScript loading~\cite{miller2019islands}. Streaming SSR (React 18) enables progressive rendering~\cite{react2022react18}.
+
+Our work differs by treating rendering strategy selection as a \textbf{learned decision} rather than a static architectural choice.
+
+\subsection{Reinforcement Learning for Systems Optimization}
+
+RL has demonstrated success in systems optimization across diverse domains: database query optimization~\cite{kraska2018case}, CPU scheduling~\cite{gaddam2022react18}, network routing~\cite{mao2021reinforcement}, cache management, and web prefetching. Mao et al.~\cite{mao2021reinforcement} surveyed RL for systems, noting that policy gradient methods are particularly effective for real-time decision-making. Our work extends this paradigm to rendering strategy selection.
+
+\subsection{Adaptive Web Optimization}
+
+Prior work has focused on adaptive loading~\cite{osmani2019adaptive}, image optimization~\cite{chen2025mrah}, code splitting, and service worker strategies~\cite{mozilla2024serviceworker}. However, none address \textbf{rendering strategy selection} as a holistic optimization problem.
+
+\begin{table}[t]
+\centering
+\caption{Comparison with Related Work}
+\label{tab:related}
+\small
+\begin{tabular}{llccc}
+\toprule
+\textbf{Work} & \textbf{Domain} & \textbf{Method} & \textbf{Adapt.} & \textbf{Var.?} \\
+\midrule
+Next.js & SSR/SSG & Static & No & No \\
+Astro & Partial & Developer & No & No \\
+Adaptive Load. & Resources & Heuristic & Partial & No \\
+RL for DBs & Queries & RL & Yes & Partial \\
+\textbf{Ours} & \textbf{Render.} & \textbf{RL (PPO)} & \textbf{Yes} & \textbf{Yes} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Methodology}
+\label{sec:methodology}
+
+\subsection{Framework Overview}
+
+\method{} consists of three components: (1) an Environment Simulator modeling web rendering with configurable conditions; (2) an RL Agent using PPO to select rendering strategies; and (3) an Evaluation Module measuring reward, latency, TTFB, TTI, CPU, bandwidth, and cache hit rate.
+
+\subsection{State Space}
+
+The agent observes a 15-dimensional state vector $\mathbf{s}_t \in \reals^{15}$:
+
+\begin{equation}
+\mathbf{s}_t = [c_{\text{comp}}, c_{\text{data}}, c_{\text{int}}, c_{\text{upd}}, n_{\text{bw}}, n_{\text{lat}}, d_{\text{cpu}}, d_{\text{mem}}, s_{\text{strat}}, s_{\text{cache}}, s_{\text{load}}, s_{\text{time}}, u_{\text{eng}}, \text{content}_{1:4}]
+\end{equation}
+
+\subsection{Action Space}
+
+The agent selects from 6 rendering strategies: CSR, SSR, SSG, ISR, STREAM, PARTIAL.
+
+\subsection{Reward Function}
+
+\begin{equation}
+R = w_1 \cdot R_{\text{perf}} + w_2 \cdot R_{\text{resource}} + w_3 \cdot R_{\text{cache}} + w_4 \cdot R_{\text{penalty}}
+\end{equation}
+
+where $R_{\text{perf}}$ rewards low latency, $R_{\text{resource}}$ rewards CPU efficiency, $R_{\text{cache}}$ rewards cache hits, and $R_{\text{penalty}}$ penalizes SLA violations. Default weights: $w_1=0.35$, $w_2=0.25$, $w_3=0.20$, $w_4=0.20$.
+
+\subsection{Training Procedure}
+
+We train using PPO~\cite{schulman2017ppo} for 5,000 episodes with learning rate $3 \times 10^{-4}$, discount $\gamma=0.99$, GAE $\lambda=0.95$, clip $\epsilon=0.2$, and network $[256, 128, 64]$.
+
+\subsection{Baseline Strategies}
+
+We compare against 9 baselines: CSR-Only, SSR-Only, SSG-Only, ISR-Only, STREAM-Only, PARTIAL-Only, Random, RoundRobin, and Greedy.
+
+\section{Experimental Setup}
+\label{sec:experimental}
+
+\subsection{Test Components}
+
+We evaluate on 10 React components: ProductCard, DataGrid, UserProfile, CommentSection, SearchBar, ShoppingCart, NavigationMenu, DashboardChart, ContactForm, and NotificationBell.
+
+\subsection{Workload Conditions}
+
+Each experiment varies 4 factors (80 conditions): Network Quality (5 levels), Server Load (4 levels), Device Profile (4 levels), and Random Seed (3 values).
+
+\subsection{Metrics}
+
+Primary metrics: Reward (composite score), Latency (ms), TTFB (ms), TTI (ms), CPU Usage (normalized), Bandwidth (KB), Cache Hit Rate (ratio).
+
+\subsection{Statistical Analysis}
+
+Omnibus: Kruskal-Wallis $H$-test. Post-hoc: Mann-Whitney $U$ with Bonferroni correction. Effect sizes: Cohen's $d$. Confidence intervals: 95\% bootstrap ($n=1000$).
+
+\section{Experimental Results}
+\label{sec:results}
+
+\subsection{Overall Performance}
+
+\begin{table*}[t]
+\centering
+\caption{Strategy Performance Comparison (2,400 experiments)}
+\label{tab:performance}
+\small
+\begin{tabular}{rllrrrr}
+\toprule
+\textbf{Rank} & \textbf{Strategy} & \textbf{Mean Reward} & \textbf{Std Dev} & \textbf{Latency (ms)} & \textbf{95\% CI} & \textbf{Lat. Rank} \\
+\midrule
+1 & SSG-Only & 147.70 & 19.83 & 8.07 & [145.8, 149.6] & 1 \\
+2 & ISR-Only & 135.57 & 36.44 & 25.98 & [132.1, 139.0] & 5 \\
+3 & PARTIAL-Only & 110.07 & 48.18 & 31.63 & [105.4, 114.7] & 6 \\
+4 & \textbf{RL-Agent} & \textbf{108.30} & \textbf{23.90} & \textbf{23.00} & \textbf{[106.0, 110.6]} & \textbf{4} \\
+5 & RoundRobin & 103.45 & 35.55 & 22.48 & [100.0, 106.9] & 3 \\
+6 & Random & 101.11 & 45.65 & 23.28 & [96.7, 105.5] & 4 \\
+7 & Greedy & 98.18 & 53.98 & 87.82 & [92.9, 103.4] & 10 \\
+8 & CSR-Only & 91.59 & 38.36 & 20.73 & [87.8, 95.3] & 2 \\
+9 & STREAM-Only & 79.20 & 33.82 & 22.44 & [75.9, 82.5] & 3 \\
+10 & SSR-Only & 32.88 & 46.01 & 52.54 & [28.4, 37.4] & 8 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+The Kruskal-Wallis $H$-test confirmed statistically significant differences ($H = 1594.11$, $p < 0.001$, $\eta^2 = 0.36$).
+
+\subsection{Variance Analysis}
+
+The RL-Agent achieves the \textbf{second-lowest variance} ($\sigma = 23.90$), 24--35\% lower than all baselines except SSG-Only ($\sigma = 19.83$).
+
+\subsection{Learned Strategy Distribution}
+
+The agent learns a hybrid policy: PARTIAL (35.3\%), SSG (25.2\%), STREAM (13.0\%), CSR (12.7\%), SSR (9.1\%), ISR (4.7\%).
+
+\subsection{Effect Size Analysis}
+
+\begin{table}[t]
+\centering
+\caption{Effect Size Analysis (Cohen's $d$)}
+\label{tab:effects}
+\small
+\begin{tabular}{lrcl}
+\toprule
+\textbf{Comparison} & \textbf{Cohen's $d$} & \textbf{Effect} & \textbf{$p$-value} \\
+\midrule
+RL vs CSR-Only & 0.523 & Medium & $<0.001$*** \\
+RL vs SSR-Only & 2.057 & Large & $<0.001$*** \\
+RL vs STREAM & 0.994 & Large & $<0.001$*** \\
+RL vs Random & 0.197 & Negligible & $<0.001$*** \\
+RL vs Greedy & 0.242 & Small & $<0.001$*** \\
+RL vs SSG-Only & $-1.794$ & Large & $<0.001$*** \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Condition-Dependent Performance}
+
+RL-Agent consistently outperforms CSR-Only across all conditions (12--25\% improvement). SSG-Only remains superior across all conditions.
+
+\subsection{Ablation Study}
+
+\begin{table}[t]
+\centering
+\caption{Ablation: Reward Weight Configurations}
+\label{tab:ablation}
+\small
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Config} & $w_1$ & $w_2$ & $w_3$ & $w_4$ & \textbf{Reward} \\
+\midrule
+Default & 0.35 & 0.25 & 0.20 & 0.20 & 108.30 \\
+Latency-focused & 0.50 & 0.15 & 0.15 & 0.20 & 95.20 \\
+Resource-focused & 0.20 & 0.40 & 0.20 & 0.20 & 102.50 \\
+UX-focused & 0.20 & 0.20 & 0.20 & 0.40 & 112.80 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+UX-focused weighting achieves the highest performance (112.80), demonstrating framework flexibility.
+
+\subsection{Strategy Distribution by Network}
+
+The agent increases SSG usage from 23.5\% (excellent network) to 27.8\% (terrible), demonstrating adaptive caching behavior.
+
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{\method{} as a Framework}
+
+\method{} should be positioned as a \textbf{framework for adaptive rendering} rather than a method that universally outperforms all baselines. SSG-Only remains optimal for static content, but \method{} provides value for dynamic workloads, heterogeneous environments, and policy discovery.
+
+\subsection{When Does RL Help?}
+
+\begin{enumerate}[nosep]
+\item \textbf{Degraded network conditions:} RL outperforms CSR-Only by 20--25\%
+\item \textbf{Heterogeneous devices:} RL adapts better to low-end devices
+\item \textbf{Dynamic content:} Adaptive selection is beneficial for real-time updates
+\end{enumerate}
+
+\subsection{Interpreting the Learned Policy}
+
+The PARTIAL (35.3\%) + SSG (25.2\%) policy aligns with web performance best practices. Developers can adopt this hybrid strategy without implementing RL.
+
+\subsection{Limitations}
+
+\begin{enumerate}[nosep]
+\item SSG-Only outperforms RL-Agent by 26.7\% in mean reward
+\item Results are from simulated environments
+\item Reward function is sensitive to weight configurations
+\item Training requires 5,000 episodes
+\item Limited to 10 components
+\end{enumerate}
+
+\subsection{Simulation Limitations}
+
+Our experiments use a simulated environment. While this provides useful insights, production deployment may yield different results due to browser optimizations, network protocols, and actual user behavior.
+
+\subsection{Threats to Validity}
+
+\textbf{Internal:} Reward weights are arbitrary; training may not reach global optimum. \textbf{External:} Results apply to React/Next.js; simulated environment may not reflect production. \textbf{Construct:} ``Reward'' is a proxy for real-world performance. \textbf{Reliability:} Code is open-source and experiments are reproducible.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+This paper presented \method{}, a reinforcement learning framework for adaptive rendering strategy selection. Through 2,400 experiments, we demonstrated:
+
+\begin{enumerate}[nosep]
+\item Rendering strategy selection significantly impacts performance ($H = 1594.11$, $p < 0.001$, $\eta^2 = 0.36$)
+\item RL achieves medium-to-large effect sizes vs CSR-Only ($d=0.523$) and SSR-Only ($d=2.057$)
+\item The learned policy discovers interpretable hybrid strategies: PARTIAL (35.3\%) and SSG (25.2\%)
+\item UX-focused reward weighting achieves the highest performance (112.80)
+\end{enumerate}
+
+We position \method{} as a \textbf{framework} for adaptive rendering. While SSG-Only achieves higher mean performance for static content, \method{} provides principled decision-making for dynamic workloads, heterogeneous environments, and policy discovery.
+
+\section*{Acknowledgments}
+
+[Add funding acknowledgments here]
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\appendix
+
+\section{PPO Hyperparameters}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ll}
+\toprule
+\textbf{Parameter} & \textbf{Value} \\
+\midrule
+Learning rate & $3 \times 10^{-4}$ \\
+Discount ($\gamma$) & 0.99 \\
+GAE $\lambda$ & 0.95 \\
+Clip $\epsilon$ & 0.2 \\
+Entropy coeff. & 0.01 \\
+Value coeff. & 0.5 \\
+Hidden layers & $[256, 128, 64]$ \\
+Batch size & 64 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Component Specifications}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Component} & \textbf{LOC} & \textbf{Deps} & \textbf{Props} & \textbf{State} \\
+\midrule
+ProductCard & 45 & 2 & 5 & 2 \\
+DataGrid & 280 & 2 & 8 & 12 \\
+UserProfile & 120 & 2 & 3 & 4 \\
+CommentSection & 180 & 2 & 4 & 6 \\
+SearchBar & 60 & 2 & 2 & 3 \\
+ShoppingCart & 220 & 2 & 6 & 8 \\
+NavigationMenu & 80 & 1 & 2 & 1 \\
+DashboardChart & 250 & 2 & 5 & 7 \\
+ContactForm & 90 & 1 & 3 & 4 \\
+NotificationBell & 50 & 1 & 1 & 2 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Reproducibility}
+
+\textbf{Code:} \url{https://github.com/shravaniparsi/Reinforcement-Learning-Framework}
+
+\textbf{Data:} All experimental data available in the repository under \texttt{src/env/results/}.
+
+\textbf{Dependencies:} Python 3.8+, PyTorch, Gymnasium, NumPy, SciPy.
+
+\textbf{Reproduction:} Run \texttt{python train\_ppo.py} to train the agent. Run \texttt{python run\_experiments.py} to reproduce all 2,400 experiments.
+
+\end{document}
