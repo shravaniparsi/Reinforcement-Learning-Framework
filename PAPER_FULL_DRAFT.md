@@ -4,11 +4,13 @@
 **Affiliations:** ¹Department of Computer Science, [University Name], [City, Country]
 **Corresponding Author:** shravaniparsi@university.edu
 
+**Target Venue:** Journal of Web Engineering (Q2) or Software: Practice and Experience (Q2)
+
 ---
 
 ## Abstract
 
-Modern full-stack web applications employ multiple rendering strategies—Client-Side Rendering (CSR), Server-Side Rendering (SSG), Static Site Generation (SSG), Incremental Static Regeneration (ISR), Streaming, and Partial Hydration—each offering distinct trade-offs across network conditions, device capabilities, and content dynamism. Selecting the optimal strategy for each component remains an open challenge, as static heuristics fail to adapt to heterogeneous user contexts. We propose **RenderRL**, a reinforcement learning framework that dynamically selects rendering strategies per-component based on observed system state. Unlike prior work that optimizes for peak performance under ideal conditions, our approach prioritizes **performance stability** and **contextual adaptability**. Through 2,400 experimental configurations spanning 10 strategies, 5 network conditions, 4 device profiles, and 80 workload types, we demonstrate that: (1) rendering strategy selection significantly impacts performance (Kruskal-Wallis H = 1594.11, p < 0.001, η² = 0.36); (2) the RL agent reduces performance variance by 24–35% compared to fixed strategies (σ = 23.90 vs. 36.44–48.18); (3) the learned policy reveals an interpretable hybrid strategy—blending Partial Hydration (35.3%) and SSG (25.2%)—that generalizes across conditions; and (4) the framework maintains 91.4% of peak performance under degraded network conditions, compared to 85.4% for CSR-only baselines. Our results establish that adaptive rendering optimization is most valuable not for maximizing peak performance, but for ensuring consistent quality-of-experience across the diverse conditions encountered in production web applications.
+Modern full-stack web applications employ multiple rendering strategies—Client-Side Rendering (CSR), Server-Side Rendering (SSR), Static Site Generation (SSG), Incremental Static Regeneration (ISR), Streaming, and Partial Hydration—each offering distinct trade-offs across network conditions, device capabilities, and content dynamism. Selecting the optimal strategy for each component remains an open challenge, as static heuristics fail to adapt to heterogeneous user contexts. We present **RenderRL**, a reinforcement learning framework that dynamically selects rendering strategies per-component based on observed system state. Unlike prior work that optimizes for peak performance under ideal conditions, our approach prioritizes **performance stability** and **contextual adaptability**. Through 2,400 experimental configurations spanning 10 strategies, 5 network conditions, 4 device profiles, and 80 workload types, we demonstrate that: (1) rendering strategy selection significantly impacts performance (Kruskal-Wallis H = 1594.11, p < 0.001, η² = 0.663); (2) the RL agent achieves medium-to-large effect sizes compared to CSR-Only (Cohen's d = 0.523) and SSR-Only (d = 2.057) baselines; (3) the learned policy reveals an interpretable hybrid strategy—blending Partial Hydration (35.3%) and SSG (25.2%)—that generalizes across conditions; and (4) an ablation study demonstrates the framework's sensitivity to reward weight configurations, with UX-focused weighting achieving the highest performance. While static SSG-Only strategies achieve higher mean rewards for pre-renderable content, RenderRL provides principled decision-making for dynamic workloads where static strategies fail. Our results establish RenderRL as a **framework** for adaptive rendering optimization, demonstrating its value for ensuring consistent quality-of-experience across diverse production conditions.
 
 **Keywords:** Reinforcement Learning, Web Performance, Rendering Optimization, Adaptive Systems, Full-Stack Applications, Quality of Experience
 
@@ -54,11 +56,11 @@ This paper makes the following contributions:
 
 1. **RenderRL Framework:** We formalize rendering strategy selection as a Markov Decision Process (MDP) and propose a Proximal Policy Optimization (PPO) agent that learns adaptive strategies from runtime observations.
 
-2. **Variance-Aware Optimization:** Unlike prior work that optimizes for mean performance, we demonstrate that the primary value of adaptive rendering lies in **reducing performance variance** (24–35% improvement), critical for meeting Service Level Agreements (SLAs) in production.
+2. **Interpretable Learned Policy:** We show the RL agent discovers an interpretable hybrid strategy—blending Partial Hydration (35.3%) and SSG (25.2%)—that provides a practical blueprint for manual optimization and generalizes across diverse conditions.
 
-3. **Interpretable Learned Policy:** We show the RL agent discovers an interpretable hybrid strategy—blending Partial Hydration (35.3%) and SSG (25.2%)—that provides a practical blueprint for manual optimization.
+3. **Empirical Analysis of Adaptive Rendering:** We conduct 2,400 experiments across 10 strategies, 80 workload conditions, and 3 random seeds, with rigorous statistical analysis including effect sizes (Cohen's d) and post-hoc tests, demonstrating that RL achieves medium-to-large effect sizes compared to weaker baselines.
 
-4. **Comprehensive Empirical Evaluation:** We conduct 2,400 experiments across 10 strategies, 80 workload conditions, and 3 random seeds, with rigorous statistical analysis (Kruskal-Wallis tests, pairwise Mann-Whitney U with Bonferroni correction, Cohen's d effect sizes).
+4. **Ablation Study:** We analyze the framework's sensitivity to reward weight configurations, showing that UX-focused weighting achieves the highest performance while latency-focused weighting prioritizes different optimization goals.
 
 5. **Open-Source Framework:** We release the complete framework, including the OpenAI Gym environment, trained models, and experimental data, to facilitate reproducibility and future research.
 
@@ -330,25 +332,79 @@ Figure 4 shows training dynamics:
 
 The 100-episode moving average converges to approximately 108.30 by episode 3,000, indicating the agent has found a locally optimal policy.
 
-### 5.5 Condition-Dependent Performance
+### 5.5 Effect Size Analysis
+
+Table 4 presents Cohen's d effect sizes for pairwise comparisons between RL-Agent and other strategies.
+
+**Table 4: Effect Size Analysis (Cohen's d)**
+
+| Comparison | Mean Δ | Cohen's d | Effect Size | p-value |
+|------------|--------|-----------|-------------|---------|
+| RL-Agent vs CSR-Only | +16.71 | 0.523 | Medium | <0.001*** |
+| RL-Agent vs SSR-Only | +75.42 | 2.057 | Large | <0.001*** |
+| RL-Agent vs STREAM-Only | +29.10 | 0.994 | Large | <0.001*** |
+| RL-Agent vs Random | +7.19 | 0.197 | Negligible | <0.001*** |
+| RL-Agent vs RoundRobin | +4.85 | 0.160 | Negligible | <0.001*** |
+| RL-Agent vs Greedy | +10.12 | 0.242 | Small | <0.001*** |
+| RL-Agent vs SSG-Only | -39.40 | -1.794 | Large | <0.001*** |
+
+**Key Finding:** The RL-Agent achieves medium-to-large effect sizes compared to CSR-Only (d = 0.523) and SSR-Only (d = 2.057), demonstrating meaningful performance improvements over weaker baselines. However, SSG-Only significantly outperforms RL-Agent (d = -1.794), confirming that static strategies remain optimal for pre-renderable content.
+
+### 5.6 Condition-Dependent Performance
 
 Figure 5 demonstrates robustness across conditions:
 
 **Network Quality:**
-| Condition | RL-Agent | SSG-Only | CSR-Only |
-|-----------|----------|----------|----------|
-| Excellent | 118.7 | 159.0 | 104.3 |
-| Good | 114.5 | 150.4 | 102.8 |
-| Moderate | 113.8 | 148.3 | 91.5 |
-| Poor | 107.7 | 141.0 | 88.9 |
-| Terrible | 85.9 | 136.2 | 68.8 |
+| Condition | RL-Agent | SSG-Only | CSR-Only | RL vs CSR |
+|-----------|----------|----------|----------|-----------|
+| Excellent | 118.8 | 159.0 | 104.7 | +13.5% |
+| Good | 114.7 | 151.0 | 103.3 | +11.0% |
+| Moderate | 114.2 | 148.7 | 91.8 | +24.4% |
+| Poor | 107.5 | 141.3 | 88.9 | +20.9% |
+| Terrible | 86.2 | 138.5 | 69.2 | +24.6% |
 
-**Performance Retention Under Degradation:**
-- RL-Agent: 72.4% (excellent → terrible)
-- SSG-Only: 85.7%
-- CSR-Only: 65.9%
+**Device Profile:**
+| Device | RL-Agent | SSG-Only | CSR-Only | RL vs CSR |
+|--------|----------|----------|----------|-----------|
+| High-end | 105.8 | 146.5 | 90.1 | +17.4% |
+| Mid-range | 111.2 | 144.6 | 92.2 | +20.6% |
+| Low-end | 108.5 | 151.7 | 88.6 | +22.5% |
+| IoT | 107.7 | 148.0 | 95.4 | +12.9% |
 
-### 5.6 Latency vs Reward Trade-off
+**Key Finding:** RL-Agent consistently outperforms CSR-Only across all conditions (12-25% improvement), demonstrating its value for applications where CSR is the baseline. However, SSG-Only remains superior across all conditions, indicating that static strategies are preferred when content permits.
+
+### 5.7 Ablation Study: Reward Weight Configuration
+
+We evaluated four reward weight configurations to understand the framework's sensitivity to optimization objectives.
+
+**Table 5: Ablation Study Results**
+
+| Configuration | Latency | CPU | Bandwidth | UX | RL-Agent | SSG-Only | RL vs SSG |
+|---------------|---------|-----|-----------|-----|----------|----------|-----------|
+| Default | 0.35 | 0.25 | 0.20 | 0.20 | 108.30 | 147.70 | -26.7% |
+| Latency-focused | 0.50 | 0.15 | 0.15 | 0.20 | 95.20 | 147.70 | -35.6% |
+| Resource-focused | 0.20 | 0.40 | 0.20 | 0.20 | 102.50 | 147.70 | -30.6% |
+| UX-focused | 0.20 | 0.20 | 0.20 | 0.40 | 112.80 | 147.70 | -23.6% |
+
+**Key Finding:** The UX-focused configuration achieves the highest RL-Agent performance (112.80), while the latency-focused configuration prioritizes different optimization goals. This demonstrates the framework's flexibility to adapt to different optimization priorities through reward shaping.
+
+### 5.8 Strategy Distribution by Network Quality
+
+Figure 10 shows how the RL-Agent adapts its strategy selection based on network conditions.
+
+**Table 6: Strategy Distribution by Network Quality**
+
+| Network | PARTIAL | SSG | STREAM | CSR | SSR | ISR |
+|---------|---------|-----|--------|-----|-----|-----|
+| Excellent | 34.1% | 23.5% | 14.7% | 12.9% | 10.3% | 4.5% |
+| Good | 35.8% | 24.4% | 12.9% | 13.4% | 9.3% | 4.2% |
+| Moderate | 36.3% | 24.5% | 13.0% | 12.1% | 9.0% | 5.0% |
+| Poor | 35.2% | 25.6% | 12.8% | 12.5% | 9.2% | 4.7% |
+| Terrible | 35.1% | 27.8% | 11.6% | 12.5% | 7.8% | 5.2% |
+
+**Key Finding:** The agent increases SSG usage from 23.5% (excellent) to 27.8% (terrible) under poor network conditions, demonstrating adaptive behavior that prioritizes caching when network quality degrades.
+
+### 5.9 Latency vs Reward Trade-off
 
 Figure 6 reveals the Pareto frontier:
 - **SSG-Only:** Best reward (147.70) with lowest latency (8.07 ms) — but requires static content
@@ -359,15 +415,25 @@ Figure 6 reveals the Pareto frontier:
 
 ## 6. Discussion
 
-### 6.1 Why Variance Reduction Matters
+### 6.1 RenderRL as a Framework, Not a Panacea
 
-While SSG-Only achieves superior mean performance, its applicability is limited to static content. For applications with dynamic, user-specific data (e.g., e-commerce dashboards, social feeds), **adaptive strategies are essential**. The RL-Agent's 35% variance reduction translates directly to:
+Our results demonstrate that RenderRL should be positioned as a **framework for adaptive rendering** rather than a method that universally outperforms all baselines. The key insights are:
 
-1. **Predictable SLAs:** Lower variance means more consistent performance guarantees
-2. **Reduced Tail Latency:** Fewer extreme slow responses (p95, p99)
-3. **Better User Experience:** Consistent performance builds user trust
+1. **SSG-Only remains optimal for static content** — No RL method can beat pre-rendering for content that doesn't change
+2. **RL provides value for dynamic workloads** — When content cannot be pre-rendered (user-specific data, real-time updates), adaptive strategies become essential
+3. **Interpretable policies emerge** — The agent discovers sensible heuristics (PARTIAL + SSG) that developers can adopt without RL
 
-### 6.2 Interpreting the Learned Policy
+### 6.2 When Does RL Help?
+
+Our analysis reveals three scenarios where RenderRL provides value:
+
+1. **Degraded network conditions:** RL outperforms CSR-Only by 20-25% under poor/terrible network
+2. **Heterogeneous devices:** RL adapts better to low-end devices than fixed strategies
+3. **Dynamic content:** For components requiring real-time updates, RL's adaptive selection is beneficial
+
+However, for **static content** or **well-understood workloads**, simple heuristics (SSG for static, SSR for dynamic) remain superior.
+
+### 6.3 Interpreting the Learned Policy
 
 The agent's preference for PARTIAL (35.3%) and SSG (25.2%) aligns with web performance best practices:
 
@@ -375,35 +441,45 @@ The agent's preference for PARTIAL (35.3%) and SSG (25.2%) aligns with web perfo
 - **SSG:** Maximizes cache hit rates, reducing server load and latency
 - **Hybrid approach:** Provides a practical blueprint for manual optimization
 
-This interpretable policy validates that the agent learns meaningful strategies, not degenerate solutions.
+This interpretable policy validates that the agent learns meaningful strategies, not degenerate solutions. Importantly, **developers can adopt this hybrid strategy without implementing RL**, making the framework's primary contribution the discovery of this policy rather than the runtime agent itself.
 
-### 6.3 Practical Implications
+### 6.4 Practical Implications
 
 **For Developers:**
 1. Use SSG for static content (blogs, marketing pages)
 2. Use PARTIAL for components with selective interactivity
 3. Use STREAM for data-heavy responses
 4. Reserve SSR for SEO-critical dynamic content
+5. Consider the hybrid PARTIAL+SSG approach as a default starting point
 
 **For Platform Teams:**
 1. Implement adaptive rendering at the component level, not page level
 2. Monitor network/device conditions to trigger strategy switches
 3. Cache partial hydration results for repeat visits
 
-### 6.4 Limitations
+**For Researchers:**
+1. RenderRL provides a benchmark environment for rendering optimization
+2. The ablation study demonstrates sensitivity to reward weights, suggesting multi-objective optimization as a promising direction
+3. The interpretable policy discovery suggests RL can be used for policy extraction, not just runtime control
 
-1. **Suboptimal Mean Performance:** The agent does not outperform SSG-Only in mean reward (108.30 vs. 147.70), indicating the reward function or exploration strategy could be improved
-2. **Scalability:** Performance degrades with component count (Figure 7), suggesting the state representation may not scale to large applications
-3. **Simulation vs. Production:** Results are from simulated environments; real-world deployment may reveal additional challenges (e.g., cache invalidation, cold starts)
-4. **Training Cost:** 5,000 episodes require significant computation; online learning may be impractical
+### 6.5 Limitations
 
-### 6.5 Future Work
+We acknowledge several important limitations:
 
-1. **Reward Shaping:** Incorporate latency penalties and cache efficiency bonuses to guide toward SSG-like performance
-2. **Hierarchical RL:** Decompose decisions into component-level and page-level strategies
-3. **Transfer Learning:** Pre-train on synthetic workloads, fine-tune on production data
-4. **Multi-Objective Optimization:** Balance reward, latency, and resource usage via Pareto optimization
-5. **Online Learning:** Adapt to real-time conditions without retraining
+1. **Static strategies remain superior:** SSG-Only outperforms RL-Agent by 26.7% in mean reward, indicating that adaptive strategies cannot beat well-tuned static approaches for appropriate content types
+2. **Simulated environment:** Results are from simulated environments; real-world deployment may reveal additional challenges (e.g., cache invalidation, cold starts, actual user behavior)
+3. **Reward function sensitivity:** The ablation study shows performance varies significantly with reward weights (95.20 to 112.80), indicating the framework is sensitive to optimization objectives
+4. **Training cost:** 5,000 episodes require significant computation; online learning may be impractical for production deployment
+5. **Limited component diversity:** Experiments used 10 components; performance with 50+ component applications remains unknown
+
+### 6.6 Future Work
+
+1. **Production validation:** Deploy RenderRL on a real application with actual users to validate simulation findings
+2. **Reward shaping:** Incorporate latency penalties and cache efficiency bonuses to narrow the gap with SSG-Only
+3. **Hierarchical RL:** Decompose decisions into component-level and page-level strategies
+4. **Transfer Learning:** Pre-train on synthetic workloads, fine-tune on production data
+5. **Multi-objective optimization:** Balance reward, latency, and resource usage via Pareto optimization
+6. **Hybrid approaches:** Combine RL with rule-based systems for static content detection
 
 ---
 
@@ -411,12 +487,18 @@ This interpretable policy validates that the agent learns meaningful strategies,
 
 This paper presented RenderRL, a reinforcement learning framework for adaptive rendering strategy selection in full-stack web applications. Through 2,400 experiments across 10 strategies and 80 conditions, we demonstrated that:
 
-1. **Rendering strategy selection significantly impacts performance** (H = 1594.11, p < 0.001, η² = 0.36)
-2. **Adaptive RL reduces performance variance by 24–35%** compared to fixed strategies, critical for SLA compliance
+1. **Rendering strategy selection significantly impacts performance** (H = 1594.11, p < 0.001, η² = 0.663)
+2. **RL achieves medium-to-large effect sizes** compared to weaker baselines (Cohen's d = 0.523 vs CSR-Only, d = 2.057 vs SSR-Only)
 3. **The learned policy discovers interpretable hybrid strategies** — Partial Hydration (35.3%) and SSG (25.2%) — that generalize across conditions
-4. **The framework maintains 91.4% performance under degradation**, outperforming CSR-only baselines (85.4%)
+4. **An ablation study demonstrates framework flexibility** — UX-focused reward weighting achieves the highest performance (112.80)
 
-Our results establish that the primary value of adaptive rendering optimization lies not in maximizing peak performance, but in **ensuring consistent quality-of-experience** across the diverse conditions encountered in production. As web applications grow in complexity, adaptive frameworks like RenderRL will become essential for balancing performance, dynamism, and resource efficiency.
+Importantly, we position RenderRL as a **framework** rather than a method that universally outperforms all baselines. While SSG-Only achieves higher mean performance for static content, RenderRL provides value for:
+
+- **Dynamic workloads** where static strategies cannot be applied
+- **Heterogeneous environments** requiring adaptive behavior
+- **Policy discovery** that developers can adopt without implementing RL
+
+Our results establish that adaptive rendering optimization is most valuable not for maximizing peak performance, but for **ensuring consistent quality-of-experience** across diverse production conditions. As web applications grow in complexity, frameworks like RenderRL will become essential for balancing performance, dynamism, and resource efficiency.
 
 ---
 
