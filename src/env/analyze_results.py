@@ -248,18 +248,25 @@ class ResultsVisualizer:
         try:
             import matplotlib.pyplot as plt
             
+            if not rl_rewards and not baseline_rewards:
+                print("Skipping learning curves plot: no data")
+                return
+            
             fig, ax = plt.subplots(figsize=(12, 6))
             
             # RL learning curve
-            if len(rl_rewards) > window:
+            if rl_rewards and len(rl_rewards) > window:
                 rl_smooth = np.convolve(rl_rewards, np.ones(window)/window, mode='valid')
                 ax.plot(rl_smooth, label='RL-Agent', linewidth=2, color='blue')
+            elif rl_rewards:
+                ax.plot(rl_rewards, label='RL-Agent', linewidth=2, color='blue')
             
             # Baseline averages (horizontal lines)
             colors = ['red', 'green', 'orange', 'purple', 'brown', 'pink', 'gray', 'olive', 'cyan']
             for (name, rewards), color in zip(baseline_rewards.items(), colors):
-                avg = np.mean(rewards)
-                ax.axhline(y=avg, label=f'{name} (avg)', linestyle='--', color=color, alpha=0.7)
+                if rewards:
+                    avg = np.mean(rewards)
+                    ax.axhline(y=avg, label=f'{name} (avg)', linestyle='--', color=color, alpha=0.7)
             
             ax.set_xlabel('Episode')
             ax.set_ylabel('Reward')
@@ -285,10 +292,17 @@ class ResultsVisualizer:
         try:
             import matplotlib.pyplot as plt
             
+            # Filter out zero values and empty distributions
+            filtered_dist = {k: v for k, v in strategy_dist.items() if v > 0}
+            
+            if not filtered_dist:
+                print(f"Skipping strategy distribution plot: no data")
+                return
+            
             fig, ax = plt.subplots(figsize=(8, 8))
             
-            labels = list(strategy_dist.keys())
-            sizes = list(strategy_dist.values())
+            labels = list(filtered_dist.keys())
+            sizes = list(filtered_dist.values())
             colors = plt.cm.Set3(np.linspace(0, 1, len(labels)))
             
             wedges, texts, autotexts = ax.pie(
@@ -360,10 +374,17 @@ class ResultsVisualizer:
         try:
             import matplotlib.pyplot as plt
             
+            # Filter out empty lists
+            filtered = {k: v for k, v in strategy_rewards.items() if v}
+            
+            if not filtered:
+                print("Skipping boxplots: no data")
+                return
+            
             fig, ax = plt.subplots(figsize=(12, 6))
             
-            strategies = list(strategy_rewards.keys())
-            data = [strategy_rewards[s] for s in strategies]
+            strategies = list(filtered.keys())
+            data = [filtered[s] for s in strategies]
             
             bp = ax.boxplot(data, labels=strategies, patch_artist=True)
             
@@ -539,8 +560,22 @@ if __name__ == "__main__":
             save_path="learning_curves.png",
         )
         
+        # Extract strategy distribution from RL-Agent experiment results
+        rl_results = results['RL-Agent']
+        strategy_dist = {}
+        if isinstance(rl_results, list) and rl_results:
+            for exp in rl_results:
+                if isinstance(exp, dict) and 'strategy_distribution' in exp:
+                    for strat, count in exp['strategy_distribution'].items():
+                        strategy_dist[strat] = strategy_dist.get(strat, 0) + count
+        
+        if strategy_dist:
+            # Normalize to percentages
+            total = sum(strategy_dist.values())
+            strategy_dist = {k: v/total for k, v in strategy_dist.items()}
+        
         visualizer.plot_strategy_distribution(
-            results.get('strategy_distribution', {}),
+            strategy_dist,
             save_path="strategy_distribution.png",
         )
     
