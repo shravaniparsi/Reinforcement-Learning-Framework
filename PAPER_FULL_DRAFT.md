@@ -1,8 +1,8 @@
 # Adaptive Rendering Optimization via Reinforcement Learning: A Framework for Component Strategy Selection in Full-Stack Web Applications
 
-**Authors:** Vishwak Thatikonda¹*, Shravani Parsi¹
-**Affiliations:** ¹Department of Computer Science, [University Name], [City, Country]
-**Corresponding Author:** shravaniparsi@university.edu
+**Authors:** Vishwak Thatikonda¹, Shravani Parsi²*
+**Affiliations:** ¹Arizona State University, Dublin, CA | ²San Jose State University, Dublin, CA
+**Corresponding Author:** shravaniparsi@sjsu.edu
 
 **Target Venue:** Journal of Web Engineering (Q2) or Software: Practice and Experience (Q2)
 
