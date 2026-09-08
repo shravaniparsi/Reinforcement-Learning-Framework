@@ -10,7 +10,7 @@
 
 ## Abstract
 
-Modern full-stack web applications employ multiple rendering strategies—Client-Side Rendering (CSR), Server-Side Rendering (SSR), Static Site Generation (SSG), Incremental Static Regeneration (ISR), Streaming, and Partial Hydration—each offering distinct trade-offs across network conditions, device capabilities, and content dynamism. Selecting the optimal strategy for each component remains an open challenge, as static heuristics fail to adapt to heterogeneous user contexts. We present **RenderRL**, a reinforcement learning framework that dynamically selects rendering strategies per-component based on observed system state. Unlike prior work that optimizes for peak performance under ideal conditions, our approach prioritizes **performance stability** and **contextual adaptability**. Through 2,400 experimental configurations spanning 10 strategies, 5 network conditions, 4 device profiles, and 80 workload types, we demonstrate that: (1) rendering strategy selection significantly impacts performance (Kruskal-Wallis H = 1594.11, p < 0.001, η² = 0.36); (2) the RL agent achieves medium-to-large effect sizes compared to CSR-Only (Cohen's d = 0.523) and SSR-Only (d = 2.057) baselines; (3) the learned policy reveals an interpretable hybrid strategy—blending Partial Hydration (35.3%) and SSG (25.2%)—that generalizes across conditions; and (4) an ablation study demonstrates the framework's sensitivity to reward weight configurations, with UX-focused weighting achieving the highest performance. While static SSG-Only strategies achieve higher mean rewards for pre-renderable content, RenderRL provides principled decision-making for dynamic workloads where static strategies fail. Our results establish RenderRL as a **framework** for adaptive rendering optimization, demonstrating its value for ensuring consistent quality-of-experience across diverse production conditions.
+Selecting optimal rendering strategies in full-stack web applications remains challenging, as static heuristics fail to adapt to heterogeneous network conditions and device capabilities. This paper presents **RenderRL**, a reinforcement learning framework for adaptive component rendering optimization. We formalize strategy selection as a Markov Decision Process and train a Proximal Policy Optimization (PPO) agent to dynamically select among six rendering strategies (CSR, SSR, SSG, ISR, Streaming, Partial Hydration) based on runtime observations. Through 2,400 experiments spanning 10 strategies, 80 workload conditions, and 3 random seeds, we demonstrate that: (1) rendering strategy selection significantly impacts performance (Kruskal-Wallis H = 1594.11, p < 0.001, η² = 0.36); (2) the RL agent achieves medium-to-large effect sizes versus CSR-Only (Cohen's d = 0.523) and SSR-Only (d = 2.057); and (3) the learned policy reveals an interpretable hybrid strategy—Partial Hydration (35.3%) and SSG (25.2%)—that generalizes across conditions. An ablation study shows framework sensitivity to reward weights, with UX-focused weighting achieving the highest performance (112.80). While SSG-Only achieves higher mean rewards for pre-renderable content, RenderRL provides principled decision-making for dynamic workloads where static strategies fail. Our results establish RenderRL as a **framework** for adaptive rendering optimization, demonstrating its value for ensuring consistent quality-of-experience across diverse production conditions.
 
 **Keywords:** Reinforcement Learning, Web Performance, Rendering Optimization, Adaptive Systems, Full-Stack Applications, Quality of Experience
 
@@ -585,6 +585,38 @@ Our results establish that adaptive rendering optimization is most valuable not 
 [24] Removed (duplicate of [9])
 
 [25] A. Hadjin. *The Ultimate Next.js E-book*. JS Mastery, 2023.
+
+---
+
+## Author Contributions
+
+**Conceptualization:** V.T. and S.P.; **Methodology:** V.T. and S.P.; **Software:** V.T.; **Validation:** V.T. and S.P.; **Formal Analysis:** V.T.; **Investigation:** V.T. and S.P.; **Data Curation:** V.T.; **Writing – Original Draft Preparation:** V.T. and S.P.; **Writing – Review & Editing:** S.P.; **Visualization:** V.T.; **Supervision:** S.P.; **Project Administration:** S.P.
+
+---
+
+## Funding
+
+This research received no external funding.
+
+---
+
+## Data Availability Statement
+
+All data and code are available at https://github.com/shravaniparsi/Reinforcement-Learning-Framework
+
+---
+
+## Conflicts of Interest
+
+The authors declare no conflicts of interest.
+
+## Ethics Statement
+
+Ethical review and approval were not required for this study due to its computational nature involving simulated environments and no human or animal subjects.
+
+## Informed Consent Statement
+
+Not applicable.
 
 ---
 
