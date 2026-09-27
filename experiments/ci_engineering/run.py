@@ -142,7 +142,8 @@ def validate(rows, schedule, adapter_checks):
     validate_session(rows, schedule)
     if any(row.get('errors') or row.get('external_requests') for row in rows):
         raise ValueError('Browser errors or nonlocal requests retained; check failed')
-    if not adapter_checks or not all(adapter_checks):
+    expected_checks = sum(t['application'] == 'external' for t in schedule['trials']) + 2
+    if len(adapter_checks) != expected_checks or not all(adapter_checks):
         raise ValueError('Missing or failed integrated adapter checks')
 
 

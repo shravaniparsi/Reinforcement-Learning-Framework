@@ -20,7 +20,7 @@ class EngineeringGates(unittest.TestCase):
                      for t in self.schedule['trials']]
 
     def test_complete_matrix(self):
-        ci.validate(self.rows, self.schedule, [True] * 24)
+        ci.validate(self.rows, self.schedule, [True] * 26)
 
     def test_rejects_incomplete_error_nonlocal_and_content_mismatch(self):
         invalid = []
@@ -33,7 +33,7 @@ class EngineeringGates(unittest.TestCase):
                 ci.validate(rows, self.schedule, [True])
 
     def test_adapter_checks_required(self):
-        for checks in [[], [False], [True, False]]:
+        for checks in [[], [False], [True, False], [True] * 25, [True] * 27]:
             with self.subTest(checks=checks), self.assertRaises(ValueError):
                 ci.validate(self.rows, self.schedule, checks)
 
