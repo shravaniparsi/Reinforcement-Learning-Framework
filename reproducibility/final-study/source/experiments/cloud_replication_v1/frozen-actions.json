@@ -1,0 +1,91 @@
+{
+  "purpose": "Finite-domain export of original frozen policies; no refitting",
+  "original_policy_content_sha256": "8b7ac71519fb3f7db4d1a6be2df337410c24d5e1c8d1cff5d8e96a82ee7ad9e2",
+  "original_implementation_sha256": "6d62928aac2ffc6fa7cb16a7081e30beb8d692d1a6dbd6d62c4c517f4f6e081d",
+  "actions": {
+    "always_ssr": {
+      "catalog|1|cold": "ssr",
+      "catalog|1|warm": "ssr",
+      "catalog|4|cold": "ssr",
+      "catalog|4|warm": "ssr",
+      "articles|1|cold": "ssr",
+      "articles|1|warm": "ssr",
+      "articles|4|cold": "ssr",
+      "articles|4|warm": "ssr",
+      "external|1|cold": "ssr",
+      "external|1|warm": "ssr",
+      "external|4|cold": "ssr",
+      "external|4|warm": "ssr"
+    },
+    "always_csr": {
+      "catalog|1|cold": "csr",
+      "catalog|1|warm": "csr",
+      "catalog|4|cold": "csr",
+      "catalog|4|warm": "csr",
+      "articles|1|cold": "csr",
+      "articles|1|warm": "csr",
+      "articles|4|cold": "csr",
+      "articles|4|warm": "csr",
+      "external|1|cold": "csr",
+      "external|1|warm": "csr",
+      "external|4|cold": "csr",
+      "external|4|warm": "csr"
+    },
+    "best_fixed": {
+      "catalog|1|cold": "ssr",
+      "catalog|1|warm": "ssr",
+      "catalog|4|cold": "ssr",
+      "catalog|4|warm": "ssr",
+      "articles|1|cold": "ssr",
+      "articles|1|warm": "ssr",
+      "articles|4|cold": "ssr",
+      "articles|4|warm": "ssr",
+      "external|1|cold": "csr",
+      "external|1|warm": "csr",
+      "external|4|cold": "csr",
+      "external|4|warm": "csr"
+    },
+    "engineering_rule": {
+      "catalog|1|cold": "ssr",
+      "catalog|1|warm": "ssr",
+      "catalog|4|cold": "ssr",
+      "catalog|4|warm": "ssr",
+      "articles|1|cold": "ssr",
+      "articles|1|warm": "ssr",
+      "articles|4|cold": "ssr",
+      "articles|4|warm": "ssr",
+      "external|1|cold": "ssr",
+      "external|1|warm": "ssr",
+      "external|4|cold": "csr",
+      "external|4|warm": "ssr"
+    },
+    "context_table": {
+      "catalog|1|cold": "ssr",
+      "catalog|1|warm": "csr",
+      "catalog|4|cold": "ssr",
+      "catalog|4|warm": "ssr",
+      "articles|1|cold": "ssr",
+      "articles|1|warm": "ssr",
+      "articles|4|cold": "ssr",
+      "articles|4|warm": "ssr",
+      "external|1|cold": "csr",
+      "external|1|warm": "csr",
+      "external|4|cold": "csr",
+      "external|4|warm": "ssr"
+    },
+    "ridge": {
+      "catalog|1|cold": "ssr",
+      "catalog|1|warm": "csr",
+      "catalog|4|cold": "ssr",
+      "catalog|4|warm": "ssr",
+      "articles|1|cold": "ssr",
+      "articles|1|warm": "ssr",
+      "articles|4|cold": "csr",
+      "articles|4|warm": "ssr",
+      "external|1|cold": "csr",
+      "external|1|warm": "ssr",
+      "external|4|cold": "csr",
+      "external|4|warm": "csr"
+    }
+  }
+}

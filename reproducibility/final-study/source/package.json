@@ -16,8 +16,8 @@
   },
   "keywords": ["reinforcement-learning", "rendering-optimization", "nextjs", "web-performance"],
   "author": "",
-  "license": "MIT",
-  "description": "Browser-study framework and reproduction package for contextual rendering selection",
+  "license": "ISC",
+  "description": "RL-based adaptive component rendering framework for full-stack web applications",
   "dependencies": {
     "@types/node": "^26.4.1",
     "@types/react": "^19.2.18",

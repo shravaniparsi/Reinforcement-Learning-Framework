@@ -1,0 +1,27 @@
+{
+  "creators": [
+    {
+      "name": "Thatikonda, Vishwak",
+      "affiliation": "Independent Researcher"
+    },
+    {
+      "name": "Parsi, Shravani",
+      "affiliation": "Independent Researcher"
+    }
+  ],
+  "title": "Contextual Rendering Selection Browser Study Reproduction Package",
+  "version": "1.0.0",
+  "license": "mit",
+  "access_right": "open",
+  "upload_type": "software",
+  "language": "eng",
+  "description": "Browser-study source, 1,728 final-test observations, frozen policy decisions and offline score reproduction for a controlled comparison of contextual and fixed rendering policies. Mac and hosted Linux cohorts remain separate, and the cloud analysis is descriptive. Original software is MIT licensed; original research data and documentation are CC BY 4.0 licensed.",
+  "keywords": [
+    "web performance",
+    "server-side rendering",
+    "client-side rendering",
+    "empirical software engineering",
+    "contextual policies",
+    "reproducibility"
+  ]
+}

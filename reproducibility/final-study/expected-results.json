@@ -1,0 +1,30 @@
+{
+  "mac": {
+    "policy_means_ms": {
+      "always_ssr": 92.6409722219439,
+      "always_csr": 90.29305555696165,
+      "best_fixed": 88.21759259322641,
+      "engineering_rule": 88.77291666672009,
+      "context_table": 87.97824074112712,
+      "ridge": 88.53009259317116
+    },
+    "contrast_ms": -0.2393518520992816,
+    "conditional_interval_ms": [
+      -0.39930555523041544,
+      -0.09236111071498515
+    ],
+    "original_report_content_sha256": "02bb9006016217f66d390923ead1967c8ca7dd063d78dce66d15b37e1a50964a"
+  },
+  "cloud": {
+    "policy_means_ms": {
+      "always_ssr": 200.80902777777757,
+      "always_csr": 199.13356481481492,
+      "best_fixed": 194.02083333333326,
+      "engineering_rule": 196.10416666666652,
+      "context_table": 193.7189814814805,
+      "ridge": 194.61041666666594
+    },
+    "contrast_ms": -0.30185185185274577,
+    "original_report_sha256": "dda97fa591d28aa6cf69d716183ee110c0e9afc806f0f126ec40179293adf759"
+  }
+}
