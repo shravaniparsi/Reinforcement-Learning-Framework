@@ -1,0 +1,5 @@
+{
+  "findings": [],
+  "scope": "Release metadata and every final-study package file; pattern scan is not a guarantee of absence of sensitive content",
+  "excluded": "Full host manifests, shell logs, screenshots, traces and private-path report envelopes remain outside the release"
+}

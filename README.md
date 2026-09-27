@@ -1,69 +1,36 @@
-# RL-Based Adaptive Component Rendering Optimization
+# Contextual Rendering Selection Browser Study
 
-A reinforcement learning framework for adaptive real-time component rendering optimization in full-stack web applications.
+This repository contains the software and numerical reproduction materials for the article "Contextual Rendering Selection Beyond Strong Fixed Baselines: A Controlled Browser Study."
 
-## Overview
+The final study compares server-side rendering and client-side rendering in three web application workflows. It evaluates six frozen policies using matched browser observations from a 12-session Mac cohort and a separate 12-allocation hosted Linux cohort. Each cohort contains 864 action observations. The contextual lookup table improved the cohort mean by 0.239 ms on the Mac and by a descriptive 0.302 ms on hosted Linux relative to a training-selected fixed policy. These small differences do not establish practical deployment benefit or reinforcement-learning superiority.
 
-This project implements a PPO (Proximal Policy Optimization) agent that dynamically selects rendering strategies (CSR, SSR, SSG, ISR, Streaming SSR, Partial Hydration) based on runtime conditions including network latency, server load, device capabilities, and component characteristics.
+## Reproduce the reported scores
 
-## Project Structure
+The self-contained numerical package is in `reproducibility/final-study`.
 
-```
-rl-rendering/
-├── src/
-│   ├── app/                    # Next.js pages
-│   ├── components/             # 10 React components
-│   ├── api/                    # Free API integrations
-│   ├── strategies/             # Rendering strategy implementations
-│   └── env/                    # RL environment and training
-│       ├── rendering_env.py    # OpenAI Gym environment
-│       ├── train_ppo.py        # PPO training script
-│       ├── experiment_runner.py # Experiment orchestration
-│       └── analyze_results.py  # Statistical analysis
-├── requirements.txt            # Python dependencies
-└── run.sh                      # Setup and run script
+```sh
+cd reproducibility/final-study
+python -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python reproduce_scores.py
 ```
 
-## Quick Start
+The script verifies file hashes, schedule completeness, correctness gates and cell balance. It then reproduces the six frozen-policy means for each cohort and the original Mac conditional bootstrap interval. It does not start browsers, recollect observations or refit policies.
 
-```bash
-# Setup
-./run.sh setup
+## Evidence boundaries
 
-# Start web app
-./run.sh dev
+- Mac and hosted Linux observations are analyzed as separate cohorts.
+- The primary endpoint is navigation-to-application-marker time. It is not a visual-completion or user-interaction metric.
+- The cloud cohort is descriptive because fresh hosted allocations do not establish independent physical hosts.
+- The package reproduces final frozen-policy scoring. It does not reproduce the complete development, fitting or pilot history.
+- Historical simulator and PPO materials elsewhere in the repository are not evidence for the final browser-study conclusions.
 
-# Train RL agent (5000 episodes)
-./run.sh train
+See `reproducibility/final-study/README.md` for provenance, expected values and package limitations.
 
-# Run experiments
-./run.sh experiment
+## Citation and archival release
 
-# Analyze results
-./run.sh analyze
-```
+Citation metadata is provided in `CITATION.cff` and `.zenodo.json`. Version 1.0.0 is being prepared for archival through GitHub and Zenodo. The journal article DOI will be added as a related identifier after it is assigned.
 
-## Free APIs Used
+## Licensing
 
-- **FakeStore** - Product data
-- **DummyJSON** - Users, carts, posts
-- **Dog CEO** - Dog images
-- **TheCatAPI** - Cat images
-- **TheMealDB** - Recipe data
-- **Frankfurter** - Currency exchange rates
-- **PokeAPI** - Pokemon data
-
-## Rendering Strategies
-
-| Strategy | Description | Best For |
-|----------|-------------|----------|
-| CSR | Client-side rendering | Interactive components |
-| SSR | Server-side rendering | SEO, initial load |
-| SSG | Static site generation | Static content |
-| ISR | Incremental static regeneration | Semi-static content |
-| STREAM | Streaming SSR | Large pages |
-| PARTIAL | Partial hydration | Mixed content |
-
-## License
-
-MIT
+The authors' original software is available under the MIT License. The authors' original research data and documentation are available under CC BY 4.0. Third-party components retain their own licenses. See `LICENSE_SCOPE.md` for the file-level boundary and retained upstream notice.

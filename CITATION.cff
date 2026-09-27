@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software or data, please cite this release and the associated article."
+title: "Contextual Rendering Selection Browser Study Reproduction Package"
+version: 1.0.0
+license: MIT
+type: software
+abstract: "Browser-study source, 1,728 final-test observations, frozen policy decisions and offline score reproduction for a controlled comparison of contextual and fixed rendering policies."
+authors:
+  - given-names: Vishwak
+    family-names: Thatikonda
+    affiliation: Independent Researcher
+  - given-names: Shravani
+    family-names: Parsi
+    affiliation: Independent Researcher
+keywords:
+  - web performance
+  - server-side rendering
+  - client-side rendering
+  - empirical software engineering
+  - contextual policies
+  - reproducibility
+repository-code: "https://github.com/shravaniparsi/Reinforcement-Learning-Framework"
