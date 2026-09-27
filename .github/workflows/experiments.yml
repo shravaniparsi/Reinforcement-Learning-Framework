@@ -6,9 +6,10 @@ on:
       mode:
         description: 'Experiment mode'
         required: true
-        default: 'quick'
+        default: 'engineering'
         type: choice
         options:
+          - engineering
           - quick
           - full
           - train
@@ -28,8 +29,16 @@ on:
 env:
   PYTHON_VERSION: '3.11'
 
+permissions:
+  contents: read
+
 jobs:
+  browser-engineering:
+    if: inputs.mode == 'engineering'
+    uses: ./.github/workflows/browser-engineering.yml
+
   run-experiments:
+    if: inputs.mode != 'engineering'
     runs-on: ubuntu-latest
     timeout-minutes: 350  # ~6 hours max per job
     

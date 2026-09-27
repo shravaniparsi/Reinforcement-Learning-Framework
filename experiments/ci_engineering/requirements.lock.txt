@@ -1,0 +1,5 @@
+# Browser engineering only; no simulator, training or statistical dependencies.
+playwright==1.50.0
+pyee==12.1.1
+greenlet==3.2.5
+typing_extensions==4.16.0
