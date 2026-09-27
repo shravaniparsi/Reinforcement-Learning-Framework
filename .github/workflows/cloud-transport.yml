@@ -1,0 +1,89 @@
+name: Frozen Policy Cloud Transport
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      collect:
+        type: boolean
+        default: false
+  # Direct dispatch performs lock validation only; use the explicit dispatcher mode to collect.
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloud-transport-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.9.25'
+      - run: python experiments/cloud_replication_v1/design.py
+      - run: python -m unittest discover -s tests -p test_cloud_replication.py -v
+  allocation:
+    needs: preflight
+    strategy:
+      fail-fast: true
+      max-parallel: 1
+      matrix:
+        allocation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    # Standard hosted Linux is free for this public repository; no paid/private fallback.
+    if: inputs.collect == true && github.event.repository.private == false && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      ALLOCATION: ${{ matrix.allocation }}
+      NEXT_TELEMETRY_DISABLED: '1'
+      PYTHONUNBUFFERED: '1'
+      RUN_DIR: ${{ github.workspace }}/ci-artifacts/cloud-transport-${{ github.run_id }}-${{ matrix.allocation }}
+      CHROME_VERSION: '154.0.8037.57'
+      CHROME_SHA256: ceee2972074d441ea7c4ba8bcc0eaab77e7e87680f6653d73d3065851fe10302
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '20.19.6'
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.9.25'
+      - name: Create diagnostics directory
+        run: mkdir -p "$RUN_DIR"
+      - name: Install locked browser dependencies
+        run: |
+          python -m pip install -r experiments/ci_engineering/requirements.lock.txt
+          python -m playwright install-deps chromium
+          corepack enable
+          corepack prepare pnpm@10.20.0 --activate
+          npm ci --no-audit --no-fund
+      - name: Install exact Chrome for Testing archive
+        shell: bash
+        run: |
+          curl --fail --location --retry 2 "https://storage.googleapis.com/chrome-for-testing-public/$CHROME_VERSION/linux64/chrome-linux64.zip" -o "$RUNNER_TEMP/chrome.zip"
+          echo "$CHROME_SHA256  $RUNNER_TEMP/chrome.zip" | sha256sum --check
+          unzip -q "$RUNNER_TEMP/chrome.zip" -d "$RUNNER_TEMP/pinned-chrome"
+          echo "CHROME_PATH=$RUNNER_TEMP/pinned-chrome/chrome-linux64/chrome" >> "$GITHUB_ENV"
+          echo "$CHROME_SHA256" > "$RUN_DIR/chrome-archive.sha256"
+      - name: Verify engineering failure gates
+        run: python -m unittest discover -s tests -p test_ci_engineering.py -v
+      - name: Build clean production fixtures
+        run: python experiments/ci_engineering/run.py prepare --output "$RUN_DIR"
+      - name: Validate all 72 application/action/CPU/cache observations
+        run: python experiments/cloud_replication_v1/collect.py --output "$RUN_DIR" --chrome "$CHROME_PATH" --allocation "$ALLOCATION"
+      - name: Retain diagnostics even on failure
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: cloud-transport-${{ github.run_id }}-${{ matrix.allocation }}
+          path: ${{ env.RUN_DIR }}/
+          retention-days: 30
+          if-no-files-found: warn

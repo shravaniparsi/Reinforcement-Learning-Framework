@@ -10,6 +10,8 @@ on:
         type: choice
         options:
           - engineering
+          - cloud-preflight
+          - cloud-collect
           - quick
           - full
           - train
@@ -37,8 +39,14 @@ jobs:
     if: inputs.mode == 'engineering'
     uses: ./.github/workflows/browser-engineering.yml
 
+  cloud-transport:
+    if: inputs.mode == 'cloud-preflight' || inputs.mode == 'cloud-collect'
+    uses: ./.github/workflows/cloud-transport.yml
+    with:
+      collect: ${{ inputs.mode == 'cloud-collect' }}
+
   run-experiments:
-    if: inputs.mode != 'engineering'
+    if: inputs.mode == 'quick' || inputs.mode == 'full' || inputs.mode == 'train'
     runs-on: ubuntu-latest
     timeout-minutes: 350  # ~6 hours max per job
     
