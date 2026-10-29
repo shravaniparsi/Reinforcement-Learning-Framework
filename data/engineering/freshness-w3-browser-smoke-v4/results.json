@@ -1,0 +1,178 @@
+{
+  "purpose": "semantic_W3_browser_gate_only",
+  "performance_measurements": false,
+  "upstream_url": "https://github.com/marmelab/react-admin",
+  "upstream_commit": "0c33d9c3c27cc4bf97e11f56080c5bfe182f2f2a",
+  "browser_version": "156.0.8078.76",
+  "checks": [
+    {
+      "label": "initial-dashboard",
+      "revision": 0,
+      "scalar_fields": {
+        "revenue": "$684",
+        "new_orders": "8",
+        "pending_reviews": "3",
+        "new_customers": "7"
+      },
+      "pending_order_ids": [
+        3,
+        6,
+        9,
+        12
+      ],
+      "pending_review_ids": [
+        1,
+        3,
+        5
+      ],
+      "new_customer_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "browser_matches_single_revision_oracle": true
+    },
+    {
+      "label": "after-order-update",
+      "revision": 1,
+      "scalar_fields": {
+        "revenue": "$1,636",
+        "new_orders": "8",
+        "pending_reviews": "3",
+        "new_customers": "7"
+      },
+      "pending_order_ids": [
+        1,
+        3,
+        6,
+        9,
+        12
+      ],
+      "pending_review_ids": [
+        1,
+        3,
+        5
+      ],
+      "new_customer_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "browser_matches_single_revision_oracle": true
+    },
+    {
+      "label": "after-review-update",
+      "revision": 2,
+      "scalar_fields": {
+        "revenue": "$1,636",
+        "new_orders": "8",
+        "pending_reviews": "2",
+        "new_customers": "7"
+      },
+      "pending_order_ids": [
+        1,
+        3,
+        6,
+        9,
+        12
+      ],
+      "pending_review_ids": [
+        3,
+        5
+      ],
+      "new_customer_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "browser_matches_single_revision_oracle": true
+    },
+    {
+      "label": "after-customer-update",
+      "revision": 3,
+      "scalar_fields": {
+        "revenue": "$1,636",
+        "new_orders": "8",
+        "pending_reviews": "2",
+        "new_customers": "7"
+      },
+      "pending_order_ids": [
+        1,
+        3,
+        6,
+        9,
+        12
+      ],
+      "pending_review_ids": [
+        3,
+        5
+      ],
+      "new_customer_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "browser_matches_single_revision_oracle": true
+    },
+    {
+      "label": "after-customer-create",
+      "revision": 4,
+      "scalar_fields": {
+        "revenue": "$1,636",
+        "new_orders": "8",
+        "pending_reviews": "2",
+        "new_customers": "8"
+      },
+      "pending_order_ids": [
+        1,
+        3,
+        6,
+        9,
+        12
+      ],
+      "pending_review_ids": [
+        3,
+        5
+      ],
+      "new_customer_ids": [
+        9,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "browser_matches_single_revision_oracle": true
+    }
+  ],
+  "commit_revisions": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "external_requests": [],
+  "browser_errors": [],
+  "build_tree_sha256": "6e9bcb075b71879d0bc365c1d89f22b4d44416d0c3d9a96964e061eafaff938a",
+  "lockfile_sha256": "64dfa96102d650b8f4bca6e66c20473b78d5ea05c7fa084964581a6cbcaf2ec8",
+  "adaptation_patch_sha256": "5561b30fae8b9e173e8c822dabfa29559b51fe4b857f89c20f90e82afa2dbb37",
+  "upstream_license_sha256": "7e911f566da7d1fb2ecaac204de5587538339902ebdceaac5e1f845c48c1981d"
+}
