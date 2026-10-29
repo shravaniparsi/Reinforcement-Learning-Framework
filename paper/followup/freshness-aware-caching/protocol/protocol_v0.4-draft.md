@@ -72,7 +72,7 @@ Redis is the selected notification substrate, with two declared modes:
 
 A study-controlled delivery adapter sits between the committed update and the policy consumer. It applies a machine-readable schedule of delay, loss, duplication and reordered delivery. The adapter records dropped notifications rather than removing them from the evidence. It is part of the experimental treatment and is not presented as native Redis behavior.
 
-The no-fault reference uses the transport without injected faults. A local engineering calibration retained 1,000 messages per mode after 100 warm-up messages. Pub/Sub p50/p95/p99 delivery was 0.044667/0.087083/0.101834 ms and Streams p50/p95/p99 was 0.053000/0.069375/0.084917 ms on that host. These values are sanity checks rather than frozen study parameters. Three sequential GitHub-hosted replicates of 5,000 retained messages per mode must be reviewed before the numerical fault levels are fixed. Confirmatory delay levels will be declared in whole milliseconds because the delivery adapter uses an integer-millisecond logical clock. Loss and duplication will use a prespecified sensitivity grid. Matched policies receive the same exogenous trace and fault schedule.
+The no-fault reference uses the transport without injected faults. A local engineering calibration retained 1,000 messages per mode after 100 warm-up messages. Three sequential GitHub-hosted replicates then retained 5,000 messages per mode after 200 warm-up messages. Hosted Pub/Sub p99 ranged from 0.090832 to 0.157139 ms, and Streams p99 ranged from 0.098138 to 0.155089 ms. Every local and hosted delivery completed within 1 ms. Because the delivery adapter uses an integer-millisecond logical clock, the injected-delay grid is fixed at 0, 1, 10 and 100 ms. Zero means no injected delay. One millisecond is the smallest supported nonzero treatment and exceeds the observed hosted maxima. Ten and 100 ms are logarithmically separated stress levels. Loss, duplication and reordering rates remain open until the number of updates per trace is fixed. Matched policies receive the same exogenous trace and fault schedule.
 
 ## 6. Mandatory policies
 
@@ -164,7 +164,7 @@ Archive protocols, workload selection records, source commits, adaptation patche
 
 1. Implement and test commit-revision query-complete update construction for W2 and W3 without consulting newer origin state at delivery.
 2. Pin the Redis version and installation identity used locally and in hosted runs.
-3. Retain the three hosted no-fault calibration replicates and freeze the delay, loss, duplication and reordering grids.
+3. Freeze loss, duplication and adjacent-pair reordering rates after the update count per trace is fixed. The delay grid is fixed at 0, 1, 10 and 100 ms.
 4. Select trace sources or freeze a bounded synthetic generator.
 5. Freeze the Mao et al. cost inputs, initial `E[W]` value and parameter-estimation budget from training evidence.
 6. Fix TTL, stale-window and repair candidate grids.

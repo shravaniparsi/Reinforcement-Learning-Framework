@@ -26,6 +26,8 @@
 - Canonical semantic-only W1 replay across all eight policies at `data/engineering/freshness-w1-policy-replay-v1/results.json`. All runs share one event-trace identity and one fault identity; delayed delivery and its duplicate remain separately visible. The artifact is labeled pre-freeze and contains no performance observations.
 - Local no-fault Redis engineering calibration at `data/engineering/freshness-redis-no-fault-local-v1/results.json`, with 100 warm-up and 1,000 retained messages per mode. On this host, Pub/Sub p50/p95/p99 were 0.044667/0.087083/0.101834 ms and Streams p50/p95/p99 were 0.053000/0.069375/0.084917 ms. These are transport sanity checks, not application results and not sufficient alone to freeze the injected-delay grid.
 - Manual GitHub workflow `.github/workflows/freshness-redis-calibration.yml` for three sequential hosted-runner replicates, 5,000 retained messages per mode per replicate, raw timings, Redis version and host manifest.
+- GitHub run `40976163674` completed successfully for all three replicates. All 30,000 retained hosted deliveries matched the merged source hash and completed within 1 ms. The reviewed summary is in `notes/redis_calibration_summary_2026-10-29.md`; raw artifacts are under `data/engineering/freshness-redis-github-40976163674/`.
+- Protocol v0.4 fixes the injected-delay grid at 0, 1, 10 and 100 ms. Loss, duplication and reordering rates remain open until the update count per trace is fixed.
 - Protocol v0.4 working draft at `protocol/protocol_v0.4-draft.md`. It chooses cache-aware, query-complete update messages for W2 and W3, captured at the commit revision. Message construction, serialized bytes and delivery work remain policy costs; delayed updates cannot consult newer origin state at delivery.
 - Verified seed bibliography for direct and adjacent work.
 
@@ -46,4 +48,4 @@
 
 ## Current next step
 
-Run and retain the three GitHub Redis calibration replicates, then use the local and hosted engineering distributions to freeze delay levels in protocol v0.4. Decide before that freeze whether W2 and W3 receive query-complete update notifications or whether always-update is restricted to W1. Do not collect study data under versions 0.1 through 0.3.
+Implement commit-revision query-complete update construction for W2 and W3. Then select or generate the request/update traces, fix the update count per trace and freeze loss, duplication and adjacent-pair reordering rates. Do not collect study data under versions 0.1 through 0.3 or the current v0.4 draft.
