@@ -1,0 +1,64 @@
+{
+  "events": [
+    {
+      "at_ms": 0,
+      "event_id": "r0",
+      "key": "product-1",
+      "kind": "request",
+      "payload": {
+        "decision_revision": 0
+      },
+      "workload": "mutable-product-v1"
+    },
+    {
+      "at_ms": 10,
+      "event_id": "u1",
+      "key": "product-1",
+      "kind": "update",
+      "payload": {
+        "expected_revision": 1,
+        "mutation": {
+          "changes": {
+            "price_cents": 5000
+          },
+          "key": "product-1"
+        }
+      },
+      "workload": "mutable-product-v1"
+    },
+    {
+      "at_ms": 20,
+      "event_id": "r1",
+      "key": "product-1",
+      "kind": "request",
+      "payload": {
+        "decision_revision": 1
+      },
+      "workload": "mutable-product-v1"
+    },
+    {
+      "at_ms": 60,
+      "event_id": "r2",
+      "key": "product-1",
+      "kind": "request",
+      "payload": {
+        "decision_revision": 1
+      },
+      "workload": "mutable-product-v1"
+    }
+  ],
+  "faults": [
+    {
+      "delay_ms": 30,
+      "drop": false,
+      "duplicate_delays_ms": [
+        35
+      ],
+      "update_event_id": "u1"
+    }
+  ],
+  "schema_version": 1,
+  "seed": 7,
+  "trace_id": "w1-engineering-policy-replay-v1",
+  "transport_mode": "redis-pubsub"
+}

@@ -1,0 +1,118 @@
+{
+  "purpose": "semantic_W2_browser_gate_only",
+  "performance_measurements": false,
+  "upstream_url": "https://github.com/sveltejs/realworld",
+  "upstream_commit": "df796708040f5200ec572b28ab7f88ecee5794dd",
+  "browser_version": "156.0.8078.76",
+  "checks": [
+    {
+      "label": "initial-feed",
+      "query": {
+        "limit": 10,
+        "offset": 0
+      },
+      "article_count": 10,
+      "ssr_first_title_verified": true,
+      "hydrated_content_matches_origin": true
+    },
+    {
+      "label": "initial-rendering-tag",
+      "query": {
+        "tag": "rendering",
+        "limit": 10,
+        "offset": 0
+      },
+      "article_count": 10,
+      "ssr_first_title_verified": true,
+      "hydrated_content_matches_origin": true
+    },
+    {
+      "label": "after-title-update",
+      "query": {
+        "limit": 10,
+        "offset": 0
+      },
+      "article_count": 10,
+      "ssr_first_title_verified": true,
+      "hydrated_content_matches_origin": true
+    },
+    {
+      "label": "after-tag-removal",
+      "query": {
+        "tag": "rendering",
+        "limit": 10,
+        "offset": 0
+      },
+      "article_count": 10,
+      "ssr_first_title_verified": true,
+      "hydrated_content_matches_origin": true
+    },
+    {
+      "label": "after-tag-addition",
+      "query": {
+        "tag": "accessibility",
+        "limit": 10,
+        "offset": 0
+      },
+      "article_count": 10,
+      "ssr_first_title_verified": true,
+      "hydrated_content_matches_origin": true
+    },
+    {
+      "label": "after-create",
+      "query": {
+        "limit": 10,
+        "offset": 0
+      },
+      "article_count": 10,
+      "ssr_first_title_verified": true,
+      "hydrated_content_matches_origin": true
+    },
+    {
+      "label": "after-create-rendering",
+      "query": {
+        "tag": "rendering",
+        "limit": 10,
+        "offset": 0
+      },
+      "article_count": 10,
+      "ssr_first_title_verified": true,
+      "hydrated_content_matches_origin": true
+    },
+    {
+      "label": "after-delete",
+      "query": {
+        "limit": 10,
+        "offset": 0
+      },
+      "article_count": 10,
+      "ssr_first_title_verified": true,
+      "hydrated_content_matches_origin": true
+    },
+    {
+      "label": "after-delete-rendering",
+      "query": {
+        "tag": "rendering",
+        "limit": 10,
+        "offset": 0
+      },
+      "article_count": 10,
+      "ssr_first_title_verified": true,
+      "hydrated_content_matches_origin": true
+    }
+  ],
+  "commit_revisions": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "external_requests": [],
+  "browser_errors": [],
+  "build_tree_sha256": "ea4503b338a4a00df74451d18685e8f3722d66b095bb8a632d96138418de295d",
+  "lockfile_sha256": "9557e304000d5ce15b180f5eae6f9895f71578d29c86cf45ded589506e422680",
+  "patch_sha256": {
+    "production-variants.patch": "9a9cd8559745503c852ae85fbb451e308c34a6836d097214011c761566e2aa2e",
+    "freshness-api.patch": "81d0dd48aa1efccba3b18431363b8436ec8d62ca938425758cfbde72f63fd241"
+  }
+}
