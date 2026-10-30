@@ -133,6 +133,8 @@ The harness must verify that matched policies observe identical exogenous reques
 
 Final-test outcomes may not change policies, freshness rules, workloads, endpoints, fault schedules or sample size.
 
+The frozen candidate grid uses 10, 25, 50, 100, 250 and 500 ms for fixed TTL, SWR TTL, SWR stale window and repair age. Initial `E[W]` candidates are 0.25, 0.5, 1, 2, 5 and 10. Write-reactive costs use median serialized update, invalidation and origin-miss bytes by workload and regime in training. Training selects candidates lexicographically: first minimize mean trace-level freshness violations, then retain candidates within 1 percentage point of that minimum and choose the one with fewer mean origin response bytes. Validation confirms the locked choice without refitting.
+
 ## 10. Outcomes and analysis principles
 
 The primary admissibility outcome is compliance with a workload-specific freshness rule frozen before collection. Latency or origin savings do not compensate for a policy that violates that rule.
@@ -149,6 +151,8 @@ Primary trace-level outcomes are:
 Primary policy contrasts will be paired within workload, trace and fault schedule. The analysis must account for repeated requests within traces and variation across workload, trace and allocation. Effects will be reported with uncertainty intervals and absolute units. No weighted scalar combines staleness, latency, CPU and bytes.
 
 The exact estimand, interval method, multiplicity rule and precision-based sample-size criterion remain open. They must be frozen after workloads and trace generators are selected and before confirmatory collection.
+
+The working statistical plan defines the complete trace execution as the independent unit. Requests within a trace are repeated observations. The primary robustness contrasts compare repair with always invalidation at each loss level; primary adaptation contrasts compare write-reactive with always update and always invalidate under no fault. These five contrast types use 99% percentile bootstrap intervals with 10,000 resamples of complete paired trace units. Secondary estimates use 95% intervals and remain descriptive. Final sample size is selected once from paired variance-planning traces to target a 99% interval half-width of 1 percentage point for freshness differences and 10% of the reference mean for primary efficiency outcomes, with a minimum of 8 seeds. The planning formula is `ceil((2.5758293 * s / h)^2)`. A requirement above the reserved 20-seed pool triggers protocol expansion before final testing.
 
 ## 11. Failure, repair and stopping rules
 
@@ -167,7 +171,5 @@ Archive protocols, workload selection records, source commits, adaptation patche
 ## 13. Decisions required for v0.4 freeze
 
 1. Pin the Redis version and installation identity used locally and in hosted runs.
-2. Freeze the Mao et al. cost inputs, initial `E[W]` value and parameter-estimation budget from training evidence.
-3. Fix TTL, stale-window and repair candidate grids.
-4. Choose the hosted environment and allocation structure.
-5. Freeze the trace-level estimand, hierarchical analysis and precision rule.
+2. Choose the hosted environment and allocation structure.
+3. Exercise the encoded parameter-selection, paired interval and precision calculations on engineering fixtures before freezing v0.4.
