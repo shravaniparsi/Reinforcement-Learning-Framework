@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "design_id": "freshness-bounded-synthetic-v1",
+  "updates_per_trace": 100,
+  "mean_inter_event_ms": 10,
+  "inter_event_jitter_ms": 5,
+  "regimes": {
+    "read-heavy": {"requests_per_trace": 500},
+    "balanced": {"requests_per_trace": 200},
+    "write-intensive": {"requests_per_trace": 100}
+  },
+  "partitions": {
+    "engineering": {"seed_start": 0, "seed_count": 2},
+    "training": {"seed_start": 100, "seed_count": 10},
+    "validation": {"seed_start": 200, "seed_count": 5},
+    "variance-planning": {"seed_start": 300, "seed_count": 10},
+    "final-test": {"seed_start": 1000, "seed_count": 20}
+  },
+  "fault_profiles": {
+    "no-fault": {"delay_ms": 0, "loss_percent": 0, "duplicate_percent": 0, "reorder_percent": 0},
+    "delay-1ms": {"delay_ms": 1, "loss_percent": 0, "duplicate_percent": 0, "reorder_percent": 0},
+    "delay-10ms": {"delay_ms": 10, "loss_percent": 0, "duplicate_percent": 0, "reorder_percent": 0},
+    "delay-100ms": {"delay_ms": 100, "loss_percent": 0, "duplicate_percent": 0, "reorder_percent": 0},
+    "loss-1pct": {"delay_ms": 0, "loss_percent": 1, "duplicate_percent": 0, "reorder_percent": 0},
+    "loss-5pct": {"delay_ms": 0, "loss_percent": 5, "duplicate_percent": 0, "reorder_percent": 0},
+    "loss-10pct": {"delay_ms": 0, "loss_percent": 10, "duplicate_percent": 0, "reorder_percent": 0},
+    "duplicate-1pct": {"delay_ms": 0, "loss_percent": 0, "duplicate_percent": 1, "reorder_percent": 0},
+    "duplicate-5pct": {"delay_ms": 0, "loss_percent": 0, "duplicate_percent": 5, "reorder_percent": 0},
+    "reorder-1pct": {"delay_ms": 0, "loss_percent": 0, "duplicate_percent": 0, "reorder_percent": 1},
+    "reorder-5pct": {"delay_ms": 0, "loss_percent": 0, "duplicate_percent": 0, "reorder_percent": 5},
+    "combined-stress": {"delay_ms": 10, "loss_percent": 5, "duplicate_percent": 5, "reorder_percent": 5}
+  }
+}

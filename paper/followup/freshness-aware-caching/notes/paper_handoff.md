@@ -31,6 +31,7 @@
 - Protocol v0.4 working draft at `protocol/protocol_v0.4-draft.md`. It chooses cache-aware, query-complete update messages for W2 and W3, captured at the commit revision. Message construction, serialized bytes and delivery work remain policy costs; delayed updates cannot consult newer origin state at delivery.
 - Commit-revision query-complete update construction is implemented for W2 and W3. Engineering tests verify delayed refresh, resource-query replacement, publisher origin-read and byte accounting, and suppression of an older update delivered after a newer revision. Write-reactive actions and write-history increments are fixed at publication, including when delivery is lost.
 - Source-bound W1, W2 and W3 semantic replays now cover all eight policies. The W2 and W3 schedules exercise delay, duplication, reordering and loss. Results and their non-inferential interpretation are recorded in `notes/semantic_policy_replays_2026-10-29.md`; the three artifacts explicitly contain no performance observations.
+- Bounded synthetic trace design v1 is machine-readable and tested. Each trace has 100 updates; read-heavy, balanced and write-intensive regimes have 500, 200 and 100 requests. Exact fault profiles cover delay, 1/5/10% loss, 1/5% duplication, 1/5% adjacent-pair reordering and one combined stress condition. Evidence-partition seed ranges are disjoint. The decision and scope boundary are in `notes/trace_design_decision_2026-10-29.md`.
 - Verified seed bibliography for direct and adjacent work.
 
 ## Required before protocol freeze
@@ -50,4 +51,4 @@
 
 ## Current next step
 
-Select or generate the request/update traces, fix the update count per trace and freeze loss, duplication and adjacent-pair reordering rates. Then freeze the TTL, stale-window, repair and write-reactive training grids. Do not collect study data under versions 0.1 through 0.3 or the current v0.4 draft.
+Freeze the TTL, stale-window, repair and write-reactive training grids. Then specify the trace-level estimand, precision rule and hosted allocation structure. Do not collect study data under versions 0.1 through 0.3 or the current v0.4 draft.

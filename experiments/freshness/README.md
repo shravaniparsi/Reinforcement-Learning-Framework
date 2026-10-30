@@ -5,6 +5,7 @@ This package implements protocol-level interfaces for the prospective cache-fres
 - `schema.py` validates exogenous request/update traces and fault directives and produces a stable SHA-256 schedule identity.
 - `fault_schedule.py` materializes delivered, duplicated, reordered and dropped notifications while retaining loss records.
 - `trace_runner.py` replays logical-time engineering schedules, commits mutations before notification creation and records event, fault and full-schedule identities separately.
+- `trace_design_v1.json` and `trace_generator.py` define bounded prospective traces with disjoint evidence partitions and exact fault counts.
 - `redis_calibration.py` measures no-fault local Pub/Sub and Streams delivery with raw per-message timings and a host manifest. Its output is transport engineering evidence, not application study data.
 - `workload.py` defines the reset, commit, read and semantic-oracle contract shared by each application.
 - `catalog_workload.py` is the deterministic SQLite-backed W1 product adapter with per-product revision history.
@@ -38,6 +39,18 @@ The source-bound cross-workload replays use:
 
 Each artifact records the gateway, runner and schedule hashes and is labeled as semantic engineering evidence without performance observations.
 
+Generate one declared schedule with, for example:
+
+```sh
+python3 -m experiments.freshness.trace_generator /tmp/w2-training.json \
+  --workload svelte-realworld-feed-v1 \
+  --regime read-heavy \
+  --partition training \
+  --seed 100 \
+  --fault-profile loss-1pct \
+  --transport redis-pubsub
+```
+
 Run the local no-fault Redis calibration with:
 
 ```sh
@@ -58,5 +71,6 @@ python3 -m unittest \
   tests.test_freshness_realworld_workload \
   tests.test_freshness_dashboard_workload \
   tests.test_freshness_cache_gateway \
-  tests.test_freshness_trace_runner
+  tests.test_freshness_trace_runner \
+  tests.test_freshness_trace_generator
 ```

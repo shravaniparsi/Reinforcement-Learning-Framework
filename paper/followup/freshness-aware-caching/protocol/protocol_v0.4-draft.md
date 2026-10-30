@@ -65,6 +65,8 @@ Every matched policy receives the same exogenous trace. A trace contains:
 
 Policy execution time must not change future exogenous events. Training, engineering and final-test trace identities remain separate.
 
+The core study uses prospectively generated bounded synthetic traces. Public cache traces do not contain the complete application-query content, revision identity and browser-visible semantic state required by the W1-W3 oracle. The study therefore estimates policy behavior under declared regimes rather than production prevalence. Every trace contains exactly 100 updates. Read-heavy, balanced and write-intensive traces contain 500, 200 and 100 requests, respectively. Inter-event gaps range from 5 to 15 logical milliseconds. The machine-readable design fixes disjoint seed pools for engineering, training, validation, variance planning and final testing. The final-test pool contains 20 available seeds, but the precision rule determines how many are used.
+
 Redis is the selected notification substrate, with two declared modes:
 
 - **Redis Pub/Sub:** a fire-and-forget, at-most-once mode. Redis documents that a notification is permanently lost when a subscriber cannot receive it.
@@ -72,7 +74,9 @@ Redis is the selected notification substrate, with two declared modes:
 
 A study-controlled delivery adapter sits between the committed update and the policy consumer. It applies a machine-readable schedule of delay, loss, duplication and reordered delivery. The adapter records dropped notifications rather than removing them from the evidence. It is part of the experimental treatment and is not presented as native Redis behavior.
 
-The no-fault reference uses the transport without injected faults. A local engineering calibration retained 1,000 messages per mode after 100 warm-up messages. Three sequential GitHub-hosted replicates then retained 5,000 messages per mode after 200 warm-up messages. Hosted Pub/Sub p99 ranged from 0.090832 to 0.157139 ms, and Streams p99 ranged from 0.098138 to 0.155089 ms. Every local and hosted delivery completed within 1 ms. Because the delivery adapter uses an integer-millisecond logical clock, the injected-delay grid is fixed at 0, 1, 10 and 100 ms. Zero means no injected delay. One millisecond is the smallest supported nonzero treatment and exceeds the observed hosted maxima. Ten and 100 ms are logarithmically separated stress levels. Loss, duplication and reordering rates remain open until the number of updates per trace is fixed. Matched policies receive the same exogenous trace and fault schedule.
+The no-fault reference uses the transport without injected faults. A local engineering calibration retained 1,000 messages per mode after 100 warm-up messages. Three sequential GitHub-hosted replicates then retained 5,000 messages per mode after 200 warm-up messages. Hosted Pub/Sub p99 ranged from 0.090832 to 0.157139 ms, and Streams p99 ranged from 0.098138 to 0.155089 ms. Every local and hosted delivery completed within 1 ms. Because the delivery adapter uses an integer-millisecond logical clock, the injected-delay grid is fixed at 0, 1, 10 and 100 ms. Zero means no injected delay. One millisecond is the smallest supported nonzero treatment and exceeds the observed hosted maxima. Ten and 100 ms are logarithmically separated stress levels.
+
+With 100 updates per trace, loss profiles drop exactly 1, 5 or 10 notifications. Duplication profiles duplicate exactly 1 or 5 notifications. Reordering profiles reverse exactly 1 or 5 non-overlapping adjacent update pairs. A combined stress profile applies 10 ms base delay with 5 losses, 5 duplicates and 5 reordered pairs. The single-factor profiles identify each mechanism; the combined profile is the only prespecified interaction condition. Dropped notifications cannot also be duplicated. Matched policies receive the same exogenous trace and fault schedule.
 
 ## 6. Mandatory policies
 
@@ -163,9 +167,7 @@ Archive protocols, workload selection records, source commits, adaptation patche
 ## 13. Decisions required for v0.4 freeze
 
 1. Pin the Redis version and installation identity used locally and in hosted runs.
-2. Freeze loss, duplication and adjacent-pair reordering rates after the update count per trace is fixed. The delay grid is fixed at 0, 1, 10 and 100 ms.
-3. Select trace sources or freeze a bounded synthetic generator.
-4. Freeze the Mao et al. cost inputs, initial `E[W]` value and parameter-estimation budget from training evidence.
-5. Fix TTL, stale-window and repair candidate grids.
-6. Choose the hosted environment and allocation structure.
-7. Freeze the trace-level estimand, hierarchical analysis and precision rule.
+2. Freeze the Mao et al. cost inputs, initial `E[W]` value and parameter-estimation budget from training evidence.
+3. Fix TTL, stale-window and repair candidate grids.
+4. Choose the hosted environment and allocation structure.
+5. Freeze the trace-level estimand, hierarchical analysis and precision rule.
