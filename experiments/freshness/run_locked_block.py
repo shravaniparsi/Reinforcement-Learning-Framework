@@ -16,6 +16,7 @@ from .locked_execution import (
 from .schema import dump_schedule
 from .trace_generator import TraceDesign, WORKLOAD_IDS, generate_schedule
 from .validation_design import ValidationDesign
+from .variance_design import VarianceDesign, load_passed_validation
 
 
 def _sha256(path: Path) -> str:
@@ -25,7 +26,7 @@ def _sha256(path: Path) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('output', type=Path)
-    parser.add_argument('--stage', choices=('validation',), required=True)
+    parser.add_argument('--stage', choices=('validation', 'variance-planning'), required=True)
     parser.add_argument('--workload', choices=WORKLOAD_IDS, required=True)
     parser.add_argument('--regime', required=True)
     parser.add_argument('--seed', type=int, required=True)
@@ -49,13 +50,32 @@ def main() -> None:
             'selected_event_parameters.json'
         ),
     )
+    parser.add_argument(
+        '--validation-lock', type=Path,
+        default=Path(
+            'data/validation/freshness-validation-41099780817-archives/'
+            'validation_report.json'
+        ),
+    )
     args = parser.parse_args()
     package = Path(__file__).parent
     allocation = AllocationDesign.load(package / 'allocation_design_v1.json')
     trace_design = TraceDesign.load(package / 'trace_design_v1.json')
-    validation = ValidationDesign.load(
-        package / 'validation_design_v1.json', trace_design, allocation,
-    )
+    if args.stage == 'validation':
+        design = ValidationDesign.load(
+            package / 'validation_design_v1.json', trace_design, allocation,
+        )
+        design_digest_key = 'validation_design_sha256'
+        prerequisite = {}
+    else:
+        design = VarianceDesign.load(
+            package / 'variance_design_v1.json', trace_design, allocation,
+        )
+        load_passed_validation(args.validation_lock)
+        design_digest_key = 'variance_planning_design_sha256'
+        prerequisite = {
+            'prerequisite_validation_sha256': _sha256(args.validation_lock),
+        }
     identity = {
         'stage': args.stage,
         'workload': args.workload,
@@ -64,8 +84,8 @@ def main() -> None:
         'transport': args.transport,
         'fault_profile': args.fault_profile,
     }
-    if not validation.contains(identity):
-        raise ValueError('block identity is outside the frozen validation campaign')
+    if not design.contains(identity):
+        raise ValueError('block identity is outside the frozen collection campaign')
     costs = load_locked_costs(args.cost_lock)
     time_lock = load_time_lock(args.time_lock)
     event_lock = load_event_lock(args.event_lock)
@@ -121,10 +141,11 @@ def main() -> None:
     passed = len(attempts) == len(specs) and all(item['returncode'] == 0 for item in attempts)
     manifest = {
         'artifact_schema_version': 1,
-        'measurement_kind': 'validation-locked-policy-block',
+        'measurement_kind': f'{args.stage}-locked-policy-block',
         'stage': args.stage,
         'confirmatory_final_test': False,
-        'validation_design_sha256': validation.digest(),
+        design_digest_key: design.digest(),
+        **prerequisite,
         'allocation_design_sha256': allocation.digest(),
         'parameter_lock_sha256': {
             'serialized_byte_costs': _sha256(args.cost_lock),
