@@ -9,7 +9,7 @@ import time
 from dataclasses import asdict, dataclass
 from typing import Any, Dict, List, Mapping, Optional, Protocol, Tuple
 
-from .cache_gateway import CacheGateway, GatewayObservation
+from .cache_gateway import CacheGateway, EVENT_POLICIES, GatewayObservation
 from .fault_schedule import materialize_notifications
 from .schema import ScheduledNotification, TraceSchedule
 
@@ -84,6 +84,7 @@ def _prepare_publication(
     notification_key: str,
     payload: Mapping[str, Any],
     revision: int,
+    transport_enabled: bool,
 ) -> tuple[Mapping[str, Any], Mapping[str, Any]]:
     prepared = dict(gateway.prepare_notification(event_id, notification_key, payload))
     actions = prepared.get('_cache_actions', {})
@@ -117,9 +118,10 @@ def _prepare_publication(
         'query_update_count': len(query_updates),
         'publisher_origin_reads': origin_reads,
         'publisher_origin_response_body_bytes': origin_body_bytes,
-        'notification_body_bytes': _encoded_size({
-            'key': notification_key, 'payload': prepared,
-        }),
+        'notification_body_bytes': (
+            _encoded_size({'key': notification_key, 'payload': prepared})
+            if transport_enabled else 0
+        ),
     }
     return prepared, record
 
@@ -137,6 +139,7 @@ def run_trace(
         raise ValueError(f'schedule workload mismatch for events: {mismatched}')
 
     delivered_templates, dropped = materialize_notifications(schedule)
+    transport_enabled = gateway.policy in EVENT_POLICIES
     templates_by_source: Dict[str, List[ScheduledNotification]] = {}
     for item in delivered_templates:
         templates_by_source.setdefault(item.source_event_id, []).append(item)
@@ -199,6 +202,7 @@ def run_trace(
                 event.key,
                 commit.notification_payload,
                 commit.revision,
+                transport_enabled,
             )
             operation_measurements.append(OperationMeasurement(
                 event_id=event.event_id,
@@ -209,7 +213,9 @@ def run_trace(
             commit_payloads[event.event_id] = prepared
             publication_records.append(publication_record)
             committed.append(event.event_id)
-            for template in templates_by_source.get(event.event_id, ()):
+            for template in (
+                templates_by_source.get(event.event_id, ()) if transport_enabled else ()
+            ):
                 heapq.heappush(
                     pending,
                     (

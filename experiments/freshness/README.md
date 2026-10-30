@@ -10,6 +10,7 @@ This package implements protocol-level interfaces for the prospective cache-fres
 - `analysis_plan.py` implements lexicographic parameter selection, complete-pair checks, deterministic trace-level bootstrap intervals and precision-based final trace counts.
 - `allocation_design_v1.json` and `allocation_design.py` freeze hosted runtime, blocking, policy order, process isolation and retry behavior.
 - `analysis_fixture_v1.json` and `run_analysis_engineering.py` exercise selection, intervals and pool expansion without application observations.
+- `training_campaign_v1.json` and `training_campaign.py` freeze the training-only workload, regime, seed, condition, candidate and matched-control expansion. The campaign contains 18,000 full trace units and does not authorize final-test collection.
 - `run_policy_unit.py` executes one policy in a fresh process, while `run_hosted_preflight.py` applies the frozen allocation identity and deterministic policy order to all eight policies.
 - `redis_calibration.py` measures no-fault local Pub/Sub and Streams delivery with raw per-message timings and a host manifest. Its output is transport engineering evidence, not application study data.
 - `redis_delivery.py` routes source-bound notification envelopes through an isolated real Redis Pub/Sub or Streams instance. `run_instrumented_unit.py` combines that transport with one application trace and records raw operation wall time, thread CPU and trace-level outcomes.
