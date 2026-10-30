@@ -1,0 +1,102 @@
+name: Freshness Held-Out Validation Batch
+
+on:
+  workflow_dispatch:
+    inputs:
+      batch:
+        description: Frozen validation batch
+        required: true
+        type: choice
+        options: [a, b, c, d, e, f]
+  workflow_call:
+    inputs:
+      batch:
+        description: Frozen validation batch
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: freshness-validation-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    outputs:
+      profiles: ${{ steps.plan.outputs.profiles }}
+      seeds: ${{ steps.plan.outputs.seeds }}
+    steps:
+      - id: plan
+        env:
+          BATCH: ${{ inputs.batch }}
+        run: |
+          case "$BATCH" in
+            a) profiles='["no-fault","delay-1ms","delay-10ms","delay-100ms"]'; seeds='[200,201,202]' ;;
+            b) profiles='["no-fault","delay-1ms","delay-10ms","delay-100ms"]'; seeds='[203,204]' ;;
+            c) profiles='["loss-1pct","loss-5pct","loss-10pct","combined-stress"]'; seeds='[200,201,202]' ;;
+            d) profiles='["loss-1pct","loss-5pct","loss-10pct","combined-stress"]'; seeds='[203,204]' ;;
+            e) profiles='["duplicate-1pct","duplicate-5pct","reorder-1pct","reorder-5pct"]'; seeds='[200,201,202]' ;;
+            f) profiles='["duplicate-1pct","duplicate-5pct","reorder-1pct","reorder-5pct"]'; seeds='[203,204]' ;;
+            *) exit 2 ;;
+          esac
+          echo "profiles=$profiles" >> "$GITHUB_OUTPUT"
+          echo "seeds=$seeds" >> "$GITHUB_OUTPUT"
+
+  validation-block:
+    needs: plan
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        workload:
+          - mutable-product-v1
+          - svelte-realworld-feed-v1
+          - react-admin-dashboard-v1
+        regime: [read-heavy, balanced, write-intensive]
+        fault_profile: ${{ fromJSON(needs.plan.outputs.profiles) }}
+        transport: [redis-pubsub, redis-streams]
+        seed: ${{ fromJSON(needs.plan.outputs.seeds) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.9.25'
+      - name: Install the calibrated Redis package
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes \
+            redis-server=5:7.0.15-1ubuntu0.24.04.5 \
+            redis-tools=5:7.0.15-1ubuntu0.24.04.5
+      - name: Verify validation contracts
+        run: |
+          python -m unittest \
+            tests.test_freshness_validation_design \
+            tests.test_freshness_locked_execution \
+            tests.test_freshness_validation_analysis \
+            tests.test_freshness_measurement
+      - name: Run eight locked policies
+        run: |
+          python -m experiments.freshness.run_locked_block \
+            "ci-artifacts/validation-${{ matrix.workload }}-${{ matrix.regime }}-${{ matrix.fault_profile }}-${{ matrix.transport }}-${{ matrix.seed }}" \
+            --stage validation \
+            --workload "${{ matrix.workload }}" \
+            --regime "${{ matrix.regime }}" \
+            --fault-profile "${{ matrix.fault_profile }}" \
+            --transport "${{ matrix.transport }}" \
+            --seed "${{ matrix.seed }}"
+      - name: Upload compact raw block
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: freshness-validation-${{ matrix.workload }}-${{ matrix.regime }}-${{ matrix.fault_profile }}-${{ matrix.transport }}-${{ matrix.seed }}-${{ github.run_id }}
+          path: ci-artifacts/
+          compression-level: 9
+          retention-days: 30
+          if-no-files-found: error

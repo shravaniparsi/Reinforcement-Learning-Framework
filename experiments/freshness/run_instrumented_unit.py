@@ -27,7 +27,11 @@ def main() -> None:
     parser.add_argument('schedule', type=Path)
     parser.add_argument('policy', choices=tuple(POLICY_OPTIONS))
     parser.add_argument('output', type=Path)
-    parser.add_argument('--stage', choices=('engineering', 'training'), required=True)
+    parser.add_argument(
+        '--stage',
+        choices=('engineering', 'training', 'validation', 'variance-planning'),
+        required=True,
+    )
     parser.add_argument('--redis-server', default='redis-server')
     parser.add_argument('--options-file', type=Path)
     parser.add_argument('--compact', action='store_true')
