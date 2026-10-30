@@ -61,8 +61,15 @@ class FreshnessTraceRunnerTests(unittest.TestCase):
             result = run_trace(schedule, self.gateway(workload, policy))
             identities.add((result.trace_sha256, result.fault_sha256))
             self.assertEqual(result.committed_event_ids, ('u1',))
-            self.assertEqual(result.delivered_notification_ids, ('u1:0',))
-            self.assertEqual(result.duplicate_notification_ids, ('u1:1',))
+            if policy in {
+                'always-invalidate', 'always-update', 'write-reactive',
+                'event-invalidate-with-repair',
+            }:
+                self.assertEqual(result.delivered_notification_ids, ('u1:0',))
+                self.assertEqual(result.duplicate_notification_ids, ('u1:1',))
+            else:
+                self.assertEqual(result.delivered_notification_ids, ())
+                self.assertEqual(result.duplicate_notification_ids, ())
             self.assertEqual(len(result.observations), 3)
             self.assertEqual(len(result.publication_records), 1)
         self.assertEqual(len(identities), 1)

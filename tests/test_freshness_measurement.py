@@ -31,6 +31,7 @@ class FreshnessMeasurementTests(unittest.TestCase):
         self.assertEqual(summary['origin_operations'], {'fetch': 100})
         self.assertGreater(summary['request_wall_ns']['p99'], 0)
         self.assertEqual(summary['redis_delivery_payload_bytes'], 0)
+        self.assertEqual(summary['notification_body_bytes'], 0)
 
 
 if __name__ == '__main__':

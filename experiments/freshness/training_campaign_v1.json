@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "campaign_id": "freshness-training-campaign-v1",
+  "partition": "training",
+  "workloads": [
+    "mutable-product-v1",
+    "svelte-realworld-feed-v1",
+    "react-admin-dashboard-v1"
+  ],
+  "regimes": ["read-heavy", "balanced", "write-intensive"],
+  "seed_start": 100,
+  "seed_count": 10,
+  "cost_calibration": {
+    "fault_profile": "no-fault",
+    "transport": "redis-pubsub",
+    "policies": [
+      "bypass",
+      "conditional-validation",
+      "fixed-ttl",
+      "stale-while-revalidate",
+      "always-invalidate",
+      "always-update",
+      "write-reactive",
+      "event-invalidate-with-repair"
+    ],
+    "cost_statistics_from": ["bypass", "always-invalidate", "always-update"],
+    "statistics": "median serialized bytes by workload and regime"
+  },
+  "time_candidate_conditions": {
+    "fault_profile": "no-fault",
+    "transport": "redis-pubsub",
+    "candidate_policies": ["fixed-ttl", "stale-while-revalidate"],
+    "matched_controls": [
+      "bypass",
+      "conditional-validation",
+      "always-invalidate",
+      "always-update",
+      "write-reactive",
+      "event-invalidate-with-repair"
+    ]
+  },
+  "event_candidate_conditions": {
+    "fault_profiles": ["no-fault", "delay-100ms", "loss-10pct", "combined-stress"],
+    "transports": ["redis-pubsub", "redis-streams"],
+    "candidate_policies": ["event-invalidate-with-repair", "write-reactive"],
+    "matched_controls": [
+      "bypass",
+      "conditional-validation",
+      "fixed-ttl",
+      "stale-while-revalidate",
+      "always-invalidate",
+      "always-update"
+    ]
+  },
+  "selection_unit": "one full policy-candidate execution over one source-bound trace",
+  "selection_rule": "minimize mean trace-level freshness violation, retain candidates within 0.01, then minimize mean origin response bytes, then declared order",
+  "final_test_authorized": false
+}

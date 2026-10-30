@@ -20,6 +20,13 @@ POLICIES = frozenset({
     'event-invalidate-with-repair',
 })
 
+EVENT_POLICIES = frozenset({
+    'always-invalidate',
+    'always-update',
+    'write-reactive',
+    'event-invalidate-with-repair',
+})
+
 
 @dataclass(frozen=True)
 class CacheEntry:
@@ -199,8 +206,24 @@ class CacheGateway:
                 self.last_write_action[cache_key] = action
         if actions or self.policy in {'always-update', 'write-reactive'}:
             prepared['_cache_actions'] = actions
+        if self.policy in {'always-invalidate', 'event-invalidate-with-repair'}:
+            prepared = self._invalidation_metadata(prepared)
+        elif self.policy == 'write-reactive' and not any(
+            action == 'update' for action in actions.values()
+        ):
+            prepared = self._invalidation_metadata(prepared)
+            prepared['_cache_actions'] = actions
         self.publications[publication_id] = (source_digest, copy.deepcopy(prepared))
         return prepared
+
+    @staticmethod
+    def _invalidation_metadata(payload: Mapping[str, Any]) -> Dict[str, Any]:
+        excluded = {'content', 'content_sha256', 'record', 'query_updates'}
+        return {
+            key: copy.deepcopy(value)
+            for key, value in payload.items()
+            if key not in excluded
+        }
 
     def notify(
         self,

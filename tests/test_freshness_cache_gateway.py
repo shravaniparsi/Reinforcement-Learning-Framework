@@ -86,6 +86,17 @@ class CacheGatewayTests(unittest.TestCase):
         self.assertTrue(fresh.semantically_fresh)
         self.assertEqual(fresh.origin_operation, 'fetch')
 
+    def test_invalidation_publication_excludes_replacement_content(self):
+        gateway = CacheGateway(self.workload, 'always-invalidate')
+        gateway.read('product-1', 0, 0)
+        commit = self.update(5000)
+        prepared = gateway.prepare_notification(
+            'u1', 'product-1', commit.notification_payload,
+        )
+        self.assertEqual(prepared['revision'], 1)
+        self.assertNotIn('content', prepared)
+        self.assertNotIn('content_sha256', prepared)
+
     def test_repair_bounds_loss_without_delivery(self):
         gateway = CacheGateway(
             self.workload, 'event-invalidate-with-repair', repair_ms=100,
