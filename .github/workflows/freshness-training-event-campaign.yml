@@ -1,0 +1,31 @@
+name: Freshness Training Event Campaign
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  batch-a:
+    uses: ./.github/workflows/freshness-training-event-candidates.yml
+    with:
+      seed_batch: a
+
+  batch-b:
+    needs: batch-a
+    uses: ./.github/workflows/freshness-training-event-candidates.yml
+    with:
+      seed_batch: b
+
+  batch-c:
+    needs: batch-b
+    uses: ./.github/workflows/freshness-training-event-candidates.yml
+    with:
+      seed_batch: c
+
+  batch-d:
+    needs: batch-c
+    uses: ./.github/workflows/freshness-training-event-candidates.yml
+    with:
+      seed_batch: d
