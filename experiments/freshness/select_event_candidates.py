@@ -6,7 +6,10 @@ import argparse
 import hashlib
 import json
 import statistics
+import zipfile
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Callable
 
 from .analysis_plan import CandidateSummary, select_candidate
 
@@ -15,19 +18,80 @@ EXPECTED_PROFILES = ('no-fault', 'delay-100ms', 'loss-10pct', 'combined-stress')
 EXPECTED_TRANSPORTS = ('redis-pubsub', 'redis-streams')
 
 
-def _sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+@dataclass(frozen=True)
+class _Source:
+    key: str
+    read_bytes: Callable[[], bytes]
+
+    def text(self) -> str:
+        return self.read_bytes().decode('utf-8')
+
+
+@dataclass(frozen=True)
+class _Block:
+    manifest: _Source
+    child: Callable[[str], _Source]
+
+
+def _filesystem_blocks(root: Path) -> list[_Block]:
+    blocks = []
+    for manifest_path in sorted(root.rglob('manifest.json')):
+        directory = manifest_path.parent
+
+        def child(relative: str, directory: Path = directory) -> _Source:
+            source = directory / relative
+            return _Source(str(source.relative_to(root)), source.read_bytes)
+
+        blocks.append(_Block(child('manifest.json'), child))
+    return blocks
+
+
+def _archive_blocks(root: Path) -> tuple[list[_Block], list[zipfile.ZipFile]]:
+    blocks = []
+    archives = []
+    try:
+        for archive_path in sorted(root.glob('*.zip')):
+            archive = zipfile.ZipFile(archive_path)
+            archives.append(archive)
+            manifests = [
+                name for name in archive.namelist()
+                if not name.endswith('/') and name.endswith('/manifest.json')
+            ]
+            if len(manifests) != 1:
+                raise ValueError('each event archive must contain exactly one manifest')
+            directory = manifests[0].rsplit('/', 1)[0]
+
+            def child(
+                relative: str,
+                archive: zipfile.ZipFile = archive,
+                directory: str = directory,
+                archive_name: str = archive_path.stem,
+            ) -> _Source:
+                member = f'{directory}/{relative}'
+                return _Source(f'{archive_name}/{member}', lambda: archive.read(member))
+
+            blocks.append(_Block(child('manifest.json'), child))
+    except Exception:
+        for archive in archives:
+            archive.close()
+        raise
+    return blocks, archives
 
 
 def select(root: Path) -> dict:
-    manifests = sorted(root.rglob('manifest.json'))
-    if len(manifests) != 720:
+    blocks = _filesystem_blocks(root)
+    archives = []
+    if not blocks:
+        blocks, archives = _archive_blocks(root)
+    if len(blocks) != 720:
+        for archive in archives:
+            archive.close()
         raise ValueError('event-candidate selection requires exactly 720 blocks')
     seen_blocks = set()
     records = {}
     hashes = {}
-    for manifest_path in manifests:
-        manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+    for block in blocks:
+        manifest = json.loads(block.manifest.text())
         if (
             not manifest.get('passed')
             or manifest.get('stage') != 'training'
@@ -43,20 +107,18 @@ def select(root: Path) -> dict:
         if block_key in seen_blocks:
             raise ValueError('duplicate event-candidate block identity')
         seen_blocks.add(block_key)
-        directory = manifest_path.parent
-        for source in (manifest_path, directory / 'schedule.json'):
-            hashes[str(source.relative_to(root))] = _sha256(source)
+        for source in (block.manifest, block.child('schedule.json')):
+            hashes[source.key] = hashlib.sha256(source.read_bytes()).hexdigest()
         if len(manifest['attempts']) != 18:
             raise ValueError('event-candidate block must contain 18 complete units')
         for attempt in manifest['attempts']:
-            for source in (directory / attempt['artifact'], directory / attempt['options']):
-                hashes[str(source.relative_to(root))] = _sha256(source)
+            for source in (block.child(attempt['artifact']), block.child(attempt['options'])):
+                hashes[source.key] = hashlib.sha256(source.read_bytes()).hexdigest()
         candidates = [attempt for attempt in manifest['attempts'] if attempt['candidate']]
         if len(candidates) != 12:
             raise ValueError('event-candidate block must contain 12 candidates')
         for attempt in candidates:
-            artifact_path = directory / attempt['artifact']
-            artifact = json.loads(artifact_path.read_text(encoding='utf-8'))
+            artifact = json.loads(block.child(attempt['artifact']).text())
             if artifact['run']['trace_sha256'] != manifest['trace_sha256']:
                 raise ValueError('event candidate trace identity differs from its block')
             summary = artifact['summary']
@@ -115,7 +177,7 @@ def select(root: Path) -> dict:
         }
     if len(selected) != 3 or any(len(regimes) != 3 for regimes in selected.values()):
         raise ValueError('event selection does not cover all workload/regime groups')
-    return {
+    result = {
         'artifact_schema_version': 1,
         'measurement_kind': 'training-event-parameter-lock',
         'stage': 'training',
@@ -130,6 +192,9 @@ def select(root: Path) -> dict:
         'selected': selected,
         'source_artifact_sha256': hashes,
     }
+    for archive in archives:
+        archive.close()
+    return result
 
 
 def main() -> None:

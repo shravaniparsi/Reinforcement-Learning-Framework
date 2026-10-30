@@ -19,6 +19,17 @@ the human-readable record is `notes/time_candidate_lock_2026-10-29.md`. These ar
 training choices only. Event-policy fitting and every later evidence partition
 remain incomplete.
 
+## 2026-10-30 event-candidate fitting
+
+Event-repair and write-reactive fitting completed in GitHub Actions run
+`41006126071`: 720/720 blocks and 12,960/12,960 full trace units passed. The
+parameter lock is
+`data/training/freshness-event-candidates-41006126071-archives/selected_event_parameters.json`;
+the archive inventory and 720 compressed raw artifacts are retained in the same
+directory. The human-readable record is
+`notes/event_candidate_lock_2026-10-30.md`. These are training choices only.
+Validation, variance planning and final testing have not begun.
+
 ## Ready
 
 - Distinct contribution and non-overlap boundary.
@@ -56,6 +67,7 @@ remain incomplete.
 - Hosted allocation design v1 places all eight randomized policies for a matched trace block on one fresh Ubuntu 24.04 runner, starts a new process and full reset per policy, pins Python 3.9.25 and Redis package `5:7.0.15-1ubuntu0.24.04.5`, forbids application-failure retries and retains both attempts for the single allowed infrastructure retry.
 - The source-bound synthetic analysis fixture exercises selection, five primary intervals and pool expansion without study observations. Its intentionally high-variance branch requires 78 traces, which is an engineering branch-coverage result rather than a study sample size. See `notes/allocation_and_analysis_engineering_2026-10-29.md`.
 - Protocol v0.4 is frozen at `protocol/protocol_v0.4.md`. It authorizes engineering preflight only. Training, validation and variance planning require a passing hosted preflight; final testing remains locked until earlier stages freeze parameters and `n`.
+- All training inputs and parameters are now locked: serialized-byte costs, fixed-TTL and stale-while-revalidate timing, event-repair age and write-reactive initial expected writes. The event campaign completed 720 blocks and 12,960 full-trace units; its 27,360 source files are checksum-bound in the parameter lock.
 - Verified seed bibliography for direct and adjacent work.
 
 ## Required before protocol freeze
@@ -75,4 +87,7 @@ remain incomplete.
 
 ## Current next step
 
-Build and pass the hosted end-to-end preflight workflow under the frozen v0.4 design. Only then begin training, validation and variance-planning collection. Final-test collection remains prohibited until those stages lock parameters and sample size.
+Implement and run the held-out validation partition with every training parameter
+fixed and no refitting. If validation passes the prespecified confirmation rule,
+run the variance-planning partition and freeze the final sample size. Final-test
+collection remains prohibited until both steps complete.
