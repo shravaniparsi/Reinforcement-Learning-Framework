@@ -39,7 +39,7 @@ def _sha256(path: Path) -> str:
 
 def _workload_and_options(workload_id: str):
     if workload_id == CatalogWorkload.workload_id:
-        return CatalogWorkload(product_count=4), {}
+        return CatalogWorkload(product_count=20), {}
     if workload_id == RealWorldFeedWorkload.workload_id:
         return RealWorldFeedWorkload(article_count=30), {'affects': realworld_feed_affects}
     if workload_id == DashboardWorkload.workload_id:
