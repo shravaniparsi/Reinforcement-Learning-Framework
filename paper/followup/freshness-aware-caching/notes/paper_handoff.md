@@ -9,6 +9,16 @@ counts are recorded in `notes/training_cost_lock_2026-10-29.md`. These are train
 inputs only. Candidate fitting, validation, variance planning and final-test
 collection remain incomplete.
 
+## 2026-10-29 time-candidate fitting
+
+Fixed-TTL and stale-while-revalidate fitting completed in GitHub Actions run
+`40984591923`: 90/90 blocks and 4,320/4,320 full trace units passed. The parameter
+lock is
+`data/training/freshness-time-candidates-40984591923/selected_time_parameters.json`;
+the human-readable record is `notes/time_candidate_lock_2026-10-29.md`. These are
+training choices only. Event-policy fitting and every later evidence partition
+remain incomplete.
+
 ## Ready
 
 - Distinct contribution and non-overlap boundary.
