@@ -6,6 +6,8 @@ This package implements protocol-level interfaces for the prospective cache-fres
 - `fault_schedule.py` materializes delivered, duplicated, reordered and dropped notifications while retaining loss records.
 - `trace_runner.py` replays logical-time engineering schedules, commits mutations before notification creation and records event, fault and full-schedule identities separately.
 - `trace_design_v1.json` and `trace_generator.py` define bounded prospective traces with disjoint evidence partitions and exact fault counts.
+- `parameter_grid_v1.json` and `parameter_design.py` freeze TTL, stale-window, repair and write-reactive candidates and keep final-test traces outside parameter selection.
+- `analysis_plan.py` implements lexicographic parameter selection, complete-pair checks, deterministic trace-level bootstrap intervals and precision-based final trace counts.
 - `redis_calibration.py` measures no-fault local Pub/Sub and Streams delivery with raw per-message timings and a host manifest. Its output is transport engineering evidence, not application study data.
 - `workload.py` defines the reset, commit, read and semantic-oracle contract shared by each application.
 - `catalog_workload.py` is the deterministic SQLite-backed W1 product adapter with per-product revision history.

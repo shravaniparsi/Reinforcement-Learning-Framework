@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "grid_id": "freshness-policy-parameters-v1",
+  "fixed_ttl_ms": [10, 25, 50, 100, 250, 500],
+  "stale_while_revalidate": {
+    "ttl_ms": [10, 25, 50, 100, 250, 500],
+    "stale_window_ms": [10, 25, 50, 100, 250, 500]
+  },
+  "repair_ms": [10, 25, 50, 100, 250, 500],
+  "write_reactive": {
+    "initial_expected_writes": [0.25, 0.5, 1.0, 2.0, 5.0, 10.0],
+    "cost_basis": "serialized-bytes",
+    "update_cost_source": "median complete update-notification bytes by workload and regime in training",
+    "invalidate_cost_source": "median key-plus-revision invalidation-notification bytes by workload and regime in training",
+    "miss_cost_source": "median origin miss response bytes by workload and regime in training"
+  },
+  "selection_partitions": {
+    "fit": "training",
+    "confirm": "validation",
+    "variance_only": "variance-planning",
+    "locked_evaluation": "final-test"
+  }
+}
