@@ -181,6 +181,51 @@ class CacheGatewayTests(unittest.TestCase):
         self.assertEqual(result.origin_operation, 'fetch')
         self.assertEqual(gateway.state()['last_write_action']['product-1'], 'invalidate')
 
+    def test_write_reactive_counts_a_published_write_once_when_delivery_is_lost(self):
+        gateway = CacheGateway(
+            self.workload,
+            'write-reactive',
+            update_cost=1,
+            invalidate_cost=1,
+            miss_cost=4,
+            initial_expected_writes=1,
+        )
+        gateway.read('product-1', 0, 0)
+        commit = self.update(5000)
+        prepared = gateway.prepare_notification(
+            'u1', 'product-1', commit.notification_payload,
+        )
+        self.assertEqual(prepared['_cache_actions'], {'product-1': 'update'})
+        before_read = gateway.state()['write_history']['product-1']
+        self.assertEqual(before_read['writes_since_read'], 1)
+
+        stale = gateway.read('product-1', 20, 1)
+        self.assertFalse(stale.semantically_fresh)
+        after_read = gateway.state()['write_history']['product-1']
+        self.assertEqual(after_read, {
+            'write_sum': 1, 'sample_count': 1, 'writes_since_read': 0,
+        })
+
+    def test_prepared_write_reactive_delivery_does_not_double_count_write(self):
+        gateway = CacheGateway(
+            self.workload,
+            'write-reactive',
+            update_cost=1,
+            invalidate_cost=1,
+            miss_cost=4,
+            initial_expected_writes=1,
+        )
+        gateway.read('product-1', 0, 0)
+        commit = self.update(5000)
+        prepared = gateway.prepare_notification(
+            'u1', 'product-1', commit.notification_payload,
+        )
+        gateway.notify('u1', 'product-1', prepared, at_ms=15)
+        gateway.read('product-1', 20, 1)
+        history = gateway.state()['write_history']['product-1']
+        self.assertEqual(history['write_sum'], 1)
+        self.assertEqual(history['sample_count'], 1)
+
     def test_reset_clears_policy_state_and_replays_fixture(self):
         gateway = CacheGateway(self.workload, 'always-invalidate')
         original = gateway.read('product-1', 0, 0).content_sha256

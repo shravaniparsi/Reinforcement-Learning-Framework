@@ -13,20 +13,30 @@ This package implements protocol-level interfaces for the prospective cache-fres
 - `dashboard_workload.py` is the versioned W3 order, review and customer adapter with a complete single-revision dashboard oracle.
 - `dashboard_service.py` exposes W3 through the React-admin simple REST contract and controller-only mutation and oracle endpoints.
 - `cache_gateway.py` is the policy-independent cache layer. Its engineering policies are bypass, conditional validation, fixed TTL, stale-while-revalidate, delivered-event invalidation, delivered-event update, a write-reactive update-or-invalidate rule and event invalidation with bounded repair.
-- `dependencies.py` contains conservative W2 feed and W3 resource-query dependency rules. The current W2 and W3 notifications identify affected queries but do not contain enough state to update arbitrary filtered, sorted and paginated query responses. Always-update therefore remains a W1-only comparison unless the notification contract is expanded before protocol freeze.
+- `dependencies.py` contains conservative W2 feed and W3 resource-query dependency rules. For update actions, the publisher snapshots complete affected cached-query responses at the commit revision and includes their content and hashes in the notification.
 - `realworld_browser_smoke.py` and `dashboard_browser_smoke.py` are semantic browser gates. They do not record latency or other performance observations.
 
-The active design is `paper/followup/freshness-aware-caching/protocol/protocol_v0.3.md`. Study collection remains disabled until protocol v0.4 is frozen.
+The active design is the working draft `paper/followup/freshness-aware-caching/protocol/protocol_v0.4-draft.md`. Study collection remains disabled until protocol v0.4 is frozen.
 
-The write-reactive implementation minimizes the declared throughput cost. It updates when `E[W] * c_u < c_m + c_i` and invalidates otherwise. Mao et al. derive the equivalent update condition in Section 3.2, but the later prose describing the `E[W]` approximation prints the action labels in the opposite direction. The implementation follows the derivation and the accompanying cost explanation; this choice must be stated in the final Methods.
+The trace runner fixes update-or-invalidate actions at publication time. W2 and W3 full-query update content is read from the origin immediately after the commit and stored in the notification, so delayed delivery cannot consult newer origin state. Publication records retain query-construction reads, response bytes and serialized notification bytes.
+
+The write-reactive implementation minimizes the declared throughput cost. It updates when `E[W] * c_u < c_m + c_i` and invalidates otherwise. Exact write-between-read history changes when the origin write is published, including when delivery is later lost; notification delivery does not count the write again. Mao et al. derive the equivalent update condition in Section 3.2, but the later prose describing the `E[W]` approximation prints the action labels in the opposite direction. The implementation follows the derivation and the accompanying cost explanation; this choice must be stated in the final Methods.
 
 The canonical W1 policy replay is a semantic engineering check only:
 
 ```sh
 python3 -m experiments.freshness.run_gateway_engineering \
   experiments/freshness/schedules/w1_policy_replay_v1.json \
-  data/engineering/freshness-w1-policy-replay-v1/results.json
+  data/engineering/freshness-w1-policy-replay-v2/results.json
 ```
+
+The source-bound cross-workload replays use:
+
+- `schedules/w1_policy_replay_v1.json` with `data/engineering/freshness-w1-policy-replay-v2/results.json`;
+- `schedules/w2_policy_replay_v1.json` with `data/engineering/freshness-w2-policy-replay-v1/results.json`; and
+- `schedules/w3_policy_replay_v1.json` with `data/engineering/freshness-w3-policy-replay-v1/results.json`.
+
+Each artifact records the gateway, runner and schedule hashes and is labeled as semantic engineering evidence without performance observations.
 
 Run the local no-fault Redis calibration with:
 

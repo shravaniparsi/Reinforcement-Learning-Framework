@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import heapq
+import copy
+import json
 from dataclasses import asdict, dataclass
 from typing import Any, Dict, List, Mapping, Tuple
 
@@ -23,6 +25,7 @@ class TraceRun:
     delivered_notification_ids: Tuple[str, ...]
     duplicate_notification_ids: Tuple[str, ...]
     dropped_notification_ids: Tuple[str, ...]
+    publication_records: Tuple[Mapping[str, Any], ...]
     final_gateway_state: Mapping[str, Any]
 
     def to_mapping(self) -> Mapping[str, Any]:
@@ -46,6 +49,58 @@ def _mutation(payload: Mapping[str, Any]) -> Mapping[str, Any]:
     return mutation
 
 
+def _encoded_size(value: Any) -> int:
+    return len(json.dumps(
+        value, sort_keys=True, separators=(',', ':'), ensure_ascii=False, allow_nan=False,
+    ).encode('utf-8'))
+
+
+def _prepare_publication(
+    gateway: CacheGateway,
+    event_id: str,
+    notification_key: str,
+    payload: Mapping[str, Any],
+    revision: int,
+) -> tuple[Mapping[str, Any], Mapping[str, Any]]:
+    prepared = dict(gateway.prepare_notification(event_id, notification_key, payload))
+    actions = prepared.get('_cache_actions', {})
+    query_updates: Dict[str, Mapping[str, Any]] = {}
+    origin_reads = 0
+    origin_body_bytes = 0
+    for cache_key, action in actions.items():
+        if action != 'update':
+            continue
+        if cache_key == notification_key and prepared.get('content') is not None:
+            continue
+        record = gateway.workload.read(cache_key)
+        if record.decision_revision != revision:
+            raise ValueError(
+                f'publication snapshot revision {record.decision_revision} differs from '
+                f'commit revision {revision} for {cache_key}'
+            )
+        query_updates[cache_key] = {
+            'revision': revision,
+            'content': copy.deepcopy(record.content),
+            'content_sha256': record.content_sha256,
+        }
+        origin_reads += 1
+        origin_body_bytes += record.response_body_bytes
+    if query_updates:
+        prepared['query_updates'] = query_updates
+    record = {
+        'event_id': event_id,
+        'revision': revision,
+        'actions': dict(actions),
+        'query_update_count': len(query_updates),
+        'publisher_origin_reads': origin_reads,
+        'publisher_origin_response_body_bytes': origin_body_bytes,
+        'notification_body_bytes': _encoded_size({
+            'key': notification_key, 'payload': prepared,
+        }),
+    }
+    return prepared, record
+
+
 def run_trace(schedule: TraceSchedule, gateway: CacheGateway) -> TraceRun:
     """Replay one schedule without allowing policy work to move exogenous events."""
 
@@ -65,6 +120,7 @@ def run_trace(schedule: TraceSchedule, gateway: CacheGateway) -> TraceRun:
     delivered_ids: List[str] = []
     duplicate_ids: List[str] = []
     observations: List[GatewayObservation] = []
+    publication_records: List[Mapping[str, Any]] = []
     commit_payloads: Dict[str, Mapping[str, Any]] = {}
 
     def deliver_through(at_ms: int) -> None:
@@ -91,7 +147,15 @@ def run_trace(schedule: TraceSchedule, gateway: CacheGateway) -> TraceRun:
                     f'commit revision {commit.revision} differs from expected revision '
                     f'{expected_revision} for {event.event_id}'
                 )
-            commit_payloads[event.event_id] = commit.notification_payload
+            prepared, publication_record = _prepare_publication(
+                gateway,
+                event.event_id,
+                event.key,
+                commit.notification_payload,
+                commit.revision,
+            )
+            commit_payloads[event.event_id] = prepared
+            publication_records.append(publication_record)
             committed.append(event.event_id)
             for template in templates_by_source.get(event.event_id, ()):
                 heapq.heappush(
@@ -123,5 +187,6 @@ def run_trace(schedule: TraceSchedule, gateway: CacheGateway) -> TraceRun:
         delivered_notification_ids=tuple(delivered_ids),
         duplicate_notification_ids=tuple(duplicate_ids),
         dropped_notification_ids=tuple(item.notification_id for item in dropped),
+        publication_records=tuple(publication_records),
         final_gateway_state=gateway.state(),
     )

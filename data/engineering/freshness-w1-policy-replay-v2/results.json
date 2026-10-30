@@ -1,0 +1,962 @@
+{
+  "artifact_schema_version": 1,
+  "contains_performance_observations": false,
+  "measurement_kind": "semantic-engineering-only",
+  "policy_parameters": {
+    "always-invalidate": {},
+    "always-update": {},
+    "bypass": {},
+    "conditional-validation": {},
+    "event-invalidate-with-repair": {
+      "repair_ms": 25
+    },
+    "fixed-ttl": {
+      "ttl_ms": 25
+    },
+    "stale-while-revalidate": {
+      "stale_window_ms": 50,
+      "ttl_ms": 25
+    },
+    "write-reactive": {
+      "initial_expected_writes": 1,
+      "invalidate_cost": 1,
+      "miss_cost": 4,
+      "update_cost": 1
+    }
+  },
+  "protocol_status": "pre-freeze-v0.4-draft-do-not-use-as-study-data",
+  "runs": [
+    {
+      "committed_event_ids": [
+        "u1"
+      ],
+      "delivered_notification_ids": [
+        "u1:0"
+      ],
+      "dropped_notification_ids": [],
+      "duplicate_notification_ids": [
+        "u1:1"
+      ],
+      "fault_sha256": "de4e1d24a8741713f50cbfdf9296a5b74c21905ed4a6e1233c46cd0cf1de7ef0",
+      "final_gateway_state": {
+        "cache_keys": [],
+        "last_write_action": {},
+        "notification_ids": [
+          "u1"
+        ],
+        "policy": "bypass",
+        "publication_ids": [
+          "u1"
+        ],
+        "seed": 7,
+        "tracked_keys": [
+          "product-1"
+        ],
+        "write_history": {}
+      },
+      "observations": [
+        {
+          "at_ms": 0,
+          "cache_hit": false,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 1244,
+            "revision": 0
+          },
+          "content_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "decision_revision": 0,
+          "key": "product-1",
+          "oracle_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "origin_operation": "fetch",
+          "origin_response_body_bytes": 159,
+          "policy": "bypass",
+          "revision_lag": 0,
+          "semantically_fresh": true,
+          "served_revision": 0
+        },
+        {
+          "at_ms": 20,
+          "cache_hit": false,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 5000,
+            "revision": 1
+          },
+          "content_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "decision_revision": 1,
+          "key": "product-1",
+          "oracle_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "origin_operation": "fetch",
+          "origin_response_body_bytes": 159,
+          "policy": "bypass",
+          "revision_lag": 0,
+          "semantically_fresh": true,
+          "served_revision": 1
+        },
+        {
+          "at_ms": 60,
+          "cache_hit": false,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 5000,
+            "revision": 1
+          },
+          "content_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "decision_revision": 1,
+          "key": "product-1",
+          "oracle_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "origin_operation": "fetch",
+          "origin_response_body_bytes": 159,
+          "policy": "bypass",
+          "revision_lag": 0,
+          "semantically_fresh": true,
+          "served_revision": 1
+        }
+      ],
+      "policy": "bypass",
+      "publication_records": [
+        {
+          "actions": {},
+          "event_id": "u1",
+          "notification_body_bytes": 316,
+          "publisher_origin_reads": 0,
+          "publisher_origin_response_body_bytes": 0,
+          "query_update_count": 0,
+          "revision": 1
+        }
+      ],
+      "schedule_sha256": "d709dddd6499201bf519742f042772b6733920fee12e3d583b0930780108a66b",
+      "trace_id": "w1-engineering-policy-replay-v1",
+      "trace_sha256": "9453364e6c0a56a4fae2b1014e4858e5f9357a71821fb91cec9cca6af7c455ce"
+    },
+    {
+      "committed_event_ids": [
+        "u1"
+      ],
+      "delivered_notification_ids": [
+        "u1:0"
+      ],
+      "dropped_notification_ids": [],
+      "duplicate_notification_ids": [
+        "u1:1"
+      ],
+      "fault_sha256": "de4e1d24a8741713f50cbfdf9296a5b74c21905ed4a6e1233c46cd0cf1de7ef0",
+      "final_gateway_state": {
+        "cache_keys": [
+          "product-1"
+        ],
+        "last_write_action": {},
+        "notification_ids": [
+          "u1"
+        ],
+        "policy": "conditional-validation",
+        "publication_ids": [
+          "u1"
+        ],
+        "seed": 7,
+        "tracked_keys": [
+          "product-1"
+        ],
+        "write_history": {}
+      },
+      "observations": [
+        {
+          "at_ms": 0,
+          "cache_hit": false,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 1244,
+            "revision": 0
+          },
+          "content_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "decision_revision": 0,
+          "key": "product-1",
+          "oracle_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "origin_operation": "fetch",
+          "origin_response_body_bytes": 159,
+          "policy": "conditional-validation",
+          "revision_lag": 0,
+          "semantically_fresh": true,
+          "served_revision": 0
+        },
+        {
+          "at_ms": 20,
+          "cache_hit": false,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 5000,
+            "revision": 1
+          },
+          "content_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "decision_revision": 1,
+          "key": "product-1",
+          "oracle_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "origin_operation": "validate",
+          "origin_response_body_bytes": 159,
+          "policy": "conditional-validation",
+          "revision_lag": 0,
+          "semantically_fresh": true,
+          "served_revision": 1
+        },
+        {
+          "at_ms": 60,
+          "cache_hit": true,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 5000,
+            "revision": 1
+          },
+          "content_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "decision_revision": 1,
+          "key": "product-1",
+          "oracle_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "origin_operation": "validate",
+          "origin_response_body_bytes": 0,
+          "policy": "conditional-validation",
+          "revision_lag": 0,
+          "semantically_fresh": true,
+          "served_revision": 1
+        }
+      ],
+      "policy": "conditional-validation",
+      "publication_records": [
+        {
+          "actions": {},
+          "event_id": "u1",
+          "notification_body_bytes": 316,
+          "publisher_origin_reads": 0,
+          "publisher_origin_response_body_bytes": 0,
+          "query_update_count": 0,
+          "revision": 1
+        }
+      ],
+      "schedule_sha256": "d709dddd6499201bf519742f042772b6733920fee12e3d583b0930780108a66b",
+      "trace_id": "w1-engineering-policy-replay-v1",
+      "trace_sha256": "9453364e6c0a56a4fae2b1014e4858e5f9357a71821fb91cec9cca6af7c455ce"
+    },
+    {
+      "committed_event_ids": [
+        "u1"
+      ],
+      "delivered_notification_ids": [
+        "u1:0"
+      ],
+      "dropped_notification_ids": [],
+      "duplicate_notification_ids": [
+        "u1:1"
+      ],
+      "fault_sha256": "de4e1d24a8741713f50cbfdf9296a5b74c21905ed4a6e1233c46cd0cf1de7ef0",
+      "final_gateway_state": {
+        "cache_keys": [
+          "product-1"
+        ],
+        "last_write_action": {},
+        "notification_ids": [
+          "u1"
+        ],
+        "policy": "fixed-ttl",
+        "publication_ids": [
+          "u1"
+        ],
+        "seed": 7,
+        "tracked_keys": [
+          "product-1"
+        ],
+        "write_history": {}
+      },
+      "observations": [
+        {
+          "at_ms": 0,
+          "cache_hit": false,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 1244,
+            "revision": 0
+          },
+          "content_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "decision_revision": 0,
+          "key": "product-1",
+          "oracle_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "origin_operation": "fetch",
+          "origin_response_body_bytes": 159,
+          "policy": "fixed-ttl",
+          "revision_lag": 0,
+          "semantically_fresh": true,
+          "served_revision": 0
+        },
+        {
+          "at_ms": 20,
+          "cache_hit": true,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 1244,
+            "revision": 0
+          },
+          "content_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "decision_revision": 1,
+          "key": "product-1",
+          "oracle_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "origin_operation": "none",
+          "origin_response_body_bytes": 0,
+          "policy": "fixed-ttl",
+          "revision_lag": 1,
+          "semantically_fresh": false,
+          "served_revision": 0
+        },
+        {
+          "at_ms": 60,
+          "cache_hit": false,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 5000,
+            "revision": 1
+          },
+          "content_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "decision_revision": 1,
+          "key": "product-1",
+          "oracle_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "origin_operation": "fetch",
+          "origin_response_body_bytes": 159,
+          "policy": "fixed-ttl",
+          "revision_lag": 0,
+          "semantically_fresh": true,
+          "served_revision": 1
+        }
+      ],
+      "policy": "fixed-ttl",
+      "publication_records": [
+        {
+          "actions": {},
+          "event_id": "u1",
+          "notification_body_bytes": 316,
+          "publisher_origin_reads": 0,
+          "publisher_origin_response_body_bytes": 0,
+          "query_update_count": 0,
+          "revision": 1
+        }
+      ],
+      "schedule_sha256": "d709dddd6499201bf519742f042772b6733920fee12e3d583b0930780108a66b",
+      "trace_id": "w1-engineering-policy-replay-v1",
+      "trace_sha256": "9453364e6c0a56a4fae2b1014e4858e5f9357a71821fb91cec9cca6af7c455ce"
+    },
+    {
+      "committed_event_ids": [
+        "u1"
+      ],
+      "delivered_notification_ids": [
+        "u1:0"
+      ],
+      "dropped_notification_ids": [],
+      "duplicate_notification_ids": [
+        "u1:1"
+      ],
+      "fault_sha256": "de4e1d24a8741713f50cbfdf9296a5b74c21905ed4a6e1233c46cd0cf1de7ef0",
+      "final_gateway_state": {
+        "cache_keys": [
+          "product-1"
+        ],
+        "last_write_action": {},
+        "notification_ids": [
+          "u1"
+        ],
+        "policy": "stale-while-revalidate",
+        "publication_ids": [
+          "u1"
+        ],
+        "seed": 7,
+        "tracked_keys": [
+          "product-1"
+        ],
+        "write_history": {}
+      },
+      "observations": [
+        {
+          "at_ms": 0,
+          "cache_hit": false,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 1244,
+            "revision": 0
+          },
+          "content_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "decision_revision": 0,
+          "key": "product-1",
+          "oracle_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "origin_operation": "fetch",
+          "origin_response_body_bytes": 159,
+          "policy": "stale-while-revalidate",
+          "revision_lag": 0,
+          "semantically_fresh": true,
+          "served_revision": 0
+        },
+        {
+          "at_ms": 20,
+          "cache_hit": true,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 1244,
+            "revision": 0
+          },
+          "content_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "decision_revision": 1,
+          "key": "product-1",
+          "oracle_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "origin_operation": "none",
+          "origin_response_body_bytes": 0,
+          "policy": "stale-while-revalidate",
+          "revision_lag": 1,
+          "semantically_fresh": false,
+          "served_revision": 0
+        },
+        {
+          "at_ms": 60,
+          "cache_hit": true,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 1244,
+            "revision": 0
+          },
+          "content_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "decision_revision": 1,
+          "key": "product-1",
+          "oracle_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "origin_operation": "background-validate",
+          "origin_response_body_bytes": 159,
+          "policy": "stale-while-revalidate",
+          "revision_lag": 1,
+          "semantically_fresh": false,
+          "served_revision": 0
+        }
+      ],
+      "policy": "stale-while-revalidate",
+      "publication_records": [
+        {
+          "actions": {},
+          "event_id": "u1",
+          "notification_body_bytes": 316,
+          "publisher_origin_reads": 0,
+          "publisher_origin_response_body_bytes": 0,
+          "query_update_count": 0,
+          "revision": 1
+        }
+      ],
+      "schedule_sha256": "d709dddd6499201bf519742f042772b6733920fee12e3d583b0930780108a66b",
+      "trace_id": "w1-engineering-policy-replay-v1",
+      "trace_sha256": "9453364e6c0a56a4fae2b1014e4858e5f9357a71821fb91cec9cca6af7c455ce"
+    },
+    {
+      "committed_event_ids": [
+        "u1"
+      ],
+      "delivered_notification_ids": [
+        "u1:0"
+      ],
+      "dropped_notification_ids": [],
+      "duplicate_notification_ids": [
+        "u1:1"
+      ],
+      "fault_sha256": "de4e1d24a8741713f50cbfdf9296a5b74c21905ed4a6e1233c46cd0cf1de7ef0",
+      "final_gateway_state": {
+        "cache_keys": [
+          "product-1"
+        ],
+        "last_write_action": {},
+        "notification_ids": [
+          "u1"
+        ],
+        "policy": "always-invalidate",
+        "publication_ids": [
+          "u1"
+        ],
+        "seed": 7,
+        "tracked_keys": [
+          "product-1"
+        ],
+        "write_history": {}
+      },
+      "observations": [
+        {
+          "at_ms": 0,
+          "cache_hit": false,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 1244,
+            "revision": 0
+          },
+          "content_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "decision_revision": 0,
+          "key": "product-1",
+          "oracle_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "origin_operation": "fetch",
+          "origin_response_body_bytes": 159,
+          "policy": "always-invalidate",
+          "revision_lag": 0,
+          "semantically_fresh": true,
+          "served_revision": 0
+        },
+        {
+          "at_ms": 20,
+          "cache_hit": true,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 1244,
+            "revision": 0
+          },
+          "content_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "decision_revision": 1,
+          "key": "product-1",
+          "oracle_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "origin_operation": "none",
+          "origin_response_body_bytes": 0,
+          "policy": "always-invalidate",
+          "revision_lag": 1,
+          "semantically_fresh": false,
+          "served_revision": 0
+        },
+        {
+          "at_ms": 60,
+          "cache_hit": false,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 5000,
+            "revision": 1
+          },
+          "content_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "decision_revision": 1,
+          "key": "product-1",
+          "oracle_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "origin_operation": "fetch",
+          "origin_response_body_bytes": 159,
+          "policy": "always-invalidate",
+          "revision_lag": 0,
+          "semantically_fresh": true,
+          "served_revision": 1
+        }
+      ],
+      "policy": "always-invalidate",
+      "publication_records": [
+        {
+          "actions": {},
+          "event_id": "u1",
+          "notification_body_bytes": 316,
+          "publisher_origin_reads": 0,
+          "publisher_origin_response_body_bytes": 0,
+          "query_update_count": 0,
+          "revision": 1
+        }
+      ],
+      "schedule_sha256": "d709dddd6499201bf519742f042772b6733920fee12e3d583b0930780108a66b",
+      "trace_id": "w1-engineering-policy-replay-v1",
+      "trace_sha256": "9453364e6c0a56a4fae2b1014e4858e5f9357a71821fb91cec9cca6af7c455ce"
+    },
+    {
+      "committed_event_ids": [
+        "u1"
+      ],
+      "delivered_notification_ids": [
+        "u1:0"
+      ],
+      "dropped_notification_ids": [],
+      "duplicate_notification_ids": [
+        "u1:1"
+      ],
+      "fault_sha256": "de4e1d24a8741713f50cbfdf9296a5b74c21905ed4a6e1233c46cd0cf1de7ef0",
+      "final_gateway_state": {
+        "cache_keys": [
+          "product-1"
+        ],
+        "last_write_action": {
+          "product-1": "update"
+        },
+        "notification_ids": [
+          "u1"
+        ],
+        "policy": "always-update",
+        "publication_ids": [
+          "u1"
+        ],
+        "seed": 7,
+        "tracked_keys": [
+          "product-1"
+        ],
+        "write_history": {}
+      },
+      "observations": [
+        {
+          "at_ms": 0,
+          "cache_hit": false,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 1244,
+            "revision": 0
+          },
+          "content_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "decision_revision": 0,
+          "key": "product-1",
+          "oracle_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "origin_operation": "fetch",
+          "origin_response_body_bytes": 159,
+          "policy": "always-update",
+          "revision_lag": 0,
+          "semantically_fresh": true,
+          "served_revision": 0
+        },
+        {
+          "at_ms": 20,
+          "cache_hit": true,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 1244,
+            "revision": 0
+          },
+          "content_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "decision_revision": 1,
+          "key": "product-1",
+          "oracle_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "origin_operation": "none",
+          "origin_response_body_bytes": 0,
+          "policy": "always-update",
+          "revision_lag": 1,
+          "semantically_fresh": false,
+          "served_revision": 0
+        },
+        {
+          "at_ms": 60,
+          "cache_hit": true,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 5000,
+            "revision": 1
+          },
+          "content_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "decision_revision": 1,
+          "key": "product-1",
+          "oracle_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "origin_operation": "none",
+          "origin_response_body_bytes": 0,
+          "policy": "always-update",
+          "revision_lag": 0,
+          "semantically_fresh": true,
+          "served_revision": 1
+        }
+      ],
+      "policy": "always-update",
+      "publication_records": [
+        {
+          "actions": {
+            "product-1": "update"
+          },
+          "event_id": "u1",
+          "notification_body_bytes": 356,
+          "publisher_origin_reads": 0,
+          "publisher_origin_response_body_bytes": 0,
+          "query_update_count": 0,
+          "revision": 1
+        }
+      ],
+      "schedule_sha256": "d709dddd6499201bf519742f042772b6733920fee12e3d583b0930780108a66b",
+      "trace_id": "w1-engineering-policy-replay-v1",
+      "trace_sha256": "9453364e6c0a56a4fae2b1014e4858e5f9357a71821fb91cec9cca6af7c455ce"
+    },
+    {
+      "committed_event_ids": [
+        "u1"
+      ],
+      "delivered_notification_ids": [
+        "u1:0"
+      ],
+      "dropped_notification_ids": [],
+      "duplicate_notification_ids": [
+        "u1:1"
+      ],
+      "fault_sha256": "de4e1d24a8741713f50cbfdf9296a5b74c21905ed4a6e1233c46cd0cf1de7ef0",
+      "final_gateway_state": {
+        "cache_keys": [
+          "product-1"
+        ],
+        "last_write_action": {
+          "product-1": "update"
+        },
+        "notification_ids": [
+          "u1"
+        ],
+        "policy": "write-reactive",
+        "publication_ids": [
+          "u1"
+        ],
+        "seed": 7,
+        "tracked_keys": [
+          "product-1"
+        ],
+        "write_history": {
+          "product-1": {
+            "sample_count": 1,
+            "write_sum": 1,
+            "writes_since_read": 0
+          }
+        }
+      },
+      "observations": [
+        {
+          "at_ms": 0,
+          "cache_hit": false,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 1244,
+            "revision": 0
+          },
+          "content_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "decision_revision": 0,
+          "key": "product-1",
+          "oracle_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "origin_operation": "fetch",
+          "origin_response_body_bytes": 159,
+          "policy": "write-reactive",
+          "revision_lag": 0,
+          "semantically_fresh": true,
+          "served_revision": 0
+        },
+        {
+          "at_ms": 20,
+          "cache_hit": true,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 1244,
+            "revision": 0
+          },
+          "content_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "decision_revision": 1,
+          "key": "product-1",
+          "oracle_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "origin_operation": "none",
+          "origin_response_body_bytes": 0,
+          "policy": "write-reactive",
+          "revision_lag": 1,
+          "semantically_fresh": false,
+          "served_revision": 0
+        },
+        {
+          "at_ms": 60,
+          "cache_hit": true,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 5000,
+            "revision": 1
+          },
+          "content_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "decision_revision": 1,
+          "key": "product-1",
+          "oracle_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "origin_operation": "none",
+          "origin_response_body_bytes": 0,
+          "policy": "write-reactive",
+          "revision_lag": 0,
+          "semantically_fresh": true,
+          "served_revision": 1
+        }
+      ],
+      "policy": "write-reactive",
+      "publication_records": [
+        {
+          "actions": {
+            "product-1": "update"
+          },
+          "event_id": "u1",
+          "notification_body_bytes": 356,
+          "publisher_origin_reads": 0,
+          "publisher_origin_response_body_bytes": 0,
+          "query_update_count": 0,
+          "revision": 1
+        }
+      ],
+      "schedule_sha256": "d709dddd6499201bf519742f042772b6733920fee12e3d583b0930780108a66b",
+      "trace_id": "w1-engineering-policy-replay-v1",
+      "trace_sha256": "9453364e6c0a56a4fae2b1014e4858e5f9357a71821fb91cec9cca6af7c455ce"
+    },
+    {
+      "committed_event_ids": [
+        "u1"
+      ],
+      "delivered_notification_ids": [
+        "u1:0"
+      ],
+      "dropped_notification_ids": [],
+      "duplicate_notification_ids": [
+        "u1:1"
+      ],
+      "fault_sha256": "de4e1d24a8741713f50cbfdf9296a5b74c21905ed4a6e1233c46cd0cf1de7ef0",
+      "final_gateway_state": {
+        "cache_keys": [
+          "product-1"
+        ],
+        "last_write_action": {},
+        "notification_ids": [
+          "u1"
+        ],
+        "policy": "event-invalidate-with-repair",
+        "publication_ids": [
+          "u1"
+        ],
+        "seed": 7,
+        "tracked_keys": [
+          "product-1"
+        ],
+        "write_history": {}
+      },
+      "observations": [
+        {
+          "at_ms": 0,
+          "cache_hit": false,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 1244,
+            "revision": 0
+          },
+          "content_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "decision_revision": 0,
+          "key": "product-1",
+          "oracle_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "origin_operation": "fetch",
+          "origin_response_body_bytes": 159,
+          "policy": "event-invalidate-with-repair",
+          "revision_lag": 0,
+          "semantically_fresh": true,
+          "served_revision": 0
+        },
+        {
+          "at_ms": 20,
+          "cache_hit": true,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 1244,
+            "revision": 0
+          },
+          "content_sha256": "37152ccdb0cb92a145a55c8f771f33604a1b72f65eba04389c5baa391a289cee",
+          "decision_revision": 1,
+          "key": "product-1",
+          "oracle_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "origin_operation": "none",
+          "origin_response_body_bytes": 0,
+          "policy": "event-invalidate-with-repair",
+          "revision_lag": 1,
+          "semantically_fresh": false,
+          "served_revision": 0
+        },
+        {
+          "at_ms": 60,
+          "cache_hit": false,
+          "content": {
+            "available": true,
+            "description": "A compact accessory for an organized workspace.",
+            "id": "product-1",
+            "name": "Desk accessory 001",
+            "price_cents": 5000,
+            "revision": 1
+          },
+          "content_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "decision_revision": 1,
+          "key": "product-1",
+          "oracle_sha256": "7420147c67f784969807d95fd591ecd2adcb76d700452d0d3a70a893954907c6",
+          "origin_operation": "fetch",
+          "origin_response_body_bytes": 159,
+          "policy": "event-invalidate-with-repair",
+          "revision_lag": 0,
+          "semantically_fresh": true,
+          "served_revision": 1
+        }
+      ],
+      "policy": "event-invalidate-with-repair",
+      "publication_records": [
+        {
+          "actions": {},
+          "event_id": "u1",
+          "notification_body_bytes": 316,
+          "publisher_origin_reads": 0,
+          "publisher_origin_response_body_bytes": 0,
+          "query_update_count": 0,
+          "revision": 1
+        }
+      ],
+      "schedule_sha256": "d709dddd6499201bf519742f042772b6733920fee12e3d583b0930780108a66b",
+      "trace_id": "w1-engineering-policy-replay-v1",
+      "trace_sha256": "9453364e6c0a56a4fae2b1014e4858e5f9357a71821fb91cec9cca6af7c455ce"
+    }
+  ],
+  "schedule_path": "experiments/freshness/schedules/w1_policy_replay_v1.json",
+  "source_sha256": {
+    "cache_gateway.py": "4c3bb7355606b7c365dbd1e04999b76a2a6b348c5be551a4f27ec25436a0e242",
+    "run_gateway_engineering.py": "e0168940c61a00d41263ad376de246eaf24deb7ba92078ae105fb0310e9e0db7",
+    "schedule": "6bb1cda7011981e63d77c4162492064ca3917e944b2aca57c36eabf271a5e002",
+    "trace_runner.py": "567a89dc1369e828a351c9bc6e295bf2a099a4de4f3103e204b59c3ed6d2c4a1"
+  },
+  "workload_id": "mutable-product-v1"
+}

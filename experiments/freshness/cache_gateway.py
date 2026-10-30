@@ -108,6 +108,7 @@ class CacheGateway:
         self.initial_expected_writes = initial_expected_writes
         self.cache: Dict[str, CacheEntry] = {}
         self.notifications: Dict[str, str] = {}
+        self.publications: Dict[str, tuple[str, Mapping[str, Any]]] = {}
         self.tracked_keys: set[str] = set()
         self.write_history: Dict[str, WriteHistory] = {}
         self.last_write_action: Dict[str, str] = {}
@@ -125,6 +126,7 @@ class CacheGateway:
         self.workload.reset(seed)
         self.cache.clear()
         self.notifications.clear()
+        self.publications.clear()
         self.tracked_keys.clear()
         self.write_history.clear()
         self.last_write_action.clear()
@@ -136,6 +138,7 @@ class CacheGateway:
             'seed': self.seed,
             'cache_keys': tuple(sorted(self.cache)),
             'notification_ids': tuple(sorted(self.notifications)),
+            'publication_ids': tuple(sorted(self.publications)),
             'tracked_keys': tuple(sorted(self.tracked_keys)),
             'write_history': {
                 key: {
@@ -147,6 +150,57 @@ class CacheGateway:
             },
             'last_write_action': dict(sorted(self.last_write_action.items())),
         }
+
+    def prepare_notification(
+        self,
+        publication_id: str,
+        key: str,
+        payload: Mapping[str, Any],
+    ) -> Mapping[str, Any]:
+        """Fix source-side policy actions when an origin write is published."""
+
+        if not isinstance(publication_id, str) or not publication_id:
+            raise ValueError('publication_id must be non-empty')
+        if not isinstance(key, str) or not key or not isinstance(payload, Mapping):
+            raise ValueError('publication key and payload are required')
+        source_digest = content_hash({'key': key, 'payload': payload})
+        previous = self.publications.get(publication_id)
+        if previous is not None:
+            if previous[0] != source_digest:
+                raise ValueError('publication ID was reused with different content')
+            return copy.deepcopy(previous[1])
+
+        prepared = copy.deepcopy(dict(payload))
+        actions: Dict[str, str] = {}
+        affected_tracked = [
+            cache_key for cache_key in self.tracked_keys
+            if self.affects(cache_key, key, payload)
+        ]
+        if self.policy == 'always-update':
+            actions = {
+                cache_key: 'update'
+                for cache_key in affected_tracked
+                if cache_key in self.cache
+            }
+        elif self.policy == 'write-reactive':
+            for cache_key in affected_tracked:
+                history = self.write_history.setdefault(cache_key, WriteHistory())
+                history.writes_since_read += 1
+                if cache_key not in self.cache:
+                    continue
+                expected_writes = (
+                    history.write_sum / history.sample_count
+                    if history.sample_count else self.initial_expected_writes
+                )
+                update_total = expected_writes * self.update_cost
+                invalidate_total = self.invalidate_cost + self.miss_cost
+                action = 'update' if update_total < invalidate_total else 'invalidate'
+                actions[cache_key] = action
+                self.last_write_action[cache_key] = action
+        if actions or self.policy in {'always-update', 'write-reactive'}:
+            prepared['_cache_actions'] = actions
+        self.publications[publication_id] = (source_digest, copy.deepcopy(prepared))
+        return prepared
 
     def notify(
         self,
@@ -170,10 +224,22 @@ class CacheGateway:
             if previous != digest:
                 raise ValueError('notification ID was reused with different content')
             return False
-        affected = [
-            cache_key for cache_key in self.tracked_keys
-            if self.affects(cache_key, key, payload)
-        ]
+        declared_actions = payload.get('_cache_actions')
+        if declared_actions is not None and not isinstance(declared_actions, Mapping):
+            raise ValueError('_cache_actions must be a mapping')
+        if declared_actions is None:
+            affected = [
+                cache_key for cache_key in self.tracked_keys
+                if self.affects(cache_key, key, payload)
+            ]
+        else:
+            affected = list(declared_actions)
+            if any(
+                not isinstance(cache_key, str)
+                or declared_actions[cache_key] not in {'update', 'invalidate'}
+                for cache_key in affected
+            ):
+                raise ValueError('_cache_actions contains an invalid action')
         if self.policy in {'always-update', 'write-reactive'} and at_ms is None and affected:
             raise ValueError(f'{self.policy} notifications require at_ms')
         cache_before = copy.deepcopy(self.cache)
@@ -184,18 +250,24 @@ class CacheGateway:
                 if self.policy in {'always-invalidate', 'event-invalidate-with-repair'}:
                     self.cache.pop(cache_key, None)
                 elif self.policy == 'always-update':
+                    if declared_actions is not None and declared_actions[cache_key] != 'update':
+                        raise ValueError('always-update publication declared a non-update action')
                     self._apply_update(cache_key, key, payload, at_ms)
                     self.last_write_action[cache_key] = 'update'
                 elif self.policy == 'write-reactive':
-                    history = self.write_history.setdefault(cache_key, WriteHistory())
-                    history.writes_since_read += 1
-                    expected_writes = (
-                        history.write_sum / history.sample_count
-                        if history.sample_count else self.initial_expected_writes
-                    )
-                    update_total = expected_writes * self.update_cost
-                    invalidate_total = self.invalidate_cost + self.miss_cost
-                    if update_total < invalidate_total:
+                    if declared_actions is not None:
+                        action = declared_actions[cache_key]
+                    else:
+                        history = self.write_history.setdefault(cache_key, WriteHistory())
+                        history.writes_since_read += 1
+                        expected_writes = (
+                            history.write_sum / history.sample_count
+                            if history.sample_count else self.initial_expected_writes
+                        )
+                        update_total = expected_writes * self.update_cost
+                        invalidate_total = self.invalidate_cost + self.miss_cost
+                        action = 'update' if update_total < invalidate_total else 'invalidate'
+                    if action == 'update':
                         self._apply_update(cache_key, key, payload, at_ms)
                         self.last_write_action[cache_key] = 'update'
                     else:
@@ -217,11 +289,22 @@ class CacheGateway:
         payload: Mapping[str, Any],
         at_ms: int,
     ) -> Optional[CacheEntry]:
-        content = payload.get('content')
-        revision = payload.get('revision')
-        declared_hash = payload.get('content_sha256')
-        if cache_key != notification_key or content is None:
-            return None
+        query_updates = payload.get('query_updates', {})
+        if not isinstance(query_updates, Mapping):
+            raise ValueError('query_updates must be a mapping')
+        query_update = query_updates.get(cache_key)
+        if query_update is not None:
+            if not isinstance(query_update, Mapping):
+                raise ValueError('query update must be a mapping')
+            content = query_update.get('content')
+            revision = query_update.get('revision')
+            declared_hash = query_update.get('content_sha256')
+        else:
+            content = payload.get('content')
+            revision = payload.get('revision')
+            declared_hash = payload.get('content_sha256')
+            if cache_key != notification_key or content is None:
+                return None
         if not isinstance(revision, int) or isinstance(revision, bool) or revision < 0:
             raise ValueError('update notification requires a non-negative revision')
         digest = content_hash(content)
