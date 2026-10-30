@@ -29,6 +29,8 @@ def main() -> None:
     parser.add_argument('output', type=Path)
     parser.add_argument('--stage', choices=('engineering', 'training'), required=True)
     parser.add_argument('--redis-server', default='redis-server')
+    parser.add_argument('--options-file', type=Path)
+    parser.add_argument('--compact', action='store_true')
     args = parser.parse_args()
 
     schedule = load_schedule(str(args.schedule))
@@ -39,10 +41,15 @@ def main() -> None:
     if len(workload_ids) != 1:
         raise ValueError('an instrumented unit requires exactly one workload')
     workload_id = next(iter(workload_ids))
+    options = POLICY_OPTIONS[args.policy]
+    if args.options_file is not None:
+        options = json.loads(args.options_file.read_text(encoding='utf-8'))
+        if not isinstance(options, dict):
+            raise ValueError('policy options file must contain a JSON object')
     workload, workload_options = _workload_and_options(workload_id)
     try:
         gateway = CacheGateway(
-            workload, args.policy, **workload_options, **POLICY_OPTIONS[args.policy],
+            workload, args.policy, **workload_options, **options,
         )
         with RedisNotificationTransport(
             schedule.transport_mode, redis_server=args.redis_server,
@@ -51,6 +58,10 @@ def main() -> None:
     finally:
         workload.close()
 
+    run_mapping = run.to_mapping(include_measurements=True)
+    if args.compact:
+        for observation in run_mapping['observations']:
+            observation.pop('content', None)
     artifact = {
         'artifact_schema_version': 1,
         'measurement_kind': 'instrumented-freshness-trace-unit',
@@ -58,7 +69,8 @@ def main() -> None:
         'confirmatory_final_test': False,
         'protocol': 'freshness-protocol-v0.4',
         'workload_id': workload_id,
-        'policy_parameters': POLICY_OPTIONS[args.policy],
+        'policy_parameters': options,
+        'compact_raw_observations': args.compact,
         'host_manifest': {
             'pid': os.getpid(),
             'platform': platform.platform(),
@@ -73,7 +85,7 @@ def main() -> None:
             'trace_runner.py': _sha256(Path(__file__).with_name('trace_runner.py')),
         },
         'summary': summarize_trace_run(run),
-        'run': run.to_mapping(include_measurements=True),
+        'run': run_mapping,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open('x', encoding='utf-8') as stream:
