@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "campaign_id": "freshness-variance-planning-v1",
+  "partition": "variance-planning",
+  "workloads": [
+    "mutable-product-v1",
+    "svelte-realworld-feed-v1",
+    "react-admin-dashboard-v1"
+  ],
+  "regimes": ["read-heavy", "balanced", "write-intensive"],
+  "seed_start": 300,
+  "seed_count": 10,
+  "fault_profiles": ["no-fault", "loss-1pct", "loss-5pct", "loss-10pct"],
+  "transports": ["redis-pubsub", "redis-streams"],
+  "policies": [
+    "bypass",
+    "conditional-validation",
+    "fixed-ttl",
+    "stale-while-revalidate",
+    "always-invalidate",
+    "always-update",
+    "write-reactive",
+    "event-invalidate-with-repair"
+  ],
+  "primary_contrasts": [
+    {
+      "contrast_id": "repair-vs-invalidate-loss-1pct",
+      "fault_profile": "loss-1pct",
+      "treatment": "event-invalidate-with-repair",
+      "reference": "always-invalidate"
+    },
+    {
+      "contrast_id": "repair-vs-invalidate-loss-5pct",
+      "fault_profile": "loss-5pct",
+      "treatment": "event-invalidate-with-repair",
+      "reference": "always-invalidate"
+    },
+    {
+      "contrast_id": "repair-vs-invalidate-loss-10pct",
+      "fault_profile": "loss-10pct",
+      "treatment": "event-invalidate-with-repair",
+      "reference": "always-invalidate"
+    },
+    {
+      "contrast_id": "write-reactive-vs-update-no-fault",
+      "fault_profile": "no-fault",
+      "treatment": "write-reactive",
+      "reference": "always-update"
+    },
+    {
+      "contrast_id": "write-reactive-vs-invalidate-no-fault",
+      "fault_profile": "no-fault",
+      "treatment": "write-reactive",
+      "reference": "always-invalidate"
+    }
+  ],
+  "precision_outcomes": [
+    {
+      "outcome_id": "freshness_violation_proportion",
+      "target_kind": "absolute",
+      "target_value": 0.01
+    },
+    {
+      "outcome_id": "mean_request_wall_ns",
+      "target_kind": "reference_fraction",
+      "target_value": 0.10
+    },
+    {
+      "outcome_id": "operation_thread_cpu_ns",
+      "target_kind": "reference_fraction",
+      "target_value": 0.10
+    },
+    {
+      "outcome_id": "total_origin_response_body_bytes",
+      "target_kind": "reference_fraction",
+      "target_value": 0.10
+    },
+    {
+      "outcome_id": "redis_delivery_payload_bytes",
+      "target_kind": "reference_fraction",
+      "target_value": 0.10
+    }
+  ],
+  "precision_rule": {
+    "confidence": 0.99,
+    "z_value": 2.5758293035489004,
+    "formula": "ceil((z_value * paired_standard_deviation / target_half_width)^2)",
+    "minimum_final_seeds": 8,
+    "reserved_final_seeds": 20,
+    "final_requirement": "maximum across every primary stratum, contrast and precision outcome"
+  },
+  "expected_blocks": 720,
+  "expected_full_trace_units": 5760,
+  "expected_precision_calculations": 450,
+  "allow_parameter_changes": false,
+  "final_test_authorized": false
+}

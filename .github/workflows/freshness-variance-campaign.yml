@@ -1,0 +1,32 @@
+name: Freshness Variance-Planning Campaign
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: freshness-variance-planning-campaign-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  batch-a:
+    uses: ./.github/workflows/freshness-variance-batch.yml
+    with:
+      batch: a
+  batch-b:
+    needs: batch-a
+    uses: ./.github/workflows/freshness-variance-batch.yml
+    with:
+      batch: b
+  batch-c:
+    needs: batch-b
+    uses: ./.github/workflows/freshness-variance-batch.yml
+    with:
+      batch: c
+  batch-d:
+    needs: batch-c
+    uses: ./.github/workflows/freshness-variance-batch.yml
+    with:
+      batch: d
