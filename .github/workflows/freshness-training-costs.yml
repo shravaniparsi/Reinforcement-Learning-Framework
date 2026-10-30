@@ -1,0 +1,61 @@
+name: Freshness Training Cost Calibration
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: freshness-training-costs-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  cost-block:
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        workload:
+          - mutable-product-v1
+          - svelte-realworld-feed-v1
+          - react-admin-dashboard-v1
+        regime: [read-heavy, balanced, write-intensive]
+        seed: [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.9.25'
+      - name: Install the calibrated Redis package
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes \
+            redis-server=5:7.0.15-1ubuntu0.24.04.5 \
+            redis-tools=5:7.0.15-1ubuntu0.24.04.5
+      - name: Verify training campaign contracts
+        run: |
+          python -m unittest \
+            tests.test_freshness_training_campaign \
+            tests.test_freshness_measurement \
+            tests.test_freshness_redis_delivery
+      - name: Run matched eight-policy cost block
+        run: |
+          python -m experiments.freshness.run_cost_calibration_block \
+            "ci-artifacts/cost-${{ matrix.workload }}-${{ matrix.regime }}-${{ matrix.seed }}" \
+            --workload "${{ matrix.workload }}" \
+            --regime "${{ matrix.regime }}" \
+            --seed "${{ matrix.seed }}"
+      - name: Upload retained raw block
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: freshness-cost-${{ matrix.workload }}-${{ matrix.regime }}-${{ matrix.seed }}-${{ github.run_id }}
+          path: ci-artifacts/
+          compression-level: 9
+          retention-days: 14
+          if-no-files-found: error
