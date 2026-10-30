@@ -1,0 +1,91 @@
+name: Freshness Training Event Candidates
+
+on:
+  workflow_dispatch:
+    inputs:
+      seed_batch:
+        description: Frozen training-seed batch
+        required: true
+        type: choice
+        options: [a, b, c, d]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: freshness-training-event-candidates-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    outputs:
+      seeds: ${{ steps.seeds.outputs.value }}
+    steps:
+      - id: seeds
+        env:
+          BATCH: ${{ inputs.seed_batch }}
+        run: |
+          case "$BATCH" in
+            a) value='[100,101,102]' ;;
+            b) value='[103,104,105]' ;;
+            c) value='[106,107]' ;;
+            d) value='[108,109]' ;;
+            *) exit 2 ;;
+          esac
+          echo "value=$value" >> "$GITHUB_OUTPUT"
+
+  candidate-block:
+    needs: plan
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        workload:
+          - mutable-product-v1
+          - svelte-realworld-feed-v1
+          - react-admin-dashboard-v1
+        regime: [read-heavy, balanced, write-intensive]
+        fault_profile: [no-fault, delay-100ms, loss-10pct, combined-stress]
+        transport: [redis-pubsub, redis-streams]
+        seed: ${{ fromJSON(needs.plan.outputs.seeds) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.9.25'
+      - name: Install the calibrated Redis package
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes \
+            redis-server=5:7.0.15-1ubuntu0.24.04.5 \
+            redis-tools=5:7.0.15-1ubuntu0.24.04.5
+      - name: Verify candidate contracts
+        run: |
+          python -m unittest \
+            tests.test_freshness_training_campaign \
+            tests.test_freshness_training_execution \
+            tests.test_freshness_measurement
+      - name: Run 12 candidates and six matched controls
+        run: |
+          python -m experiments.freshness.run_candidate_block \
+            "ci-artifacts/event-${{ matrix.workload }}-${{ matrix.regime }}-${{ matrix.fault_profile }}-${{ matrix.transport }}-${{ matrix.seed }}" \
+            --phase event-candidates \
+            --workload "${{ matrix.workload }}" \
+            --regime "${{ matrix.regime }}" \
+            --fault-profile "${{ matrix.fault_profile }}" \
+            --transport "${{ matrix.transport }}" \
+            --seed "${{ matrix.seed }}"
+      - name: Upload compact raw block
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: freshness-event-${{ matrix.workload }}-${{ matrix.regime }}-${{ matrix.fault_profile }}-${{ matrix.transport }}-${{ matrix.seed }}-${{ github.run_id }}
+          path: ci-artifacts/
+          compression-level: 9
+          retention-days: 14
+          if-no-files-found: error

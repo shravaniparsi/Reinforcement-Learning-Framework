@@ -30,6 +30,17 @@ def load_locked_costs(path: Path) -> Mapping[str, Any]:
     return value
 
 
+def load_time_lock(path: Path) -> Mapping[str, Any]:
+    value = json.loads(path.read_text(encoding='utf-8'))
+    if (
+        value.get('measurement_kind') != 'training-time-parameter-lock'
+        or value.get('stage') != 'training'
+        or value.get('confirmatory_final_test') is not False
+    ):
+        raise ValueError('invalid or non-training time-parameter lock')
+    return value
+
+
 def _cost_options(cost_lock: Mapping[str, Any], workload: str, regime: str) -> dict:
     try:
         costs = cost_lock['costs'][workload][regime]
@@ -48,6 +59,7 @@ def unit_specs(
     phase: str,
     workload: str,
     regime: str,
+    time_lock: Mapping[str, Any] = None,
 ) -> Tuple[TrainingUnitSpec, ...]:
     cost_options = _cost_options(cost_lock, workload, regime)
     specs = []
@@ -71,6 +83,14 @@ def unit_specs(
             }),
         )
     elif phase == 'event-candidates':
+        if time_lock is None:
+            raise ValueError('event candidates require the locked time parameters')
+        try:
+            time_options = time_lock['selected'][workload][regime]
+            fixed_options = time_options['fixed-ttl']['options']
+            swr_options = time_options['stale-while-revalidate']['options']
+        except KeyError as error:
+            raise ValueError('time lock lacks the requested workload/regime') from error
         for candidate in campaign.candidates('event-invalidate-with-repair'):
             specs.append(TrainingUnitSpec(
                 candidate.candidate_id, candidate.policy, dict(candidate.options), True,
@@ -87,10 +107,8 @@ def unit_specs(
         controls = (
             ('control:bypass', 'bypass', {}),
             ('control:conditional-validation', 'conditional-validation', {}),
-            ('control:fixed-ttl', 'fixed-ttl', {'ttl_ms': 25}),
-            ('control:stale-while-revalidate', 'stale-while-revalidate', {
-                'ttl_ms': 25, 'stale_window_ms': 50,
-            }),
+            ('control:fixed-ttl', 'fixed-ttl', dict(fixed_options)),
+            ('control:stale-while-revalidate', 'stale-while-revalidate', dict(swr_options)),
             ('control:always-invalidate', 'always-invalidate', {}),
             ('control:always-update', 'always-update', {}),
         )
