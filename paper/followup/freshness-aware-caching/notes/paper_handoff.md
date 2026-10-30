@@ -1,5 +1,14 @@
 # Paper handoff
 
+## 2026-10-29 training cost calibration
+
+Phase 1 training cost calibration completed in GitHub Actions run `40982405656`:
+90/90 matched blocks and 720/720 full trace units passed. The compact cost lock is
+`data/training/freshness-costs-40982405656/locked_costs.json`; interpretation and
+counts are recorded in `notes/training_cost_lock_2026-10-29.md`. These are training
+inputs only. Candidate fitting, validation, variance planning and final-test
+collection remain incomplete.
+
 ## Ready
 
 - Distinct contribution and non-overlap boundary.
