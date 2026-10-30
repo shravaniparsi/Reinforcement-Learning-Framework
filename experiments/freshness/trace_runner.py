@@ -5,12 +5,31 @@ from __future__ import annotations
 import heapq
 import copy
 import json
+import time
 from dataclasses import asdict, dataclass
-from typing import Any, Dict, List, Mapping, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Protocol, Tuple
 
 from .cache_gateway import CacheGateway, GatewayObservation
 from .fault_schedule import materialize_notifications
 from .schema import ScheduledNotification, TraceSchedule
+
+
+class NotificationTransport(Protocol):
+    def reset(self) -> None:
+        ...
+
+    def deliver(
+        self, notification_id: str, key: str, payload: Mapping[str, Any]
+    ) -> Any:
+        ...
+
+
+@dataclass(frozen=True)
+class OperationMeasurement:
+    event_id: str
+    operation: str
+    wall_ns: int
+    thread_cpu_ns: int
 
 
 @dataclass(frozen=True)
@@ -26,13 +45,17 @@ class TraceRun:
     duplicate_notification_ids: Tuple[str, ...]
     dropped_notification_ids: Tuple[str, ...]
     publication_records: Tuple[Mapping[str, Any], ...]
+    operation_measurements: Tuple[OperationMeasurement, ...]
+    transport_deliveries: Tuple[Mapping[str, Any], ...]
     final_gateway_state: Mapping[str, Any]
 
-    def to_mapping(self) -> Mapping[str, Any]:
-        return {
-            **asdict(self),
-            'observations': [asdict(item) for item in self.observations],
-        }
+    def to_mapping(self, *, include_measurements: bool = False) -> Mapping[str, Any]:
+        value = asdict(self)
+        value['observations'] = [asdict(item) for item in self.observations]
+        if not include_measurements:
+            value.pop('operation_measurements')
+            value.pop('transport_deliveries')
+        return value
 
 
 def _request_revision(payload: Mapping[str, Any]) -> int:
@@ -101,7 +124,11 @@ def _prepare_publication(
     return prepared, record
 
 
-def run_trace(schedule: TraceSchedule, gateway: CacheGateway) -> TraceRun:
+def run_trace(
+    schedule: TraceSchedule,
+    gateway: CacheGateway,
+    transport: Optional[NotificationTransport] = None,
+) -> TraceRun:
     """Replay one schedule without allowing policy work to move exogenous events."""
 
     workload_id = gateway.workload.workload_id
@@ -115,23 +142,40 @@ def run_trace(schedule: TraceSchedule, gateway: CacheGateway) -> TraceRun:
         templates_by_source.setdefault(item.source_event_id, []).append(item)
 
     gateway.reset(schedule.seed)
+    if transport is not None:
+        transport.reset()
     pending: List[tuple] = []
     committed: List[str] = []
     delivered_ids: List[str] = []
     duplicate_ids: List[str] = []
     observations: List[GatewayObservation] = []
     publication_records: List[Mapping[str, Any]] = []
+    operation_measurements: List[OperationMeasurement] = []
+    transport_deliveries: List[Mapping[str, Any]] = []
     commit_payloads: Dict[str, Mapping[str, Any]] = {}
 
     def deliver_through(at_ms: int) -> None:
         while pending and pending[0][0] <= at_ms:
             _, source_sequence, copy_index, template = heapq.heappop(pending)
+            payload = commit_payloads[template.source_event_id]
+            if transport is not None:
+                delivery = transport.deliver(template.notification_id, template.key, payload)
+                value = delivery.to_mapping() if hasattr(delivery, 'to_mapping') else asdict(delivery)
+                transport_deliveries.append(value)
+            wall_start = time.perf_counter_ns()
+            cpu_start = time.thread_time_ns()
             accepted = gateway.notify(
                 template.source_event_id,
                 template.key,
-                commit_payloads[template.source_event_id],
+                payload,
                 at_ms=template.deliver_at_ms,
             )
+            operation_measurements.append(OperationMeasurement(
+                event_id=template.notification_id,
+                operation='notification-apply',
+                wall_ns=time.perf_counter_ns() - wall_start,
+                thread_cpu_ns=time.thread_time_ns() - cpu_start,
+            ))
             if accepted:
                 delivered_ids.append(template.notification_id)
             else:
@@ -140,6 +184,8 @@ def run_trace(schedule: TraceSchedule, gateway: CacheGateway) -> TraceRun:
     for event in schedule.events:
         deliver_through(event.at_ms)
         if event.kind == 'update':
+            wall_start = time.perf_counter_ns()
+            cpu_start = time.thread_time_ns()
             commit = gateway.workload.commit(_mutation(event.payload), at_ms=event.at_ms)
             expected_revision = event.payload.get('expected_revision')
             if expected_revision is not None and commit.revision != expected_revision:
@@ -154,6 +200,12 @@ def run_trace(schedule: TraceSchedule, gateway: CacheGateway) -> TraceRun:
                 commit.notification_payload,
                 commit.revision,
             )
+            operation_measurements.append(OperationMeasurement(
+                event_id=event.event_id,
+                operation='commit-and-publication',
+                wall_ns=time.perf_counter_ns() - wall_start,
+                thread_cpu_ns=time.thread_time_ns() - cpu_start,
+            ))
             commit_payloads[event.event_id] = prepared
             publication_records.append(publication_record)
             committed.append(event.event_id)
@@ -169,10 +221,18 @@ def run_trace(schedule: TraceSchedule, gateway: CacheGateway) -> TraceRun:
                 )
             deliver_through(event.at_ms)
         else:
+            wall_start = time.perf_counter_ns()
+            cpu_start = time.thread_time_ns()
             observations.append(gateway.read(
                 event.key,
                 at_ms=event.at_ms,
                 decision_revision=_request_revision(event.payload),
+            ))
+            operation_measurements.append(OperationMeasurement(
+                event_id=event.event_id,
+                operation='request',
+                wall_ns=time.perf_counter_ns() - wall_start,
+                thread_cpu_ns=time.thread_time_ns() - cpu_start,
             ))
 
     deliver_through(2**63 - 1)
@@ -188,5 +248,7 @@ def run_trace(schedule: TraceSchedule, gateway: CacheGateway) -> TraceRun:
         duplicate_notification_ids=tuple(duplicate_ids),
         dropped_notification_ids=tuple(item.notification_id for item in dropped),
         publication_records=tuple(publication_records),
+        operation_measurements=tuple(operation_measurements),
+        transport_deliveries=tuple(transport_deliveries),
         final_gateway_state=gateway.state(),
     )

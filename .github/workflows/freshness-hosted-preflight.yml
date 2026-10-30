@@ -52,6 +52,21 @@ jobs:
             "ci-artifacts/block-${{ matrix.workload }}-${{ matrix.transport }}" \
             --workload "${{ matrix.workload }}" \
             --transport "${{ matrix.transport }}"
+      - name: Run integrated Redis instrumentation gate
+        run: |
+          python -m experiments.freshness.trace_generator \
+            "ci-artifacts/integrated-${{ matrix.workload }}-${{ matrix.transport }}/schedule.json" \
+            --workload "${{ matrix.workload }}" \
+            --regime write-intensive \
+            --partition engineering \
+            --seed 0 \
+            --fault-profile combined-stress \
+            --transport "${{ matrix.transport }}"
+          python -m experiments.freshness.run_instrumented_unit \
+            "ci-artifacts/integrated-${{ matrix.workload }}-${{ matrix.transport }}/schedule.json" \
+            fixed-ttl \
+            "ci-artifacts/integrated-${{ matrix.workload }}-${{ matrix.transport }}/result.json" \
+            --stage engineering
       - name: Upload retained preflight artifacts
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
