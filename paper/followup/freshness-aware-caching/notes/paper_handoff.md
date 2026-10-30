@@ -30,6 +30,18 @@ directory. The human-readable record is
 `notes/event_candidate_lock_2026-10-30.md`. These are training choices only.
 Validation, variance planning and final testing have not begun.
 
+## 2026-10-30 held-out validation
+
+Held-out validation completed in GitHub Actions run `41099780817`: 1,080/1,080
+allocation blocks and 8,640/8,640 full-trace units passed. All 36 prespecified
+freshness guardrails passed without refitting; the maximum
+validation-minus-training increase was 0.007 against the frozen 0.01 limit. The
+checksum-bound report is
+`data/validation/freshness-validation-41099780817-archives/validation_report.json`;
+the human-readable record is `notes/validation_lock_2026-10-30.md`. Variance
+planning is now authorized. Final testing remains prohibited until the sample
+size is frozen.
+
 ## Ready
 
 - Distinct contribution and non-overlap boundary.
@@ -68,6 +80,7 @@ Validation, variance planning and final testing have not begun.
 - The source-bound synthetic analysis fixture exercises selection, five primary intervals and pool expansion without study observations. Its intentionally high-variance branch requires 78 traces, which is an engineering branch-coverage result rather than a study sample size. See `notes/allocation_and_analysis_engineering_2026-10-29.md`.
 - Protocol v0.4 is frozen at `protocol/protocol_v0.4.md`. It authorizes engineering preflight only. Training, validation and variance planning require a passing hosted preflight; final testing remains locked until earlier stages freeze parameters and `n`.
 - All training inputs and parameters are now locked: serialized-byte costs, fixed-TTL and stale-while-revalidate timing, event-repair age and write-reactive initial expected writes. The event campaign completed 720 blocks and 12,960 full-trace units; its 27,360 source files are checksum-bound in the parameter lock.
+- Held-out validation passed all 36 no-refit guardrails across 1,080 allocation blocks and 8,640 full-trace units. The report binds 19,440 source files and authorizes variance planning without authorizing final testing.
 - Verified seed bibliography for direct and adjacent work.
 
 ## Required before protocol freeze
@@ -87,7 +100,7 @@ Validation, variance planning and final testing have not begun.
 
 ## Current next step
 
-Implement and run the held-out validation partition with every training parameter
-fixed and no refitting. If validation passes the prespecified confirmation rule,
-run the variance-planning partition and freeze the final sample size. Final-test
-collection remains prohibited until both steps complete.
+Implement and run the variance-planning partition with every policy and parameter
+fixed. Apply the prespecified trace-level precision rule once, then freeze the
+final sample size. Final-test collection remains prohibited until that lock is
+complete.
