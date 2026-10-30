@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "campaign_id": "freshness-validation-campaign-v1",
+  "partition": "validation",
+  "workloads": [
+    "mutable-product-v1",
+    "svelte-realworld-feed-v1",
+    "react-admin-dashboard-v1"
+  ],
+  "regimes": ["read-heavy", "balanced", "write-intensive"],
+  "seed_start": 200,
+  "seed_count": 5,
+  "fault_profiles": [
+    "no-fault",
+    "delay-1ms",
+    "delay-10ms",
+    "delay-100ms",
+    "loss-1pct",
+    "loss-5pct",
+    "loss-10pct",
+    "duplicate-1pct",
+    "duplicate-5pct",
+    "reorder-1pct",
+    "reorder-5pct",
+    "combined-stress"
+  ],
+  "transports": ["redis-pubsub", "redis-streams"],
+  "policies": [
+    "bypass",
+    "conditional-validation",
+    "fixed-ttl",
+    "stale-while-revalidate",
+    "always-invalidate",
+    "always-update",
+    "write-reactive",
+    "event-invalidate-with-repair"
+  ],
+  "time_policy_confirmation_condition": {
+    "fault_profiles": ["no-fault"],
+    "transports": ["redis-pubsub"]
+  },
+  "event_policy_confirmation_condition": {
+    "fault_profiles": ["no-fault", "delay-100ms", "loss-10pct", "combined-stress"],
+    "transports": ["redis-pubsub", "redis-streams"]
+  },
+  "confirmation_rule": {
+    "metric": "mean trace-level freshness violation proportion",
+    "maximum_increase_over_training": 0.01,
+    "require_all_planned_blocks": true,
+    "require_exact_locked_options": true,
+    "allow_refitting": false
+  },
+  "expected_blocks": 1080,
+  "expected_full_trace_units": 8640,
+  "final_test_authorized": false
+}
