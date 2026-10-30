@@ -8,6 +8,8 @@ This package implements protocol-level interfaces for the prospective cache-fres
 - `trace_design_v1.json` and `trace_generator.py` define bounded prospective traces with disjoint evidence partitions and exact fault counts.
 - `parameter_grid_v1.json` and `parameter_design.py` freeze TTL, stale-window, repair and write-reactive candidates and keep final-test traces outside parameter selection.
 - `analysis_plan.py` implements lexicographic parameter selection, complete-pair checks, deterministic trace-level bootstrap intervals and precision-based final trace counts.
+- `allocation_design_v1.json` and `allocation_design.py` freeze hosted runtime, blocking, policy order, process isolation and retry behavior.
+- `analysis_fixture_v1.json` and `run_analysis_engineering.py` exercise selection, intervals and pool expansion without application observations.
 - `redis_calibration.py` measures no-fault local Pub/Sub and Streams delivery with raw per-message timings and a host manifest. Its output is transport engineering evidence, not application study data.
 - `workload.py` defines the reset, commit, read and semantic-oracle contract shared by each application.
 - `catalog_workload.py` is the deterministic SQLite-backed W1 product adapter with per-product revision history.
@@ -19,7 +21,7 @@ This package implements protocol-level interfaces for the prospective cache-fres
 - `dependencies.py` contains conservative W2 feed and W3 resource-query dependency rules. For update actions, the publisher snapshots complete affected cached-query responses at the commit revision and includes their content and hashes in the notification.
 - `realworld_browser_smoke.py` and `dashboard_browser_smoke.py` are semantic browser gates. They do not record latency or other performance observations.
 
-The active design is the working draft `paper/followup/freshness-aware-caching/protocol/protocol_v0.4-draft.md`. Study collection remains disabled until protocol v0.4 is frozen.
+The frozen design is `paper/followup/freshness-aware-caching/protocol/protocol_v0.4.md`. Engineering preflight is authorized. Training, validation and variance-planning collection require a passing hosted preflight, and final-test collection remains prohibited until parameters and sample size are locked.
 
 The trace runner fixes update-or-invalidate actions at publication time. W2 and W3 full-query update content is read from the origin immediately after the commit and stored in the notification, so delayed delivery cannot consult newer origin state. Publication records retain query-construction reads, response bytes and serialized notification bytes.
 
@@ -63,6 +65,13 @@ python3 -m experiments.freshness.redis_calibration \
 ```
 
 `.github/workflows/freshness-redis-calibration.yml` repeats the same calibrated operation on three sequential GitHub-hosted allocations. Redis package versions and host details are captured in each result rather than assumed.
+
+Exercise the analysis code without study observations with:
+
+```sh
+python3 -m experiments.freshness.run_analysis_engineering \
+  data/engineering/freshness-analysis-engineering-v1/results.json
+```
 
 Run the pure contract, workload and gateway tests with:
 

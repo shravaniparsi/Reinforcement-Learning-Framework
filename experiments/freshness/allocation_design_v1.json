@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "design_id": "freshness-hosted-allocation-v1",
+  "runner": "ubuntu-24.04",
+  "python_version": "3.9.25",
+  "redis_package_version": "5:7.0.15-1ubuntu0.24.04.5",
+  "max_parallel_allocations": 3,
+  "allocation_block": ["stage", "workload", "regime", "trace_seed", "transport", "fault_profile"],
+  "policies_per_allocation": [
+    "bypass",
+    "conditional-validation",
+    "fixed-ttl",
+    "stale-while-revalidate",
+    "always-invalidate",
+    "always-update",
+    "write-reactive",
+    "event-invalidate-with-repair"
+  ],
+  "policy_order": "sha256-derived permutation independent of trace contents",
+  "process_isolation": "new process and complete reset for every policy",
+  "application_failure_retries": 0,
+  "infrastructure_failure_retries": 1,
+  "retain_all_attempts": true
+}

@@ -34,6 +34,9 @@
 - Bounded synthetic trace design v1 is machine-readable and tested. Each trace has 100 updates; read-heavy, balanced and write-intensive regimes have 500, 200 and 100 requests. Exact fault profiles cover delay, 1/5/10% loss, 1/5% duplication, 1/5% adjacent-pair reordering and one combined stress condition. Evidence-partition seed ranges are disjoint. The decision and scope boundary are in `notes/trace_design_decision_2026-10-29.md`.
 - Policy parameter grid v1 freezes 10/25/50/100/250/500 ms candidates for TTL, SWR and repair and six initial `E[W]` candidates. Write-reactive costs are observed serialized bytes rather than subjective weights. The statistical plan defines the full trace execution as `n`, prespecifies the primary contrasts and sets a variance-planning precision rule. See `notes/statistical_analysis_plan_v0.1.md`.
 - Statistical calculations are encoded and tested: lexicographic candidate selection, exact paired-unit matching, deterministic 10,000-resample trace bootstrap intervals, 99% primary intervals for five contrast types, and precision-based `n` with protocol expansion when more than 20 final seeds are required.
+- Hosted allocation design v1 places all eight randomized policies for a matched trace block on one fresh Ubuntu 24.04 runner, starts a new process and full reset per policy, pins Python 3.9.25 and Redis package `5:7.0.15-1ubuntu0.24.04.5`, forbids application-failure retries and retains both attempts for the single allowed infrastructure retry.
+- The source-bound synthetic analysis fixture exercises selection, five primary intervals and pool expansion without study observations. Its intentionally high-variance branch requires 78 traces, which is an engineering branch-coverage result rather than a study sample size. See `notes/allocation_and_analysis_engineering_2026-10-29.md`.
+- Protocol v0.4 is frozen at `protocol/protocol_v0.4.md`. It authorizes engineering preflight only. Training, validation and variance planning require a passing hosted preflight; final testing remains locked until earlier stages freeze parameters and `n`.
 - Verified seed bibliography for direct and adjacent work.
 
 ## Required before protocol freeze
@@ -53,4 +56,4 @@
 
 ## Current next step
 
-Exercise the selection and interval code on engineering fixtures, then freeze the hosted allocation structure and protocol v0.4. Do not collect study data under versions 0.1 through 0.3 or the current v0.4 draft.
+Build and pass the hosted end-to-end preflight workflow under the frozen v0.4 design. Only then begin training, validation and variance-planning collection. Final-test collection remains prohibited until those stages lock parameters and sample size.

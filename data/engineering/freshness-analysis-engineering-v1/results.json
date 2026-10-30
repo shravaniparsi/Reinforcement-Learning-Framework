@@ -1,0 +1,63 @@
+{
+  "artifact_schema_version": 1,
+  "contains_application_study_observations": false,
+  "final_trace_requirement": 78,
+  "fixture_id": "freshness-analysis-engineering-v1",
+  "measurement_kind": "synthetic-analysis-engineering-only",
+  "primary_intervals": {
+    "repair-loss-10pct": {
+      "confidence": 0.99,
+      "estimate": -0.05,
+      "lower": -0.07375000000000001,
+      "n": 8,
+      "resamples": 10000,
+      "upper": -0.025000000000000005
+    },
+    "repair-loss-1pct": {
+      "confidence": 0.99,
+      "estimate": -0.010499999999999999,
+      "lower": -0.01175,
+      "n": 8,
+      "resamples": 10000,
+      "upper": -0.009125000000000001
+    },
+    "repair-loss-5pct": {
+      "confidence": 0.99,
+      "estimate": -0.03,
+      "lower": -0.04000000000000001,
+      "n": 8,
+      "resamples": 10000,
+      "upper": -0.01875
+    },
+    "write-reactive-vs-invalidate": {
+      "confidence": 0.99,
+      "estimate": -712.5,
+      "lower": -987.5,
+      "n": 8,
+      "resamples": 10000,
+      "upper": -462.5
+    },
+    "write-reactive-vs-update": {
+      "confidence": 0.99,
+      "estimate": 50.0,
+      "lower": -237.5,
+      "n": 8,
+      "resamples": 10000,
+      "upper": 325.0
+    }
+  },
+  "requires_reserved_pool_expansion": true,
+  "selected_candidate": "ttl-50",
+  "source_sha256": {
+    "analysis_plan.py": "342f46edcd60149d29a786a41475c1f3f78f21d561add7344f45f650feb60036",
+    "fixture": "dea2d5f647145204735529f502b43f94db4e7356377a35d938c5a22196c8fe98",
+    "run_analysis_engineering.py": "261049dcee932b711b072cf64b698b763eea9e22404782d4efa706db3debaebf"
+  },
+  "trace_requirements": {
+    "repair-loss-10pct": 57,
+    "repair-loss-1pct": 8,
+    "repair-loss-5pct": 12,
+    "write-reactive-vs-invalidate": 66,
+    "write-reactive-vs-update": 78
+  }
+}

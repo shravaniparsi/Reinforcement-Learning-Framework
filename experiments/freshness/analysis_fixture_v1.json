@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "fixture_id": "freshness-analysis-engineering-v1",
+  "candidate_summaries": [
+    {"name": "ttl-10", "mean_freshness_violation": 0.005, "mean_origin_response_bytes": 10000, "declared_order": 0},
+    {"name": "ttl-25", "mean_freshness_violation": 0.008, "mean_origin_response_bytes": 7000, "declared_order": 1},
+    {"name": "ttl-50", "mean_freshness_violation": 0.014, "mean_origin_response_bytes": 4000, "declared_order": 2},
+    {"name": "ttl-100", "mean_freshness_violation": 0.020, "mean_origin_response_bytes": 2500, "declared_order": 3}
+  ],
+  "expected_selected_candidate": "ttl-50",
+  "primary_paired_differences": {
+    "repair-loss-1pct": [-0.010, -0.012, -0.008, -0.011, -0.009, -0.013, -0.010, -0.011],
+    "repair-loss-5pct": [-0.030, -0.020, -0.040, -0.010, -0.050, -0.020, -0.030, -0.040],
+    "repair-loss-10pct": [-0.060, -0.030, -0.080, -0.020, -0.090, -0.040, -0.070, -0.010],
+    "write-reactive-vs-update": [200, -100, 300, -200, 400, -300, 500, -400],
+    "write-reactive-vs-invalidate": [-800, -500, -1000, -300, -1200, -600, -900, -400]
+  },
+  "precision_targets": {
+    "repair-loss-1pct": 0.01,
+    "repair-loss-5pct": 0.01,
+    "repair-loss-10pct": 0.01,
+    "write-reactive-vs-update": 100,
+    "write-reactive-vs-invalidate": 100
+  },
+  "expected_pool_expansion": true
+}

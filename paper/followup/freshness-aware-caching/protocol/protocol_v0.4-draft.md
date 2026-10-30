@@ -123,6 +123,8 @@ Before each unit:
 
 The harness must verify that matched policies observe identical exogenous request, update and fault schedules. Fresh allocations are not assumed to be independent physical hosts.
 
+One hosted allocation block is defined by stage, workload, regime, trace seed, transport and fault profile. It runs all eight policies in a deterministic SHA-256-derived permutation independent of trace contents. Every policy runs in a new process after complete reset. The frozen hosted runtime is `ubuntu-24.04`, Python 3.9.25 and Redis package `5:7.0.15-1ubuntu0.24.04.5`. At most three blocks run concurrently. Application, oracle and schedule failures are not retried. A declared infrastructure failure permits one replacement allocation, with both attempts retained.
+
 ## 9. Development and evidence partitions
 
 - **Engineering:** validate semantics, instrumentation, resets and failure retention. No estimates enter the paper.
@@ -168,8 +170,12 @@ The working statistical plan defines the complete trace execution as the indepen
 
 Archive protocols, workload selection records, source commits, adaptation patches, licenses, dependency locks, trace sources or generators, fault schedules, build receipts, allocation identities, raw successes and failures, analysis code and checksums. A public versioned release and DOI will be created only after secrets and nonredistributable data are removed or documented.
 
-## 13. Decisions required for v0.4 freeze
+## 13. v0.4 freeze record
 
-1. Pin the Redis version and installation identity used locally and in hosted runs.
-2. Choose the hosted environment and allocation structure.
-3. Exercise the encoded parameter-selection, paired interval and precision calculations on engineering fixtures before freezing v0.4.
+- Redis hosted package: `5:7.0.15-1ubuntu0.24.04.5` on `ubuntu-24.04`.
+- Hosted block and retry contract: `experiments/freshness/allocation_design_v1.json`.
+- Trace and fault contract: `experiments/freshness/trace_design_v1.json`.
+- Parameter candidates: `experiments/freshness/parameter_grid_v1.json`.
+- Analysis implementation: `experiments/freshness/analysis_plan.py`.
+- Synthetic analysis engineering artifact: `data/engineering/freshness-analysis-engineering-v1/results.json`.
+- Application study observations collected before this freeze: none.
