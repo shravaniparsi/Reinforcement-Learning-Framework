@@ -42,6 +42,17 @@ the human-readable record is `notes/validation_lock_2026-10-30.md`. Variance
 planning is now authorized. Final testing remains prohibited until the sample
 size is frozen.
 
+## 2026-10-30 variance planning
+
+Variance planning completed in GitHub Actions run `41131844320`: 720/720
+allocation blocks and 5,760/5,760 full-trace units passed. The maximum across 450
+prespecified precision calculations requires 67 final-test seeds; freshness under
+10% loss in the mutable-product write-intensive regime was the driver. The
+reserved 20-seed pool is insufficient, so final testing remains prohibited. The
+checksum-bound report is
+`data/variance/freshness-variance-41131844320-archives/final_sample_size_lock.json`;
+the human-readable record is `notes/variance_planning_lock_2026-10-30.md`.
+
 ## Ready
 
 - Distinct contribution and non-overlap boundary.
@@ -81,6 +92,7 @@ size is frozen.
 - Protocol v0.4 is frozen at `protocol/protocol_v0.4.md`. It authorizes engineering preflight only. Training, validation and variance planning require a passing hosted preflight; final testing remains locked until earlier stages freeze parameters and `n`.
 - All training inputs and parameters are now locked: serialized-byte costs, fixed-TTL and stale-while-revalidate timing, event-repair age and write-reactive initial expected writes. The event campaign completed 720 blocks and 12,960 full-trace units; its 27,360 source files are checksum-bound in the parameter lock.
 - Held-out validation passed all 36 no-refit guardrails across 1,080 allocation blocks and 8,640 full-trace units. The report binds 19,440 source files and authorizes variance planning without authorizing final testing.
+- Variance planning completed 720 allocation blocks and 5,760 full-trace units. The report binds 12,960 source files and locks the final requirement at 67 seeds. The reserved 20-seed pool is insufficient, so a protocol expansion is required before final testing.
 - Verified seed bibliography for direct and adjacent work.
 
 ## Required before protocol freeze
@@ -100,7 +112,7 @@ size is frozen.
 
 ## Current next step
 
-Implement and run the variance-planning partition with every policy and parameter
-fixed. Apply the prespecified trace-level precision rule once, then freeze the
-final sample size. Final-test collection remains prohibited until that lock is
-complete.
+Freeze a new protocol version that expands the disjoint final-test seed pool from
+20 to at least 67 and defines the batched confirmatory campaign. Policies,
+contrasts, outcomes, precision targets and the 67-seed requirement cannot change.
+Final-test collection remains prohibited until that protocol expansion is merged.
