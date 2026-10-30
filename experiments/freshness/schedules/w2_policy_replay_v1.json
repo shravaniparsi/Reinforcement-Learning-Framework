@@ -1,0 +1,98 @@
+{
+  "events": [
+    {
+      "at_ms": 0,
+      "event_id": "r0",
+      "key": "/api/articles?limit=10&offset=0",
+      "kind": "request",
+      "payload": {"decision_revision": 0},
+      "workload": "svelte-realworld-feed-v1"
+    },
+    {
+      "at_ms": 10,
+      "event_id": "u1",
+      "key": "independent-note-29",
+      "kind": "update",
+      "payload": {
+        "expected_revision": 1,
+        "mutation": {
+          "operation": "update",
+          "slug": "independent-note-29",
+          "changes": {"title": "Older delayed title"}
+        }
+      },
+      "workload": "svelte-realworld-feed-v1"
+    },
+    {
+      "at_ms": 20,
+      "event_id": "r1",
+      "key": "/api/articles?limit=10&offset=0",
+      "kind": "request",
+      "payload": {"decision_revision": 1},
+      "workload": "svelte-realworld-feed-v1"
+    },
+    {
+      "at_ms": 25,
+      "event_id": "u2",
+      "key": "independent-note-29",
+      "kind": "update",
+      "payload": {
+        "expected_revision": 2,
+        "mutation": {
+          "operation": "update",
+          "slug": "independent-note-29",
+          "changes": {"title": "Newer prompt title"}
+        }
+      },
+      "workload": "svelte-realworld-feed-v1"
+    },
+    {
+      "at_ms": 26,
+      "event_id": "r2",
+      "key": "/api/articles?limit=10&offset=0",
+      "kind": "request",
+      "payload": {"decision_revision": 2},
+      "workload": "svelte-realworld-feed-v1"
+    },
+    {
+      "at_ms": 45,
+      "event_id": "r3",
+      "key": "/api/articles?limit=10&offset=0",
+      "kind": "request",
+      "payload": {"decision_revision": 2},
+      "workload": "svelte-realworld-feed-v1"
+    },
+    {
+      "at_ms": 50,
+      "event_id": "u3",
+      "key": "independent-note-29",
+      "kind": "update",
+      "payload": {
+        "expected_revision": 3,
+        "mutation": {
+          "operation": "update",
+          "slug": "independent-note-29",
+          "changes": {"description": "Update whose notification is dropped."}
+        }
+      },
+      "workload": "svelte-realworld-feed-v1"
+    },
+    {
+      "at_ms": 60,
+      "event_id": "r4",
+      "key": "/api/articles?limit=10&offset=0",
+      "kind": "request",
+      "payload": {"decision_revision": 3},
+      "workload": "svelte-realworld-feed-v1"
+    }
+  ],
+  "faults": [
+    {"delay_ms": 30, "duplicate_delays_ms": [35], "drop": false, "update_event_id": "u1"},
+    {"delay_ms": 0, "duplicate_delays_ms": [], "drop": false, "update_event_id": "u2"},
+    {"delay_ms": 0, "duplicate_delays_ms": [], "drop": true, "update_event_id": "u3"}
+  ],
+  "schema_version": 1,
+  "seed": 0,
+  "trace_id": "w2-engineering-policy-replay-v1",
+  "transport_mode": "redis-pubsub"
+}

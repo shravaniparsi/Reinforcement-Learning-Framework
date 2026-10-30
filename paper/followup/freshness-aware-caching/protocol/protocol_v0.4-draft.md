@@ -162,12 +162,10 @@ Archive protocols, workload selection records, source commits, adaptation patche
 
 ## 13. Decisions required for v0.4 freeze
 
-1. Implement and test commit-revision query-complete update construction for W2 and W3 without consulting newer origin state at delivery.
-2. Pin the Redis version and installation identity used locally and in hosted runs.
-3. Freeze loss, duplication and adjacent-pair reordering rates after the update count per trace is fixed. The delay grid is fixed at 0, 1, 10 and 100 ms.
-4. Select trace sources or freeze a bounded synthetic generator.
-5. Freeze the Mao et al. cost inputs, initial `E[W]` value and parameter-estimation budget from training evidence.
-6. Fix TTL, stale-window and repair candidate grids.
-7. Choose the hosted environment and allocation structure.
-8. Freeze the trace-level estimand, hierarchical analysis and precision rule.
-9. Complete W2 and W3 engineering replays across every supported policy, including retained failures.
+1. Pin the Redis version and installation identity used locally and in hosted runs.
+2. Freeze loss, duplication and adjacent-pair reordering rates after the update count per trace is fixed. The delay grid is fixed at 0, 1, 10 and 100 ms.
+3. Select trace sources or freeze a bounded synthetic generator.
+4. Freeze the Mao et al. cost inputs, initial `E[W]` value and parameter-estimation budget from training evidence.
+5. Fix TTL, stale-window and repair candidate grids.
+6. Choose the hosted environment and allocation structure.
+7. Freeze the trace-level estimand, hierarchical analysis and precision rule.

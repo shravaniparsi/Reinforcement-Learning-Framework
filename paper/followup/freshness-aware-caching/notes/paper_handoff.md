@@ -29,6 +29,8 @@
 - GitHub run `40976163674` completed successfully for all three replicates. All 30,000 retained hosted deliveries matched the merged source hash and completed within 1 ms. The reviewed summary is in `notes/redis_calibration_summary_2026-10-29.md`; raw artifacts are under `data/engineering/freshness-redis-github-40976163674/`.
 - Protocol v0.4 fixes the injected-delay grid at 0, 1, 10 and 100 ms. Loss, duplication and reordering rates remain open until the update count per trace is fixed.
 - Protocol v0.4 working draft at `protocol/protocol_v0.4-draft.md`. It chooses cache-aware, query-complete update messages for W2 and W3, captured at the commit revision. Message construction, serialized bytes and delivery work remain policy costs; delayed updates cannot consult newer origin state at delivery.
+- Commit-revision query-complete update construction is implemented for W2 and W3. Engineering tests verify delayed refresh, resource-query replacement, publisher origin-read and byte accounting, and suppression of an older update delivered after a newer revision. Write-reactive actions and write-history increments are fixed at publication, including when delivery is lost.
+- Source-bound W1, W2 and W3 semantic replays now cover all eight policies. The W2 and W3 schedules exercise delay, duplication, reordering and loss. Results and their non-inferential interpretation are recorded in `notes/semantic_policy_replays_2026-10-29.md`; the three artifacts explicitly contain no performance observations.
 - Verified seed bibliography for direct and adjacent work.
 
 ## Required before protocol freeze
@@ -48,4 +50,4 @@
 
 ## Current next step
 
-Implement commit-revision query-complete update construction for W2 and W3. Then select or generate the request/update traces, fix the update count per trace and freeze loss, duplication and adjacent-pair reordering rates. Do not collect study data under versions 0.1 through 0.3 or the current v0.4 draft.
+Select or generate the request/update traces, fix the update count per trace and freeze loss, duplication and adjacent-pair reordering rates. Then freeze the TTL, stale-window, repair and write-reactive training grids. Do not collect study data under versions 0.1 through 0.3 or the current v0.4 draft.

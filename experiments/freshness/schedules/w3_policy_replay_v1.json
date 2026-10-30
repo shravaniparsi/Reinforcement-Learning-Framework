@@ -1,0 +1,101 @@
+{
+  "events": [
+    {
+      "at_ms": 0,
+      "event_id": "r0",
+      "key": "/api/orders?sort=[\"id\",\"ASC\"]&range=[0,9]",
+      "kind": "request",
+      "payload": {"decision_revision": 0},
+      "workload": "react-admin-dashboard-v1"
+    },
+    {
+      "at_ms": 10,
+      "event_id": "u1",
+      "key": "orders:1",
+      "kind": "update",
+      "payload": {
+        "expected_revision": 1,
+        "mutation": {
+          "resource": "orders",
+          "operation": "update",
+          "id": 1,
+          "changes": {"total": 501}
+        }
+      },
+      "workload": "react-admin-dashboard-v1"
+    },
+    {
+      "at_ms": 20,
+      "event_id": "r1",
+      "key": "/api/orders?sort=[\"id\",\"ASC\"]&range=[0,9]",
+      "kind": "request",
+      "payload": {"decision_revision": 1},
+      "workload": "react-admin-dashboard-v1"
+    },
+    {
+      "at_ms": 25,
+      "event_id": "u2",
+      "key": "orders:1",
+      "kind": "update",
+      "payload": {
+        "expected_revision": 2,
+        "mutation": {
+          "resource": "orders",
+          "operation": "update",
+          "id": 1,
+          "changes": {"total": 777}
+        }
+      },
+      "workload": "react-admin-dashboard-v1"
+    },
+    {
+      "at_ms": 26,
+      "event_id": "r2",
+      "key": "/api/orders?sort=[\"id\",\"ASC\"]&range=[0,9]",
+      "kind": "request",
+      "payload": {"decision_revision": 2},
+      "workload": "react-admin-dashboard-v1"
+    },
+    {
+      "at_ms": 45,
+      "event_id": "r3",
+      "key": "/api/orders?sort=[\"id\",\"ASC\"]&range=[0,9]",
+      "kind": "request",
+      "payload": {"decision_revision": 2},
+      "workload": "react-admin-dashboard-v1"
+    },
+    {
+      "at_ms": 50,
+      "event_id": "u3",
+      "key": "orders:1",
+      "kind": "update",
+      "payload": {
+        "expected_revision": 3,
+        "mutation": {
+          "resource": "orders",
+          "operation": "update",
+          "id": 1,
+          "changes": {"status": "cancelled"}
+        }
+      },
+      "workload": "react-admin-dashboard-v1"
+    },
+    {
+      "at_ms": 60,
+      "event_id": "r4",
+      "key": "/api/orders?sort=[\"id\",\"ASC\"]&range=[0,9]",
+      "kind": "request",
+      "payload": {"decision_revision": 3},
+      "workload": "react-admin-dashboard-v1"
+    }
+  ],
+  "faults": [
+    {"delay_ms": 30, "duplicate_delays_ms": [35], "drop": false, "update_event_id": "u1"},
+    {"delay_ms": 0, "duplicate_delays_ms": [], "drop": false, "update_event_id": "u2"},
+    {"delay_ms": 0, "duplicate_delays_ms": [], "drop": true, "update_event_id": "u3"}
+  ],
+  "schema_version": 1,
+  "seed": 0,
+  "trace_id": "w3-engineering-policy-replay-v1",
+  "transport_mode": "redis-streams"
+}
