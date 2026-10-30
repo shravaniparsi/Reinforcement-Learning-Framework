@@ -8,6 +8,12 @@ on:
         required: true
         type: choice
         options: [a, b, c, d]
+  workflow_call:
+    inputs:
+      seed_batch:
+        description: Frozen training-seed batch
+        required: true
+        type: string
 
 permissions:
   contents: read
