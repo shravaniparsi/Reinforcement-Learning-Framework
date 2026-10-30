@@ -10,6 +10,7 @@ This package implements protocol-level interfaces for the prospective cache-fres
 - `analysis_plan.py` implements lexicographic parameter selection, complete-pair checks, deterministic trace-level bootstrap intervals and precision-based final trace counts.
 - `allocation_design_v1.json` and `allocation_design.py` freeze hosted runtime, blocking, policy order, process isolation and retry behavior.
 - `analysis_fixture_v1.json` and `run_analysis_engineering.py` exercise selection, intervals and pool expansion without application observations.
+- `run_policy_unit.py` executes one policy in a fresh process, while `run_hosted_preflight.py` applies the frozen allocation identity and deterministic policy order to all eight policies.
 - `redis_calibration.py` measures no-fault local Pub/Sub and Streams delivery with raw per-message timings and a host manifest. Its output is transport engineering evidence, not application study data.
 - `workload.py` defines the reset, commit, read and semantic-oracle contract shared by each application.
 - `catalog_workload.py` is the deterministic SQLite-backed W1 product adapter with per-product revision history.
@@ -72,6 +73,14 @@ Exercise the analysis code without study observations with:
 python3 -m experiments.freshness.run_analysis_engineering \
   data/engineering/freshness-analysis-engineering-v1/results.json
 ```
+
+The manually dispatched `.github/workflows/freshness-hosted-preflight.yml` runs six
+engineering allocation blocks, one for every workload and Redis transport identity.
+Each block retains the generated schedule, deterministic policy order, subprocess
+status and eight policy artifacts. It also runs a real Redis Pub/Sub and Streams
+transport check. These are separate engineering gates: the policy replay uses the
+frozen deterministic delivery schedule, while the transport check verifies the real
+Redis paths and pinned package. Neither artifact is application study evidence.
 
 Run the pure contract, workload and gateway tests with:
 
