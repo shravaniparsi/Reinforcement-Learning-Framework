@@ -12,6 +12,7 @@ This package implements protocol-level interfaces for the prospective cache-fres
 - `analysis_fixture_v1.json` and `run_analysis_engineering.py` exercise selection, intervals and pool expansion without application observations.
 - `run_policy_unit.py` executes one policy in a fresh process, while `run_hosted_preflight.py` applies the frozen allocation identity and deterministic policy order to all eight policies.
 - `redis_calibration.py` measures no-fault local Pub/Sub and Streams delivery with raw per-message timings and a host manifest. Its output is transport engineering evidence, not application study data.
+- `redis_delivery.py` routes source-bound notification envelopes through an isolated real Redis Pub/Sub or Streams instance. `run_instrumented_unit.py` combines that transport with one application trace and records raw operation wall time, thread CPU and trace-level outcomes.
 - `workload.py` defines the reset, commit, read and semantic-oracle contract shared by each application.
 - `catalog_workload.py` is the deterministic SQLite-backed W1 product adapter with per-product revision history.
 - `realworld_workload.py` is the deterministic SQLite-backed W2 article-feed adapter with historical membership, ordering and field snapshots.
@@ -78,9 +79,10 @@ The manually dispatched `.github/workflows/freshness-hosted-preflight.yml` runs 
 engineering allocation blocks, one for every workload and Redis transport identity.
 Each block retains the generated schedule, deterministic policy order, subprocess
 status and eight policy artifacts. It also runs a real Redis Pub/Sub and Streams
-transport check. These are separate engineering gates: the policy replay uses the
-frozen deterministic delivery schedule, while the transport check verifies the real
-Redis paths and pinned package. Neither artifact is application study evidence.
+transport check. It also runs an integrated engineering unit that sends the frozen
+delivered-notification schedule through the selected real Redis mode before applying
+notifications to the gateway. None of these engineering artifacts is application
+study evidence.
 
 Run the pure contract, workload and gateway tests with:
 
