@@ -13,7 +13,7 @@ from .allocation_design import AllocationDesign
 from .schema import dump_schedule
 from .trace_generator import TraceDesign, WORKLOAD_IDS, generate_schedule
 from .training_campaign import TrainingCampaign
-from .training_execution import load_locked_costs, unit_specs
+from .training_execution import load_locked_costs, load_time_lock, unit_specs
 
 
 def _ordered_specs(allocation, identity, phase, specs):
@@ -43,6 +43,13 @@ def main() -> None:
         '--cost-lock', type=Path,
         default=Path('data/training/freshness-costs-40982405656/locked_costs.json'),
     )
+    parser.add_argument(
+        '--time-lock', type=Path,
+        default=Path(
+            'data/training/freshness-time-candidates-40984591923/'
+            'selected_time_parameters.json'
+        ),
+    )
     args = parser.parse_args()
     if args.phase == 'time-candidates' and (
         args.fault_profile != 'no-fault' or args.transport != 'redis-pubsub'
@@ -58,6 +65,7 @@ def main() -> None:
         package / 'trace_design_v1.json',
     )
     costs = load_locked_costs(args.cost_lock)
+    time_lock = load_time_lock(args.time_lock) if args.phase == 'event-candidates' else None
     identity = {
         'stage': 'training',
         'workload': args.workload,
@@ -68,7 +76,10 @@ def main() -> None:
     }
     specs = _ordered_specs(
         allocation, identity, args.phase,
-        unit_specs(campaign, costs, args.phase, args.workload, args.regime),
+        unit_specs(
+            campaign, costs, args.phase, args.workload, args.regime,
+            time_lock=time_lock,
+        ),
     )
     schedule = generate_schedule(
         trace_design,
