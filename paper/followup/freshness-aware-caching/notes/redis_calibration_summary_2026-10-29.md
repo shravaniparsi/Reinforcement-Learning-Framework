@@ -4,7 +4,7 @@ Status: engineering evidence only; not application study data.
 
 GitHub Actions run: `40976163674`
 
-Each hosted replicate used 200 warm-up messages followed by 5,000 retained messages for Redis Pub/Sub and 5,000 for Redis Streams. All three jobs passed their contract tests and retained raw per-message timings. The harness source hash matched the merged source in every artifact. Hosted runs used Redis 7.0.15 on `ubuntu-24.04` Azure runners.
+Each hosted replicate used 200 warm-up messages followed by 5,000 retained messages for Redis Pub/Sub and 5,000 for Redis Streams. All three jobs passed their contract tests and retained raw per-message timings. The harness source hash matched the merged source in every artifact. Hosted runs used Redis package `5:7.0.15-1ubuntu0.24.04.5` on `ubuntu-24.04` Azure runners.
 
 | Replicate | Mode | p50 (ms) | p95 (ms) | p99 (ms) | Maximum (ms) |
 |---:|---|---:|---:|---:|---:|

@@ -29,7 +29,9 @@ jobs:
       - name: Install Redis from the runner distribution
         run: |
           sudo apt-get update
-          sudo apt-get install --yes redis-server
+          sudo apt-get install --yes \
+            redis-server=5:7.0.15-1ubuntu0.24.04.5 \
+            redis-tools=5:7.0.15-1ubuntu0.24.04.5
           redis-server --version
       - name: Verify calibration and gateway contracts
         run: |
