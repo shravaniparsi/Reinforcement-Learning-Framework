@@ -87,6 +87,12 @@ def _sha256(source: _Source) -> str:
     return hashlib.sha256(source.read_bytes()).hexdigest()
 
 
+def _json_normalize(value: Mapping) -> Mapping:
+    """Return the JSON representation used by a persisted schedule."""
+
+    return json.loads(json.dumps(value, sort_keys=True, allow_nan=False))
+
+
 def _bootstrap_seed(identity: Mapping) -> int:
     encoded = json.dumps(
         identity, sort_keys=True, separators=(',', ':'), allow_nan=False,
@@ -236,7 +242,7 @@ def analyze(
             transport_mode=identity['transport'],
         )
         if (
-            schedule.json() != expected_schedule.to_mapping()
+            schedule.json() != _json_normalize(expected_schedule.to_mapping())
             or manifest.get('schedule_sha256') != expected_schedule.digest()
             or manifest.get('trace_sha256') != expected_schedule.trace_digest()
             or manifest.get('fault_sha256') != expected_schedule.fault_digest()
