@@ -141,6 +141,8 @@ Lost update notifications turn event-driven cache invalidation into a freshness 
 
 ## Data and code availability
 
-Study code, prespecified protocols, selected parameter files, the analysis implementation, paired estimates and figure-source data are available in the [project repository](https://github.com/shravaniparsi/Reinforcement-Learning-Framework). The complete raw execution archives are retained by the authors and are available on reasonable request.
+Analysis-ready paired estimates, figure-source data, the confirmatory analysis artifact, archive inventory and all 4,824 raw execution archives are publicly available in the [Cache Freshness Confirmatory Data v1.0.0 release](https://github.com/shravaniparsi/Reinforcement-Learning-Framework/releases/tag/freshness-caching-study-v1.0.0). The release provides SHA-256 checksums and records the exact source revision used to build the package.
+
+Study code, prespecified protocols, selected parameter files and the analysis implementation are available in the [project repository](https://github.com/shravaniparsi/Reinforcement-Learning-Framework) at tag `freshness-caching-study-v1.0.0`.
 
 ## References
