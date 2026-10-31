@@ -17,9 +17,9 @@ Every primary observation for this paper must be collected under the new frozen 
 ## Active sources
 
 - Manuscript source: `output/doc/manuscript.md`
-- Protocol source: `protocol/protocol_v0.3.md`
+- Protocol source: `protocol/protocol_v0.5.md`
 - Novelty source: `notes/literature_novelty_review_2026-10-29.md`
-- Results source: `notes/result_summary.md`, populated only after locked collection and analysis
+- Results source: `notes/result_summary.md` and the checksum-bound final analysis artifact from GitHub Actions run `41148624728`
 
 ## Venue style
 
