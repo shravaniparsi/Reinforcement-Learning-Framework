@@ -140,10 +140,12 @@ did not dominate fixed update or fixed invalidation.
 
 ## Current next step
 
-Prepare a versioned data release with the paired estimates, figure-source data,
-inventory and checksums. The claim-by-source audit is complete at
-`notes/claim_source_audit_2026-10-31.md`; it corrected the Mao et al. rule
-disclosure, bounded the novelty wording and added the missing pinned Svelte
-source. Then adapt the manuscript to the selected journal template and complete
-the author declarations. Ji et al. remains an arXiv/CoRR preprint with no
-verified final venue.
+Create a separate Zenodo dataset record from the public GitHub release
+`freshness-caching-study-v1.0.0` and add its DOI to the manuscript. The GitHub
+release contains the analysis-ready core package, all 4,824 raw execution
+archives and matching SHA-256 checksums. Do not reuse the contextual-rendering
+study's earlier Zenodo DOI. The claim-by-source audit is complete at
+`notes/claim_source_audit_2026-10-31.md`. After the dataset DOI is assigned,
+adapt the manuscript to the selected journal template and complete the author
+declarations. Ji et al. remains an arXiv/CoRR preprint with no verified final
+venue.
