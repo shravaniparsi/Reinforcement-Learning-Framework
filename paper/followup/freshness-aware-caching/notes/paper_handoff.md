@@ -140,8 +140,10 @@ did not dominate fixed update or fixed invalidation.
 
 ## Current next step
 
-Complete the claim-by-source audit and prepare a versioned data release with the
-paired estimates, figure-source data, inventory and checksums. Then adapt the
-manuscript to the selected journal template and complete the author
-declarations. As of 2026-10-31, Ji et al. remains an arXiv/CoRR preprint with no
-verified final venue; the bibliography now identifies it accordingly.
+Prepare a versioned data release with the paired estimates, figure-source data,
+inventory and checksums. The claim-by-source audit is complete at
+`notes/claim_source_audit_2026-10-31.md`; it corrected the Mao et al. rule
+disclosure, bounded the novelty wording and added the missing pinned Svelte
+source. Then adapt the manuscript to the selected journal template and complete
+the author declarations. Ji et al. remains an arXiv/CoRR preprint with no
+verified final venue.
