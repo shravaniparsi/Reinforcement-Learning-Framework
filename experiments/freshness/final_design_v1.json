@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "campaign_id": "freshness-confirmatory-final-v1",
+  "protocol": "freshness-protocol-v0.5",
+  "partition": "final-test",
+  "trace_design": "freshness-bounded-synthetic-v2",
+  "workloads": [
+    "mutable-product-v1",
+    "svelte-realworld-feed-v1",
+    "react-admin-dashboard-v1"
+  ],
+  "regimes": ["read-heavy", "balanced", "write-intensive"],
+  "seed_start": 1000,
+  "seed_count": 67,
+  "fault_profiles": ["no-fault", "loss-1pct", "loss-5pct", "loss-10pct"],
+  "transports": ["redis-pubsub", "redis-streams"],
+  "policies": [
+    "bypass",
+    "conditional-validation",
+    "fixed-ttl",
+    "stale-while-revalidate",
+    "always-invalidate",
+    "always-update",
+    "write-reactive",
+    "event-invalidate-with-repair"
+  ],
+  "primary_contrasts": [
+    {
+      "contrast_id": "repair-vs-invalidate-loss-1pct",
+      "fault_profile": "loss-1pct",
+      "treatment": "event-invalidate-with-repair",
+      "reference": "always-invalidate"
+    },
+    {
+      "contrast_id": "repair-vs-invalidate-loss-5pct",
+      "fault_profile": "loss-5pct",
+      "treatment": "event-invalidate-with-repair",
+      "reference": "always-invalidate"
+    },
+    {
+      "contrast_id": "repair-vs-invalidate-loss-10pct",
+      "fault_profile": "loss-10pct",
+      "treatment": "event-invalidate-with-repair",
+      "reference": "always-invalidate"
+    },
+    {
+      "contrast_id": "write-reactive-vs-update-no-fault",
+      "fault_profile": "no-fault",
+      "treatment": "write-reactive",
+      "reference": "always-update"
+    },
+    {
+      "contrast_id": "write-reactive-vs-invalidate-no-fault",
+      "fault_profile": "no-fault",
+      "treatment": "write-reactive",
+      "reference": "always-invalidate"
+    }
+  ],
+  "primary_outcomes": [
+    "freshness_violation_proportion",
+    "mean_request_wall_ns",
+    "operation_thread_cpu_ns",
+    "total_origin_response_body_bytes",
+    "redis_delivery_payload_bytes"
+  ],
+  "analysis": {
+    "independent_unit": "one complete policy execution over one trace",
+    "paired_by": ["workload", "regime", "transport", "fault_profile", "trace_seed"],
+    "confidence": 0.99,
+    "bootstrap_resamples": 10000,
+    "freshness_admissibility_upper_bound": 0.01,
+    "p_values": false,
+    "star_notation": false,
+    "simultaneous_familywise_coverage_claim": false
+  },
+  "expected_blocks": 4824,
+  "expected_full_trace_units": 38592,
+  "expected_primary_estimates": 450,
+  "allow_parameter_changes": false,
+  "allow_sample_size_changes": false,
+  "confirmatory_final_test": true,
+  "final_test_authorized": true
+}

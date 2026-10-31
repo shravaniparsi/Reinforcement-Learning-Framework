@@ -29,16 +29,21 @@ def main() -> None:
     parser.add_argument('output', type=Path)
     parser.add_argument(
         '--stage',
-        choices=('engineering', 'training', 'validation', 'variance-planning'),
+        choices=('engineering', 'training', 'validation', 'variance-planning', 'final-test'),
         required=True,
     )
+    parser.add_argument('--confirmatory-final-test', action='store_true')
     parser.add_argument('--redis-server', default='redis-server')
     parser.add_argument('--options-file', type=Path)
     parser.add_argument('--compact', action='store_true')
     args = parser.parse_args()
 
     schedule = load_schedule(str(args.schedule))
-    expected_prefix = 'freshness-bounded-synthetic-v1:%s:' % args.stage
+    is_final = args.stage == 'final-test'
+    if is_final != args.confirmatory_final_test:
+        raise ValueError('final-test stage and explicit confirmatory authorization must agree')
+    design_id = 'freshness-bounded-synthetic-v2' if is_final else 'freshness-bounded-synthetic-v1'
+    expected_prefix = '%s:%s:' % (design_id, args.stage)
     if not schedule.trace_id.startswith(expected_prefix):
         raise ValueError('schedule partition does not match the declared collection stage')
     workload_ids = {event.workload for event in schedule.events}
@@ -70,8 +75,8 @@ def main() -> None:
         'artifact_schema_version': 1,
         'measurement_kind': 'instrumented-freshness-trace-unit',
         'stage': args.stage,
-        'confirmatory_final_test': False,
-        'protocol': 'freshness-protocol-v0.4',
+        'confirmatory_final_test': is_final,
+        'protocol': 'freshness-protocol-v0.5' if is_final else 'freshness-protocol-v0.4',
         'workload_id': workload_id,
         'policy_parameters': options,
         'compact_raw_observations': args.compact,

@@ -53,6 +53,16 @@ checksum-bound report is
 `data/variance/freshness-variance-41131844320-archives/final_sample_size_lock.json`;
 the human-readable record is `notes/variance_planning_lock_2026-10-30.md`.
 
+## 2026-10-30 confirmatory final-test freeze
+
+Protocol v0.5 expands only the untouched final-test seed range to 1000 through
+1066 and authorizes the exact machine-readable campaign in
+`experiments/freshness/final_design_v1.json`. The campaign contains 4,824 matched
+allocation blocks, 38,592 full-trace policy units and 450 prespecified primary
+estimates. Policies, source locks, contrasts, outcomes, analysis code and sample
+size are immutable after collection begins. The design record is
+`notes/final_test_design_2026-10-30.md`.
+
 ## Ready
 
 - Distinct contribution and non-overlap boundary.
@@ -89,10 +99,10 @@ the human-readable record is `notes/variance_planning_lock_2026-10-30.md`.
 - Statistical calculations are encoded and tested: lexicographic candidate selection, exact paired-unit matching, deterministic 10,000-resample trace bootstrap intervals, 99% primary intervals for five contrast types, and precision-based `n` with protocol expansion when more than 20 final seeds are required.
 - Hosted allocation design v1 places all eight randomized policies for a matched trace block on one fresh Ubuntu 24.04 runner, starts a new process and full reset per policy, pins Python 3.9.25 and Redis package `5:7.0.15-1ubuntu0.24.04.5`, forbids application-failure retries and retains both attempts for the single allowed infrastructure retry.
 - The source-bound synthetic analysis fixture exercises selection, five primary intervals and pool expansion without study observations. Its intentionally high-variance branch requires 78 traces, which is an engineering branch-coverage result rather than a study sample size. See `notes/allocation_and_analysis_engineering_2026-10-29.md`.
-- Protocol v0.4 is frozen at `protocol/protocol_v0.4.md`. It authorizes engineering preflight only. Training, validation and variance planning require a passing hosted preflight; final testing remains locked until earlier stages freeze parameters and `n`.
+- Protocol v0.5 is frozen at `protocol/protocol_v0.5.md`. It authorizes only the exact 67-seed confirmatory campaign in `experiments/freshness/final_design_v1.json`; all earlier protocol versions remain design-history records.
 - All training inputs and parameters are now locked: serialized-byte costs, fixed-TTL and stale-while-revalidate timing, event-repair age and write-reactive initial expected writes. The event campaign completed 720 blocks and 12,960 full-trace units; its 27,360 source files are checksum-bound in the parameter lock.
 - Held-out validation passed all 36 no-refit guardrails across 1,080 allocation blocks and 8,640 full-trace units. The report binds 19,440 source files and authorizes variance planning without authorizing final testing.
-- Variance planning completed 720 allocation blocks and 5,760 full-trace units. The report binds 12,960 source files and locks the final requirement at 67 seeds. The reserved 20-seed pool is insufficient, so a protocol expansion is required before final testing.
+- Variance planning completed 720 allocation blocks and 5,760 full-trace units. The report binds 12,960 source files and locks the final requirement at 67 seeds. Protocol v0.5 implements the required expansion without using final-test observations.
 - Verified seed bibliography for direct and adjacent work.
 
 ## Required before protocol freeze
@@ -112,7 +122,7 @@ the human-readable record is `notes/variance_planning_lock_2026-10-30.md`.
 
 ## Current next step
 
-Freeze a new protocol version that expands the disjoint final-test seed pool from
-20 to at least 67 and defines the batched confirmatory campaign. Policies,
-contrasts, outcomes, precision targets and the 67-seed requirement cannot change.
-Final-test collection remains prohibited until that protocol expansion is merged.
+After protocol v0.5 and its machine-readable contracts are merged, dispatch the
+exact confirmatory campaign. Retain every block, do not inspect outcomes while the
+campaign is active and do not change policies, contrasts, outcomes, analysis code
+or the 67-seed sample size.
