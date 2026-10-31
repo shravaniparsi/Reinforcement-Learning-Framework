@@ -1,0 +1,36 @@
+{
+  "title": "Cache Freshness under Lost Invalidation Messages: Confirmatory Data and Reproducibility Package",
+  "version": "1.0.0",
+  "upload_type": "dataset",
+  "access_right": "open",
+  "license": "cc-by-4.0",
+  "language": "eng",
+  "creators": [
+    {
+      "name": "Thatikonda, Vishwak",
+      "affiliation": "Independent Researcher",
+      "orcid": "0009-0009-5828-5903"
+    },
+    {
+      "name": "Parsi, Shravani",
+      "affiliation": "Independent Researcher",
+      "orcid": "0009-0004-0084-4657"
+    }
+  ],
+  "description": "Confirmatory data and reproducibility materials for a controlled study of application-cache freshness under lost invalidation messages. The deposit contains 450 prespecified paired estimates from 4,824 matched allocation blocks and 38,592 complete policy executions across three web workloads, three request/update regimes, Redis Pub/Sub and Streams, and no-fault plus 1%, 5% and 10% notification-loss conditions. It includes analysis-ready data, figure source data, the frozen protocol and analyzer, archive inventories and all raw GitHub Actions artifacts.",
+  "keywords": [
+    "application caching",
+    "cache invalidation",
+    "data freshness",
+    "Redis",
+    "empirical software engineering",
+    "reproducibility"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/shravaniparsi/Reinforcement-Learning-Framework",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ]
+}
