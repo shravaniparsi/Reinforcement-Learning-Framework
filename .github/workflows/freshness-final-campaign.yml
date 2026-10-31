@@ -1,0 +1,127 @@
+name: Freshness Confirmatory Final Campaign
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: freshness-confirmatory-final-campaign-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  batch-a:
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: a
+  batch-b:
+    needs: batch-a
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: b
+  batch-c:
+    needs: batch-b
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: c
+  batch-d:
+    needs: batch-c
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: d
+  batch-e:
+    needs: batch-d
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: e
+  batch-f:
+    needs: batch-e
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: f
+  batch-g:
+    needs: batch-f
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: g
+  batch-h:
+    needs: batch-g
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: h
+  batch-i:
+    needs: batch-h
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: i
+  batch-j:
+    needs: batch-i
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: j
+  batch-k:
+    needs: batch-j
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: k
+  batch-l:
+    needs: batch-k
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: l
+  batch-m:
+    needs: batch-l
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: m
+  batch-n:
+    needs: batch-m
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: n
+  batch-o:
+    needs: batch-n
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: o
+  batch-p:
+    needs: batch-o
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: p
+  batch-q:
+    needs: batch-p
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: q
+  batch-r:
+    needs: batch-q
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: r
+  batch-s:
+    needs: batch-r
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: s
+  batch-t:
+    needs: batch-s
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: t
+  batch-u:
+    needs: batch-t
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: u
+  batch-v:
+    needs: batch-u
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: v
+  batch-w:
+    needs: batch-v
+    uses: ./.github/workflows/freshness-final-batch.yml
+    with:
+      batch: w

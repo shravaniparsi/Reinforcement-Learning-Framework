@@ -5,7 +5,7 @@ This package implements protocol-level interfaces for the prospective cache-fres
 - `schema.py` validates exogenous request/update traces and fault directives and produces a stable SHA-256 schedule identity.
 - `fault_schedule.py` materializes delivered, duplicated, reordered and dropped notifications while retaining loss records.
 - `trace_runner.py` replays logical-time engineering schedules, commits mutations before notification creation and records event, fault and full-schedule identities separately.
-- `trace_design_v1.json` and `trace_generator.py` define bounded prospective traces with disjoint evidence partitions and exact fault counts.
+- `trace_design_v1.json` and `trace_generator.py` define the historical bounded prospective traces with disjoint evidence partitions and exact fault counts. `trace_design_v2.json` preserves every earlier partition and expands only the untouched final-test range to the 67 seeds required by the frozen precision rule.
 - `parameter_grid_v1.json` and `parameter_design.py` freeze TTL, stale-window, repair and write-reactive candidates and keep final-test traces outside parameter selection.
 - `analysis_plan.py` implements lexicographic parameter selection, complete-pair checks, deterministic trace-level bootstrap intervals and precision-based final trace counts.
 - `allocation_design_v1.json` and `allocation_design.py` freeze hosted runtime, blocking, policy order, process isolation and retry behavior.
@@ -14,6 +14,7 @@ This package implements protocol-level interfaces for the prospective cache-fres
 - `validation_design_v1.json` and `validation_design.py` freeze the five held-out validation seeds, full fault and transport grid, exact training-lock requirement and no-refit progression guardrail. The campaign contains 1,080 allocation blocks and 8,640 full-trace units.
 - `locked_execution.py` binds all eight policy families to the serialized-byte, time-parameter and event-parameter training locks. `run_locked_block.py` executes one validation allocation, and `validate_locked_parameters.py` checks complete coverage and the prespecified one-percentage-point freshness guardrail.
 - `variance_design_v1.json` and `variance_design.py` freeze the ten variance-planning seeds, five primary contrast types, five precision outcomes and 450 stratum-level calculations. `plan_final_sample_size.py` takes the maximum requirement and refuses final-test authorization when the reserved 20-seed pool is insufficient.
+- `final_design_v1.json` and `final_design.py` bind the authorized confirmatory campaign to 67 untouched seeds, four primary fault conditions, both transports, all eight locked policies, five contrasts and five outcomes. `run_final_block.py` executes one matched block, and `analyze_final_test.py` rejects incomplete or mismatched campaigns before producing the 450 frozen paired estimates.
 - `run_policy_unit.py` executes one policy in a fresh process, while `run_hosted_preflight.py` applies the frozen allocation identity and deterministic policy order to all eight policies.
 - `redis_calibration.py` measures no-fault local Pub/Sub and Streams delivery with raw per-message timings and a host manifest. Its output is transport engineering evidence, not application study data.
 - `redis_delivery.py` routes source-bound notification envelopes through an isolated real Redis Pub/Sub or Streams instance. `run_instrumented_unit.py` combines that transport with one application trace and records raw operation wall time, thread CPU and trace-level outcomes.
@@ -27,7 +28,7 @@ This package implements protocol-level interfaces for the prospective cache-fres
 - `dependencies.py` contains conservative W2 feed and W3 resource-query dependency rules. For update actions, the publisher snapshots complete affected cached-query responses at the commit revision and includes their content and hashes in the notification.
 - `realworld_browser_smoke.py` and `dashboard_browser_smoke.py` are semantic browser gates. They do not record latency or other performance observations.
 
-The frozen design is `paper/followup/freshness-aware-caching/protocol/protocol_v0.4.md`. Engineering preflight is authorized. Training, validation and variance-planning collection require a passing hosted preflight, and final-test collection remains prohibited until parameters and sample size are locked.
+The frozen confirmatory design is `paper/followup/freshness-aware-caching/protocol/protocol_v0.5.md`. Training, validation and variance planning are complete. Final-test collection is authorized only for the exact campaign in `final_design_v1.json`; policies, parameters, outcomes, analysis and the 67-seed sample size cannot change after collection begins.
 
 The trace runner fixes update-or-invalidate actions at publication time. W2 and W3 full-query update content is read from the origin immediately after the commit and stored in the notification, so delayed delivery cannot consult newer origin state. Publication records retain query-construction reads, response bytes and serialized notification bytes.
 

@@ -1,0 +1,116 @@
+name: Freshness Confirmatory Final Batch
+
+on:
+  workflow_dispatch:
+    inputs:
+      batch:
+        description: Frozen confirmatory final-test batch
+        required: true
+        type: choice
+        options: [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w]
+  workflow_call:
+    inputs:
+      batch:
+        description: Frozen confirmatory final-test batch
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: freshness-confirmatory-final-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    outputs:
+      seeds: ${{ steps.plan.outputs.seeds }}
+    steps:
+      - id: plan
+        env:
+          BATCH: ${{ inputs.batch }}
+        run: |
+          case "$BATCH" in
+            a) seeds='[1000,1001,1002]' ;;
+            b) seeds='[1003,1004,1005]' ;;
+            c) seeds='[1006,1007,1008]' ;;
+            d) seeds='[1009,1010,1011]' ;;
+            e) seeds='[1012,1013,1014]' ;;
+            f) seeds='[1015,1016,1017]' ;;
+            g) seeds='[1018,1019,1020]' ;;
+            h) seeds='[1021,1022,1023]' ;;
+            i) seeds='[1024,1025,1026]' ;;
+            j) seeds='[1027,1028,1029]' ;;
+            k) seeds='[1030,1031,1032]' ;;
+            l) seeds='[1033,1034,1035]' ;;
+            m) seeds='[1036,1037,1038]' ;;
+            n) seeds='[1039,1040,1041]' ;;
+            o) seeds='[1042,1043,1044]' ;;
+            p) seeds='[1045,1046,1047]' ;;
+            q) seeds='[1048,1049,1050]' ;;
+            r) seeds='[1051,1052,1053]' ;;
+            s) seeds='[1054,1055,1056]' ;;
+            t) seeds='[1057,1058,1059]' ;;
+            u) seeds='[1060,1061,1062]' ;;
+            v) seeds='[1063,1064,1065]' ;;
+            w) seeds='[1066]' ;;
+            *) exit 2 ;;
+          esac
+          echo "seeds=$seeds" >> "$GITHUB_OUTPUT"
+
+  final-block:
+    needs: plan
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        workload:
+          - mutable-product-v1
+          - svelte-realworld-feed-v1
+          - react-admin-dashboard-v1
+        regime: [read-heavy, balanced, write-intensive]
+        fault_profile: [no-fault, loss-1pct, loss-5pct, loss-10pct]
+        transport: [redis-pubsub, redis-streams]
+        seed: ${{ fromJSON(needs.plan.outputs.seeds) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.9.25'
+      - name: Install the calibrated Redis package
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes \
+            redis-server=5:7.0.15-1ubuntu0.24.04.5 \
+            redis-tools=5:7.0.15-1ubuntu0.24.04.5
+      - name: Verify frozen final-test contracts
+        run: |
+          python -m unittest \
+            tests.test_freshness_final_design \
+            tests.test_freshness_final_analysis \
+            tests.test_freshness_locked_execution \
+            tests.test_freshness_measurement
+      - name: Run eight locked policies
+        run: |
+          python -m experiments.freshness.run_final_block \
+            "ci-artifacts/final-${{ matrix.workload }}-${{ matrix.regime }}-${{ matrix.fault_profile }}-${{ matrix.transport }}-${{ matrix.seed }}" \
+            --workload "${{ matrix.workload }}" \
+            --regime "${{ matrix.regime }}" \
+            --fault-profile "${{ matrix.fault_profile }}" \
+            --transport "${{ matrix.transport }}" \
+            --seed "${{ matrix.seed }}"
+      - name: Upload compact raw block
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: freshness-final-${{ matrix.workload }}-${{ matrix.regime }}-${{ matrix.fault_profile }}-${{ matrix.transport }}-${{ matrix.seed }}-${{ github.run_id }}
+          path: ci-artifacts/
+          compression-level: 9
+          retention-days: 90
+          if-no-files-found: error
