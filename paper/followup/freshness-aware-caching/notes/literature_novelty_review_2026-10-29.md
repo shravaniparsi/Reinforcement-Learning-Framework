@@ -64,12 +64,18 @@ The manuscript must not claim:
 - Freshness is semantic. The oracle must compare the served response with the origin revision and declared response content, not rely only on HTTP `Age` or a cache-hit label.
 - Any learning-based policy is deferred. It can enter a later study only if strong rules leave a measurable decision problem under equal information.
 
-## Unresolved source work
+## Resolution update, 31 October 2026
 
-Before protocol freeze, verify from primary sources:
+The protocol now uses bounded synthetic traces and explicitly limits its claims
+to the declared regimes. Semantic freshness is defined by workload-specific
+complete-content oracles. Redis delivery faults are controlled treatments rather
+than estimates of native failure rates. Ji et al. remains an arXiv/CoRR preprint
+with no verified final venue.
 
-1. realistic notification-delay, loss and reordering regimes for the selected queue or pub/sub mechanism;
-2. public request/update traces whose license permits redistribution, or a principled synthetic trace model with limited claims;
-3. the final publication status and version to cite for Ji et al.;
-4. workload-specific definitions of semantic freshness; and
-5. implementation details needed to reproduce the Mao et al. decision rule without inventing missing parameters.
+The Mao et al. source contains an internal action-label inconsistency. Its cost
+derivation and explanation imply updating when the expected update cost is less
+than invalidation plus the subsequent miss, while one evaluation sentence prints
+the action labels in the opposite direction. The study implements the
+cost-minimizing direction and the manuscript now discloses this interpretation.
+The full claim-by-source record is in
+`notes/claim_source_audit_2026-10-31.md`.
