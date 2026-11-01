@@ -10,7 +10,9 @@
 - [x] Journal-compatible numbered references
 - [x] Original editable LaTeX source included
 - [x] Two figure files included in the same upload directory
-- [x] Supplementary Data S1 and S2 included in the upload directory
+- [x] Figure-internal titles removed, captions retained in the manuscript and vector fonts embedded
+- [x] Online Resources 1 and 2 included in the upload directory with article and author metadata
+- [x] Online Resource captions prepared in `submission_metadata.md`
 - [x] Figures cited in consecutive order
 - [x] Abstract between 150 and 250 words
 - [x] Six indexing keywords
@@ -35,7 +37,7 @@
 - [ ] Paste the author-contribution statement into the portal field
 - [ ] Paste the competing-interest and funding statements into the portal fields
 - [ ] Upload the cover letter
-- [ ] Upload the final flat LaTeX ZIP, compiled PDF and both Supplementary Data files
+- [ ] Upload the final flat LaTeX ZIP, compiled PDF and both Online Resource files
 - [ ] Review the system-generated PDF before approving submission
 - [ ] Choose subscription publishing after acceptance to avoid an APC
 

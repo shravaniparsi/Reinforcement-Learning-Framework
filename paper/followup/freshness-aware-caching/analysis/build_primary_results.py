@@ -118,6 +118,17 @@ def _row_label(row: tuple[str, str]) -> str:
     return f'{WORKLOAD_LABELS[row[0]]}, {REGIME_LABELS[row[1]]}'
 
 
+def _save_figure(fig, path: Path) -> None:
+    for suffix in ('svg', 'pdf', 'png'):
+        output = path.with_suffix(f'.{suffix}')
+        fig.savefig(output, dpi=300, bbox_inches='tight')
+        if suffix == 'svg':
+            lines = output.read_text(encoding='utf-8').splitlines()
+            output.write_text(
+                '\n'.join(line.rstrip() for line in lines) + '\n', encoding='utf-8',
+            )
+
+
 def _forest(
     axis,
     items: Iterable[Mapping],
@@ -192,15 +203,10 @@ def _figure_repair(path: Path, estimates: Sequence[Mapping]) -> None:
             ('redis-pubsub', 'Redis Pub/Sub'), ('redis-streams', 'Redis Streams'),
         )
     ]
-    fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, 0.95), ncol=5)
-    fig.suptitle(
-        'Bounded repair reduces freshness violations while increasing request time',
-        fontsize=9, y=0.99,
-    )
-    fig.subplots_adjust(left=0.27, right=0.98, bottom=0.08, top=0.87,
+    fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, 0.99), ncol=5)
+    fig.subplots_adjust(left=0.27, right=0.98, bottom=0.08, top=0.89,
                         hspace=0.68, wspace=0.36)
-    for suffix in ('svg', 'pdf', 'png'):
-        fig.savefig(path.with_suffix(f'.{suffix}'), dpi=300, bbox_inches='tight')
+    _save_figure(fig, path)
     plt.close(fig)
 
 
@@ -246,15 +252,10 @@ def _figure_write_reactive(path: Path, estimates: Sequence[Mapping]) -> None:
         handles.append(plt.Line2D([], [], marker=TRANSPORT_MARKERS[transport],
                                   linestyle='none', color='#333333', markersize=4,
                                   label=label))
-    fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, 0.94), ncol=5)
-    fig.suptitle(
-        'Write-reactive selection shifts costs without a universal fixed-policy gain',
-        fontsize=9, y=0.99,
-    )
-    fig.subplots_adjust(left=0.25, right=0.99, bottom=0.10, top=0.85,
+    fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, 0.99), ncol=5)
+    fig.subplots_adjust(left=0.25, right=0.99, bottom=0.10, top=0.88,
                         hspace=0.58, wspace=0.42)
-    for suffix in ('svg', 'pdf', 'png'):
-        fig.savefig(path.with_suffix(f'.{suffix}'), dpi=300, bbox_inches='tight')
+    _save_figure(fig, path)
     plt.close(fig)
 
 

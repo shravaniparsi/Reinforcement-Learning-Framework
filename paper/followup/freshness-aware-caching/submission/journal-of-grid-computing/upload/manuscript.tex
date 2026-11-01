@@ -8,7 +8,7 @@
 \usepackage{placeins}
 \providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \hypersetup{
-  pdftitle={Bounded Repair Reduces Cache Staleness under Lost Invalidation Messages},
+  pdftitle={Bounded Repair Reduces Cache Staleness under Lost Invalidation Messages: A Controlled Study across Web Applications},
   pdfauthor={Vishwak Thatikonda and Shravani Parsi},
   pdfkeywords={application caching, cache invalidation, distributed systems, cache consistency, reliability, performance evaluation}
 }
@@ -167,7 +167,7 @@ Primary contrasts are paired by workload, regime, transport, fault profile and t
 
 where \(F\) is the trace-level freshness-violation proportion. A contrast passes the prespecified admissibility gate when the upper bound of the 99\% interval for \(\Delta_F\) is no greater than 0.01, equivalent to one percentage point. The gate therefore limits how much worse the treatment may be than its stated reference before any efficiency outcome is interpreted. It is applied separately to each of the five prespecified contrast types in every workload--regime--transport stratum. No P values or significance stars are used. The prespecified 99\% intervals describe individual estimands and are not simultaneous familywise intervals across all 450 estimates.
 
-We added a post hoc multiplicity sensitivity for the central repair-freshness result. Across its 54 estimands, 10,000 common-index bootstrap resamples of the 67 trace-seed labels were used to calculate the maximum centered mean difference after scaling by each estimand's observed standard error. The 95th percentile of this maximum supplied simultaneous one-sided 95\% upper bounds. The prespecified intervals remain primary. The sensitivity covers the 54 repair-freshness estimands, while efficiency intervals remain pointwise. Full bounds are reported in Supplementary Data~S2.
+We added a post hoc multiplicity sensitivity for the central repair-freshness result. Across its 54 estimands, 10,000 common-index bootstrap resamples of the 67 trace-seed labels were used to calculate the maximum centered mean difference after scaling by each estimand's observed standard error. The 95th percentile of this maximum supplied simultaneous one-sided 95\% upper bounds. The prespecified intervals remain primary. The sensitivity covers the 54 repair-freshness estimands, while efficiency intervals remain pointwise. Full bounds are reported in Online Resource~2.
 
 \subsection{AI assistance}\label{ai-assistance}
 
@@ -179,11 +179,11 @@ The experiment completed all 4,824 planned allocation blocks and all 38,592 poli
 
 \subsection{Descriptive results for all policies}\label{descriptive-results-for-all-policies}
 
-Supplementary Data~S1 reports the mean, sample standard deviation and observed range for every combination of eight policies, five outcomes and 72 workload--regime--transport--fault strata. These summaries provide context for policies outside the prespecified contrasts. Bypass and conditional validation had no observed freshness violations in any stratum. Across all fault conditions, the stratum means ranged from 0\% to 0.916\% for fixed TTL and from 0.313\% to 1.716\% for stale-while-revalidate. Event-driven policies had no observed violations without injected loss, but their rates diverged when notifications were dropped. The efficiency outcomes remain in their native units in Supplementary Data~S1 and are not combined into a cross-policy score.
+Online Resource~1 reports the mean, sample standard deviation and observed range for every combination of eight policies, five outcomes and 72 workload--regime--transport--fault strata. These summaries provide context for policies outside the prespecified contrasts. Bypass and conditional validation had no observed freshness violations in any stratum. Across all fault conditions, the stratum means ranged from 0\% to 0.916\% for fixed TTL and from 0.313\% to 1.716\% for stale-while-revalidate. Event-driven policies had no observed violations without injected loss, but their rates diverged when notifications were dropped. The efficiency outcomes remain in their native units in Online Resource~1 and are not combined into a cross-policy score.
 
 \subsection{Bounded repair reduces freshness violations under notification loss}\label{bounded-repair-reduces-freshness-violations-under-notification-loss}
 
-The paired mean difference favored bounded repair over invalidation alone in all 54 loss strata (Fig.~\ref{fig:repair}). At 1\% notification loss, the paired mean reduction ranged from 0.090 to 0.699 percentage points across workloads, regimes and transports. Seventeen of the 18 corresponding 99\% intervals had upper endpoints below zero, while one ended at zero. At 5\% loss, the reduction increased to 0.851 to 3.600 points. At 10\% loss, it increased to 1.478 to 7.654 points. All interval upper endpoints at 5\% and 10\% loss were below zero. In the post hoc familywise sensitivity, the simultaneous 95\% upper bounds remained below zero in 16 of 18 strata at 1\% loss and all 18 strata at both 5\% and 10\% loss (Supplementary Data~S2).
+The paired mean difference favored bounded repair over invalidation alone in all 54 loss strata (Fig.~\ref{fig:repair}). At 1\% notification loss, the paired mean reduction ranged from 0.090 to 0.699 percentage points across workloads, regimes and transports. Seventeen of the 18 corresponding 99\% intervals had upper endpoints below zero, while one ended at zero. At 5\% loss, the reduction increased to 0.851 to 3.600 points. At 10\% loss, it increased to 1.478 to 7.654 points. All interval upper endpoints at 5\% and 10\% loss were below zero. In the post hoc familywise sensitivity, the simultaneous 95\% upper bounds remained below zero in 16 of 18 strata at 1\% loss and all 18 strata at both 5\% and 10\% loss (Online Resource~2).
 
 The absolute rates give the scale of these paired effects (Table~\ref{tab:absolute-freshness}). Without injected loss, both policies had zero observed violations. Under loss, the mean violation rate for invalidation alone reached 7.755\% across the evaluated strata, whereas the largest mean under bounded repair was 0.388\%. These values summarize stratum-level means. Confirmatory inference uses the paired contrasts.
 
@@ -215,7 +215,7 @@ The repair mechanism imposed a consistent request-path cost. Mean request wall t
 
 \subsection{Write-reactive selection shifts costs across resources}\label{write-reactive-selection-shifts-costs-across-resources}
 
-Under reliable delivery, write-reactive selection, always update and always invalidation produced identical freshness-violation proportions in all 36 primary comparisons. The efficiency results therefore reflect different ways of maintaining the same observed freshness in these conditions (Fig.~\ref{fig:reactive}). Write-reactive executions under notification loss are included in the descriptive Supplementary Data~S1, but adaptive-versus-fixed contrasts under loss were not part of the prespecified confirmatory analysis.
+Under reliable delivery, write-reactive selection, always update and always invalidation produced identical freshness-violation proportions in all 36 primary comparisons. The efficiency results therefore reflect different ways of maintaining the same observed freshness in these conditions (Fig.~\ref{fig:reactive}). Write-reactive executions under notification loss are included in the descriptive Online Resource~1, but adaptive-versus-fixed contrasts under loss were not part of the prespecified confirmatory analysis.
 
 Compared with always update, write-reactive selection increased mean request wall time in all 18 strata by 5.5 to 306.5 microseconds. Every 99\% interval was above zero. It reduced delivered Redis payload in every stratum, by 19.2 to 1,759.1 KiB per trace, because it avoided some complete replacement messages. CPU and origin-byte effects differed by workload. Both quantities were lower for all 12 article-feed and dashboard strata and higher for all six product strata, with every interval excluding zero. Complete query replacements were costly for the article and dashboard, while the smaller product updates made fixed updating comparatively cheap.
 
@@ -261,7 +261,7 @@ Not applicable. This study did not involve human participants, human data or ani
 Not applicable.
 
 \subsection*{Data availability}
-Supplementary Data~S1 provides descriptive summaries for all eight policies and five outcomes. Supplementary Data~S2 provides the post hoc familywise repair-freshness sensitivity. Analysis-ready paired estimates, source data for figures, confirmatory analysis outputs and the archive inventory are available in Zenodo \cite{freshnessDataset2026}. All 4,824 raw execution archives are available in the associated \href{https://github.com/shravaniparsi/Reinforcement-Learning-Framework/releases/tag/freshness-caching-study-v1.0.0}{GitHub release}, together with checksums and the exact source revision.
+Online Resource~1 provides descriptive summaries for all eight policies and five outcomes. Online Resource~2 provides the post hoc familywise repair-freshness sensitivity. Analysis-ready paired estimates, source data for figures, confirmatory analysis outputs and the archive inventory are available in Zenodo \cite{freshnessDataset2026}. All 4,824 raw execution archives are available in the associated \href{https://github.com/shravaniparsi/Reinforcement-Learning-Framework/releases/tag/freshness-caching-study-v1.0.0}{GitHub release}, together with checksums and the exact source revision.
 
 \subsection*{Code availability}
 Study code, prespecified protocols, selected parameter files and the analysis implementation are available in the \href{https://github.com/shravaniparsi/Reinforcement-Learning-Framework}{project repository} at tag \texttt{freshness-caching-study-v1.0.0}.

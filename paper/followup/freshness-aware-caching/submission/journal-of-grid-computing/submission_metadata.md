@@ -66,3 +66,8 @@ Distributed application caches for mutable web data depend on update information
 - Dataset DOI: https://doi.org/10.5281/zenodo.23843162
 - Raw archive release: https://github.com/shravaniparsi/Reinforcement-Learning-Framework/releases/tag/freshness-caching-study-v1.0.0
 - Tagged code: https://github.com/shravaniparsi/Reinforcement-Learning-Framework/tree/freshness-caching-study-v1.0.0
+
+## Supplementary material captions
+
+- Online Resource 1: Descriptive summaries for all eight cache policies and five outcomes across 72 workload, request/update regime, Redis transport and notification-fault strata.
+- Online Resource 2: Post hoc simultaneous one-sided 95% familywise upper bounds for the 54 bounded-repair freshness estimands.
