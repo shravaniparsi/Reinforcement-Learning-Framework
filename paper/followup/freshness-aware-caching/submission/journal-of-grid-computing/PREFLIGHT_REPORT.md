@@ -4,46 +4,46 @@ Date: 31 October 2026
 
 ## Readiness assessment
 
-The package is scientifically and technically ready for Journal of Grid Computing submission.
+The package is scientifically and technically ready for submission to the *Journal of Grid Computing*.
 
-## High priority
+## Remaining editorial risk
 
-No submission-blocking issue remains. Both unaffiliated authors are identified as Independent Researchers in Dublin, California 94568, USA.
+No submission-blocking defect remains. The principal irreducible risk is venue fit: the paper evaluates reliability and performance in distributed application caches, but its web-application setting is narrower than some infrastructure-focused work published by the journal. The title, abstract, Introduction and cover letter consistently present the distributed-systems contribution without expanding the claims beyond the controlled study.
 
-## Medium priority
+## Completed scientific checks
 
-### Venue fit is defensible but not guaranteed
+- All 4,824 allocation blocks and 38,592 policy executions were read from the frozen release archive.
+- The archive SHA-256 is `598be5e50c7644e9acc2ec5b32438d0460f3d40b4419bb9d958323037dd6e590`.
+- All 450 released primary estimates were reproduced exactly.
+- Supplementary Data S1 contains 2,880 descriptive policy-outcome summaries: 72 strata, eight policies and five outcomes.
+- Supplementary Data S2 contains all 54 repair-freshness estimands and the post hoc simultaneous one-sided 95% familywise sensitivity bounds.
+- The absolute freshness-rate ranges, paired reductions, sample-size calculation, admissibility gate and write-reactive decision rule were checked against the analysis outputs and protocol.
+- The complete freshness test suite passes: 105 tests run, zero failures or errors.
 
-The strongest venue-facing frame is the reliability and performance evaluation of distributed application caches over Redis notification modes. The paper directly matches the journal's scope in distributed data management, dependability, and experimental evaluation. Its application-level web setting is narrower than some infrastructure-focused papers in the journal, so editorial fit remains the main irreducible desk-review risk.
+## Completed citation and claim checks
 
-No manuscript change is recommended. The title, abstract, Introduction and cover letter already foreground the distributed-systems reliability contribution without overstating the evidence.
+- Fifteen unique citation keys are used and all resolve to fifteen unique bibliography entries.
+- No cited key is missing, no bibliography entry is uncited, and no duplicate key or DOI is present.
+- The submission bibliography matches the verified source ledger, with the cited Zenodo record added for the study dataset.
+- The Gray and Cheriton leases paper and the Nishtala et al. production Memcache paper were added to place bounded authority and missed-invalidation recovery in context.
+- The description of Mao et al. follows the cost derivation and records the conflicting action labels in the source rather than silently reproducing them.
+- No citation placeholders or unresolved cross-references remain.
 
-## Low priority and residual notes
+## Completed manuscript and package checks
 
-- The transparent-invalidation reference is an arXiv preprint and is identified as such. The claim-to-source audit found that it supports the limited statement made in the manuscript.
-- No special-issue call currently matches this study closely enough to justify reframing it. The regular Research Article track is the honest choice.
-- Suggested reviewers have not been selected because reviewer names and conflicts require an author decision at the portal stage.
+- Official Springer Nature `sn-jnl` LaTeX template and numeric mathematics/physics bibliography style retained.
+- Clean `pdflatex` and BibTeX build completed with no undefined citations or references, overfull boxes or LaTeX errors.
+- Final PDF: 14 A4 pages; every page was visually inspected.
+- Table 1, both equations, Figures 1 and 2, declarations and the complete reference list render without clipping or overlap.
+- Abstract length: 228 words, within the journal's 150-to-250-word range.
+- Six keywords and three MSC 2020 codes are present.
+- Title, abstract, portal metadata, cover letter and Markdown manuscript use the same claim and title.
+- The independent source archive contains exactly six files (`manuscript.tex`, `references.bib`, `Fig1.pdf`, `Fig2.pdf`, `sn-jnl.cls`, and `sn-mathphys-num.bst`) and compiles successfully after fresh extraction.
+- Supplementary Data S1 and S2 are separate upload files and are not embedded in the LaTeX source ZIP.
+- Funding, competing interests, ethics, consent, data availability, code availability and equal-author-contribution statements are present.
+- AI assistance is disclosed in Methods using the author-approved limited statement.
+- No em dashes appear in the manuscript, cover letter or portal metadata.
 
-## Completed checks
+## Submission action
 
-- Official Springer Nature LaTeX template, December 2024 version
-- Successful `pdflatex` and BibTeX build with no undefined citations or references
-- Visual inspection of all 11 pages
-- Title, abstract, Introduction, Results, Discussion and Conclusion aligned to the same contribution
-- Abstract length: 217 words, within the journal's 150 to 250 word range
-- Six keywords and three verified MSC 2020 codes
-- Figure citations, numbering, captions and placement verified
-- All figures appear before the declarations and reference list
-- Thirteen unique citation keys and thirteen unique bibliography entries
-- No citation placeholders or duplicate BibTeX keys
-- Full DOI links rendered in the reference list
-- Public Zenodo dataset cited in the reference list
-- Funding, competing interests, ethics, consent, data, code and author-contribution statements present
-- AI assistance documented in the Methods section using the author-approved limited statement
-- No em dashes in the manuscript, cover letter or portal metadata
-- AI-style scan reviewed; its three question-mark flags are the three explicit research questions, and its single compound-modifier flag is the accurate term `analysis-ready`
-- PDF title, author and keyword metadata embedded
-
-## Highest-leverage next step
-
-Enter the verified metadata in SNAPP, upload the cover letter and final LaTeX package, and inspect the system-generated review PDF before approving submission.
+Upload the final manuscript PDF, the six-file LaTeX source ZIP, Supplementary Data S1, Supplementary Data S2 and the cover letter. Inspect the portal-generated review PDF before approving the submission.

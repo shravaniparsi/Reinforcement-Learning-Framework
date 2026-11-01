@@ -7,6 +7,8 @@ This directory contains the venue-adapted package for a regular Research Article
 - `upload/manuscript.tex`: submission source in the official Springer Nature LaTeX format
 - `upload/references.bib`: verified bibliography plus the Zenodo dataset citation
 - `upload/Fig1.pdf` and `upload/Fig2.pdf`: final vector figures
+- `upload/Supplementary_Data_S1.csv`: descriptive summaries for all eight policies and five outcomes
+- `upload/Supplementary_Data_S2.csv`: post hoc familywise repair-freshness sensitivity
 - `upload/sn-jnl.cls` and `upload/sn-mathphys-num.bst`: official Springer Nature template files, December 2024 version
 - `cover_letter.md`: journal-specific cover letter
 - `submission_metadata.md`: exact portal metadata and declarations
@@ -22,7 +24,7 @@ From the `upload` directory, run:
 latexmk -pdf -interaction=nonstopmode -halt-on-error manuscript.tex
 ```
 
-The SNAPP upload must be a flat ZIP whose files are all at the archive root. The package must compile with `pdflatex`.
+The SNAPP manuscript upload must be a flat ZIP whose files are all at the archive root. The two Supplementary Data files should also be uploaded as supplementary material in the portal.
 
 ## Author affiliation
 

@@ -1,8 +1,8 @@
-# Bounded Repair Controls Cache Staleness under Lost Invalidation Messages: A Controlled Study across Web Applications
+# Bounded Repair Reduces Cache Staleness under Lost Invalidation Messages: A Controlled Study across Web Applications
 
 ## Abstract
 
-Application caches for mutable web data depend on update information that may arrive late or not at all. We evaluated eight cache policies in a controlled laboratory study spanning a mutable product service, an article feed and an administrative dashboard. The experiment used bounded synthetic request and update traces, page- or query-level responses, Redis Pub/Sub and Streams, and injected notification loss at 1%, 5% and 10%. The confirmatory campaign comprised 4,824 matched allocation blocks and 38,592 full policy executions, with 67 independent paired traces in each stratum. Compared with event-driven invalidation alone, bounded repair reduced freshness violations by 0.090 to 0.699 percentage points at 1% loss, 0.851 to 3.600 points at 5% loss and 1.478 to 7.654 points at 10% loss, while adding 6.6 to 131.2 microseconds to mean request wall time. Under reliable delivery, a write-reactive update-or-invalidate rule preserved the same freshness as fixed update and fixed invalidation, but reduced update traffic at the cost of higher request wall time relative to fixed update and showed workload-dependent CPU and origin-byte effects. These results identify bounded repair as an explicit reliability tradeoff and show that adaptive action selection can move cost between the request path, origin and notification channel without producing a universally superior policy.
+Distributed application caches for mutable web data depend on update information that may arrive late or not at all. We evaluated eight cache policies in a controlled laboratory study spanning a mutable product service, an article feed and an administrative dashboard. The experiment used bounded synthetic request and update traces, page- or query-level responses, Redis Pub/Sub and Streams, and injected notification loss at 1%, 5% and 10%. The confirmatory campaign comprised 4,824 matched allocation blocks and 38,592 full policy executions, with 67 independent paired traces in each stratum. Across loss treatments, mean freshness-violation rates ranged from 0.119% to 7.755% with event-driven invalidation alone and from 0% to 0.388% with bounded repair. Relative to invalidation alone, repair reduced violations by 0.090 to 0.699 percentage points at 1% loss, 0.851 to 3.600 points at 5% loss and 1.478 to 7.654 points at 10% loss, while adding 6.6 to 131.2 microseconds to mean request wall time. Under reliable delivery, a write-reactive update-or-invalidate rule preserved the same freshness as fixed update and fixed invalidation, but reduced update traffic at the cost of higher request wall time relative to fixed update and showed workload-dependent CPU and origin-byte effects. These results identify bounded repair as an explicit reliability tradeoff and show that adaptive action selection moves cost between the request path, origin and notification channel without producing a universally superior policy.
 
 ## 1. Introduction
 
@@ -10,7 +10,7 @@ Web caches reduce latency and origin work by reusing earlier responses, but muta
 
 Applications use several established strategies to manage this boundary. Fixed time-to-live rules bound reuse by age. Stale-while-revalidate permits bounded stale serving during asynchronous refresh [@rfc5861]. Conditional validation checks a revision before reuse. Event-driven policies invalidate or replace cached content after an origin update. These event policies depend on delivery: a lost notification can leave cached content stale until another mechanism repairs it.
 
-Prior work has examined strong invalidation, adaptive TTLs, transparent query-cache invalidation and workload-dependent selection between updating and invalidating [@cao1998strongcache; @sazoglu2013ttl; @amza2005transparent; @mao2024cachefreshness]. None of these cited studies jointly evaluates the combination used here: matched complete application responses across controlled notification loss, multiple web workloads and measured request, origin and messaging costs. Analytical or simulation results do not by themselves establish how message construction, cache misses, origin responses and request execution interact across distinct web applications.
+Prior work has examined strong invalidation, adaptive TTLs, transparent query-cache invalidation, workload-dependent selection between updating and invalidating, time-bounded leases and production invalidation recovery [@cao1998strongcache; @sazoglu2013ttl; @amza2005transparent; @mao2024cachefreshness; @gray1989leases; @nishtala2013memcache]. This study contributes a matched, controlled evaluation of complete application responses under exact notification-loss schedules, spanning multiple web workloads and separate measurements of request, origin and messaging costs. The measurements capture interactions among message construction, cache misses, origin responses and request execution.
 
 We address that question with a prospective controlled study of three distinct mutable applications. Every matched policy receives the same exogenous trace and notification-fault schedule. An application-specific oracle compares the served response with the required origin revision and content. The study separates freshness, request wall time, thread CPU, origin-response bytes and Redis payload rather than combining them with subjective weights. Its central finding is a two-part tradeoff: bounded repair consistently recovers freshness lost by invalidation-only policies, while write-reactive selection preserves freshness but does not dominate fixed updating or invalidation across efficiency outcomes.
 
@@ -24,13 +24,15 @@ RFC 9111 defines HTTP cache freshness, validation and conditions for serving sta
 
 Cao and Liu showed that server invalidation can maintain strong consistency with competitive traffic and response cost, whereas polling adds control and latency overhead [@cao1998strongcache]. Search-cache research has used timestamps and workload signals to predict stale entries or set TTL values [@alici2011timestamp; @sazoglu2013ttl]. Deep reinforcement learning has also been applied to TTL-based cache-utility control under changing content popularity [@cho2021ttlrl]. Amza et al. use write-driven dependency tracking and automatic invalidation to provide transparent, strongly consistent query caching for dynamic-content web sites [@amza2005transparent]. These results define fixed, adaptive and transparent baselines for the controlled comparison.
 
+Gray and Cheriton proposed leases, which grant cache rights for a bounded term and use expiration to preserve consistency despite communication and host failures under their system assumptions [@gray1989leases]. At production scale, Nishtala et al. describe Facebook's regional memcache invalidation pipeline, including reliable logs that permit replay of invalidations that were lost or misrouted, and report the observed latency of cache deletes [@nishtala2013memcache]. These mechanisms motivate bounded authority and recovery from missed invalidations. The present study measures periodic semantic repair after controlled notification loss across complete application responses.
+
 ### 2.3 Write-reactive update or invalidation
 
-Mao et al. formulate the choice between updating and invalidating as a function of expected writes between reads and the respective update, invalidation and miss costs [@mao2024cachefreshness]. Their analysis shows that neither fixed action is uniformly preferable. One sentence in Section 3.4 labels the two actions opposite to the preceding cost comparison and its explanation. We therefore implement the cost-minimizing interpretation: update when the expected update cost is less than the combined invalidation and subsequent miss cost, otherwise invalidate. This comparison is especially relevant for query caches because a complete pushed replacement can be much larger than an invalidation message.
+Mao et al. show that the relative cost of update and invalidation depends on the workload's read/write pattern and the update, invalidation and miss costs [@mao2024cachefreshness]. Their derivation selects update when its expected cost is lower than the combined invalidation and subsequent-miss cost. In a later approximation based on expected writes between reads, the printed action labels conflict with the cost explanation that follows the inequality. We therefore use the cost-minimizing direction and state the exact study rule in Section 4.2. This comparison is especially relevant for query caches because a complete pushed replacement can be much larger than an invalidation message.
 
 ### 2.4 Notification delivery
 
-Redis Pub/Sub provides at-most-once delivery; a message that cannot be received is lost [@redisPubSubDocs]. Redis Streams persists entries and supports acknowledgment and recovery [@redisStreamsDocs]. Our study uses both transports, with one controlled consumer and a study-owned fault adapter. Injected loss is an experimental treatment, not a claim about the transports' native failure rates.
+Redis Pub/Sub provides at-most-once delivery. A message that cannot be received is lost [@redisPubSubDocs]. Redis Streams persists entries and supports acknowledgment and recovery [@redisStreamsDocs]. Our study uses both transports, with one controlled consumer and a study-owned fault adapter. Injected loss is an experimental treatment, not a claim about the transports' native failure rates.
 
 ## 3. Research questions
 
@@ -48,7 +50,7 @@ The confirmatory analysis comprises five prespecified contrast types. Three comp
 
 The study uses three deterministic mutable applications. The product workload returns individual products with revisioned price, availability and descriptive fields. The article-feed workload adapts the pinned SvelteKit RealWorld application to a controlled origin whose responses include membership, order, tags and displayed article fields [@svelteRealWorld]. The dashboard workload adapts the pinned React-admin e-commerce demo to a controlled REST origin and evaluates orders, revenue, pending reviews and customer references at one revision [@reactAdminDemo].
 
-Each workload implements reset, commit, request and oracle operations. The oracle compares the complete declared response content with the state required at the request decision. Version labels alone do not determine freshness. Feed membership, ordering and displayed fields matter for the article workload; joined counts and referenced entities matter for the dashboard.
+Each workload implements reset, commit, request and oracle operations. The oracle compares the complete declared response content with the state required at the request decision. Version labels alone do not determine freshness. Feed membership, ordering and displayed fields matter for the article workload. Joined counts and referenced entities matter for the dashboard.
 
 ### 4.2 Cache policies
 
@@ -63,13 +65,21 @@ Every allocation executes eight policies:
 7. **Write-reactive selection** chooses update or invalidation from observed writes between reads and training-derived serialized-byte costs.
 8. **Invalidation with bounded repair** combines delivered-event invalidation with a maximum cached age selected during training.
 
+For the write-reactive policy, the action for an affected cached key is
+
+\[
+\text{update if } E[W]C_u < C_i+C_m; \qquad \text{otherwise invalidate}.
+\]
+
+Here, \(E[W]\) is the running mean number of writes observed between reads for that key, initialized from the training-selected value until a completed write-between-read observation is available. The costs \(C_u\), \(C_i\) and \(C_m\) are the training medians, in serialized bytes, for a complete update notification, a key-plus-revision invalidation notification and an origin miss response, respectively. Costs are specific to each workload and request/update regime. Equality selects invalidation.
+
 For the article and dashboard workloads, update messages carry complete replacements for affected cached queries at the commit revision. Message construction reads and bytes are charged to the update policy. Delayed delivery cannot consult a newer origin state.
 
 ## 5. Experimental design and analysis
 
 ### 5.1 Traces, regimes and notification faults
 
-Every trace contains 100 origin updates. Read-heavy, balanced and write-intensive traces contain 500, 200 and 100 requests, respectively. Inter-event gaps range from 5 to 15 logical milliseconds. The traces are bounded synthetic workloads designed to preserve complete request, update, revision and content identities; they do not estimate production prevalence.
+Every trace contains 100 origin updates. This count makes the 1%, 5% and 10% loss treatments exactly 1, 5 and 10 dropped notifications without rounding. Read-heavy, balanced and write-intensive traces contain 500, 200 and 100 requests, respectively, giving request-to-update ratios of 5:1, 2:1 and 1:1 while holding the update count fixed. Inter-event gaps range from 5 to 15 logical milliseconds. The bounded synthetic workloads preserve complete request, update, revision and content identities. They estimate effects within the declared regimes, not production prevalence.
 
 The confirmatory campaign includes no injected fault and exact notification-loss rates of 1%, 5% and 10%. The corresponding schedules drop 0, 1, 5 or 10 of the 100 update notifications. Redis Pub/Sub and Streams both carry source-bound notification envelopes through an isolated local server. Matched policies receive identical exogenous request, update and loss schedules.
 
@@ -81,7 +91,7 @@ Engineering, training, held-out validation, variance planning and final testing 
 n = \left\lceil \left(\frac{2.5758293s}{h}\right)^2 \right\rceil,
 \]
 
-where \(s\) is the paired planning standard deviation and \(h\) is the target interval half-width. The maximum of 450 calculations required 67 final-test seeds. No final-test observation contributed to parameter selection or sample-size determination.
+where \(s\) is the paired planning standard deviation and \(h\) is the target interval half-width in the same units as the outcome difference. For freshness, \(h=0.01\) as a proportion, or one percentage point. For each efficiency outcome, \(h\) was 10% of the paired reference-policy mean in that outcome's native units. The maximum required sample size across 450 prespecified contrast-by-stratum-by-outcome calculations was 67 final-test seeds. It arose for the repair-minus-invalidation freshness contrast in the mutable-product, write-intensive, 10%-loss stratum under both Redis transports. No final-test observation contributed to parameter selection or sample-size determination.
 
 ### 5.3 Allocation and experimental unit
 
@@ -91,19 +101,42 @@ The independent experimental unit is one complete policy execution over one trac
 
 ### 5.4 Outcomes
 
-The admissibility outcome is the proportion of requests that violate the workload-specific semantic freshness rule. The primary efficiency outcomes are mean request wall time, total operation-thread CPU per trace, request-path plus publisher origin-response bytes and delivered Redis payload bytes. These quantities remain separate; no weighted score combines freshness, time, CPU and bytes.
+The admissibility outcome is the proportion of requests that violate the workload-specific semantic freshness rule. The primary efficiency outcomes are mean request wall time, total operation-thread CPU per trace, request-path plus publisher origin-response bytes and delivered Redis payload bytes. These quantities remain separate. No weighted score combines freshness, time, CPU and bytes.
 
 ### 5.5 Statistical analysis
 
-Primary contrasts are paired by workload, regime, transport, fault profile and trace seed. Each stratum contains 67 complete paired trace units. We report the paired mean difference and a deterministic 99% percentile bootstrap interval from 10,000 resamples of complete trace pairs. Efficiency is interpreted only when the upper 99% bound for excess freshness violations is no greater than 0.01. No P values, significance stars or binary significance claims are used. The 99% intervals describe individual estimands and are not simultaneous familywise intervals across all 450 estimates.
+Primary contrasts are paired by workload, regime, transport, fault profile and trace seed. Each stratum contains 67 complete paired trace units. We report the paired mean difference and a deterministic 99% percentile bootstrap interval from 10,000 resamples of complete trace pairs. For each contrast and stratum, the freshness difference is
+
+\[
+\Delta_F = \overline{F}_{\mathrm{treatment}}-\overline{F}_{\mathrm{reference}},
+\]
+
+where \(F\) is the trace-level freshness-violation proportion. A contrast passes the prespecified admissibility gate when the upper bound of the 99% interval for \(\Delta_F\) is no greater than 0.01, equivalent to one percentage point. The gate therefore limits how much worse the treatment may be than its stated reference before any efficiency outcome is interpreted. It is applied separately to each of the five prespecified contrast types in every workload--regime--transport stratum. No P values or significance stars are used. The prespecified 99% intervals describe individual estimands and are not simultaneous familywise intervals across all 450 estimates.
+
+We added a post hoc multiplicity sensitivity for the central repair-freshness result. Across its 54 estimands, 10,000 common-index bootstrap resamples of the 67 trace-seed labels were used to calculate the maximum centered mean difference after scaling by each estimand's observed standard error. The 95th percentile of this maximum supplied simultaneous one-sided 95% upper bounds. The prespecified intervals remain primary. The sensitivity covers the 54 repair-freshness estimands, while efficiency intervals remain pointwise. Full bounds are reported in Supplementary Data S2.
 
 ## 6. Results
 
 The experiment completed all 4,824 planned allocation blocks and all 38,592 policy executions. Every primary estimate contains 67 complete paired traces. All 90 freshness comparisons met the prespecified admissibility rule, so the associated efficiency outcomes were interpretable.
 
-### 6.1 Bounded repair reduces freshness violations under notification loss
+### 6.1 Descriptive results for all policies
 
-Bounded repair reduced the freshness violations caused by lost invalidation messages in every evaluated stratum (Fig. 1). At 1% notification loss, the paired mean reduction ranged from 0.090 to 0.699 percentage points across workloads, regimes and transports. The 99% interval was below zero in 17 of 18 strata and included zero in one. At 5% loss, the reduction increased to 0.851 to 3.600 points; at 10% loss it increased to 1.478 to 7.654 points. All intervals at 5% and 10% loss were below zero.
+Supplementary Data S1 reports the mean, sample standard deviation and observed range for every combination of eight policies, five outcomes and 72 workload--regime--transport--fault strata. These summaries provide context for policies outside the prespecified contrasts. Bypass and conditional validation had no observed freshness violations in any stratum. Across all fault conditions, the stratum means ranged from 0% to 0.916% for fixed TTL and from 0.313% to 1.716% for stale-while-revalidate. Event-driven policies had no observed violations without injected loss, but their rates diverged when notifications were dropped. The efficiency outcomes remain in their native units in Supplementary Data S1 and are not combined into a cross-policy score.
+
+### 6.2 Bounded repair reduces freshness violations under notification loss
+
+The paired mean difference favored bounded repair over invalidation alone in all 54 loss strata (Fig. 1). At 1% notification loss, the paired mean reduction ranged from 0.090 to 0.699 percentage points across workloads, regimes and transports. Seventeen of the 18 corresponding 99% intervals had upper endpoints below zero, while one ended at zero. At 5% loss, the reduction increased to 0.851 to 3.600 points. At 10% loss, it increased to 1.478 to 7.654 points. All interval upper endpoints at 5% and 10% loss were below zero. In the post hoc familywise sensitivity, the simultaneous 95% upper bounds remained below zero in 16 of 18 strata at 1% loss and all 18 strata at both 5% and 10% loss (Supplementary Data S2).
+
+The absolute rates give the scale of these paired effects (Table 1). Without injected loss, both policies had zero observed violations. Under loss, the mean violation rate for invalidation alone reached 7.755% across the evaluated strata, whereas the largest mean under bounded repair was 0.388%. These values summarize stratum-level means. Confirmatory inference uses the paired contrasts.
+
+**Table 1. Absolute freshness-violation rates for invalidation alone and bounded repair.** Values are the minimum and maximum stratum means across the three workloads, three request/update regimes and two Redis transports. Each fault condition contains 18 strata, and each stratum contains 67 complete traces. The final column reports the range of paired mean reductions.
+
+| Notification loss | Invalidation (%) | Repair (%) | Paired reduction (points) |
+|---|---:|---:|---:|
+| None | 0.000--0.000 | 0.000--0.000 | 0.000--0.000 |
+| 1% | 0.119--0.710 | 0.000--0.060 | 0.090--0.699 |
+| 5% | 1.045--3.633 | 0.030--0.194 | 0.851--3.600 |
+| 10% | 1.866--7.755 | 0.060--0.388 | 1.478--7.654 |
 
 The repair mechanism imposed a consistent request-path cost. Mean request wall time increased by 6.6 to 120.6 microseconds at 1% loss, 6.8 to 124.5 microseconds at 5% loss and 7.6 to 131.2 microseconds at 10% loss. All 54 intervals were above zero. Thread CPU increased by 0.47 to 65.28 milliseconds per trace, with 53 intervals above zero and one including zero. Origin-response bytes also increased as repair recovered from missing messages. Delivered Redis payload was identical to always invalidation because both policies used the same invalidation envelopes. Bounded repair therefore exchanges periodic validation or refresh work for a progressively larger freshness benefit as loss rises.
 
@@ -111,11 +144,11 @@ The repair mechanism imposed a consistent request-path cost. Mean request wall t
 
 **Figure 1. Bounded repair reduces freshness violations while increasing request time.** The left column reports the difference in freshness-violation proportion at 1%, 5% and 10% notification loss. The right column reports the corresponding mean request wall-time difference. Each row is a workload and request/update regime; each marker is one transport stratum. \(n=67\) complete paired traces per marker.
 
-### 6.2 Write-reactive selection shifts cost rather than dominating fixed actions
+### 6.3 Write-reactive selection shifts costs across resources
 
-Under reliable delivery, write-reactive selection, always update and always invalidation produced identical freshness-violation proportions in all 36 primary comparisons. The efficiency results therefore reflect different ways of maintaining the same observed freshness in these conditions (Fig. 2).
+Under reliable delivery, write-reactive selection, always update and always invalidation produced identical freshness-violation proportions in all 36 primary comparisons. The efficiency results therefore reflect different ways of maintaining the same observed freshness in these conditions (Fig. 2). Write-reactive executions under notification loss are included in the descriptive Supplementary Data S1, but adaptive-versus-fixed contrasts under loss were not part of the prespecified confirmatory analysis.
 
-Compared with always update, write-reactive selection increased mean request wall time in all 18 strata by 5.5 to 306.5 microseconds. Every 99% interval was above zero. It reduced delivered Redis payload in every stratum, by 19.2 to 1,759.1 KiB per trace, because it avoided some complete replacement messages. CPU and origin bytes divided by workload. Both quantities were lower for all 12 article-feed and dashboard strata and higher for all six product strata, with every interval excluding zero. Complete query replacements were costly for the article and dashboard, while the smaller product updates made fixed updating comparatively cheap.
+Compared with always update, write-reactive selection increased mean request wall time in all 18 strata by 5.5 to 306.5 microseconds. Every 99% interval was above zero. It reduced delivered Redis payload in every stratum, by 19.2 to 1,759.1 KiB per trace, because it avoided some complete replacement messages. CPU and origin-byte effects differed by workload. Both quantities were lower for all 12 article-feed and dashboard strata and higher for all six product strata, with every interval excluding zero. Complete query replacements were costly for the article and dashboard, while the smaller product updates made fixed updating comparatively cheap.
 
 The comparison with always invalidation did not yield a uniform efficiency gain. Write-reactive selection reduced origin-response bytes only in the six product strata, by 0.84 to 1.90 KiB per trace, and matched fixed invalidation in the other 12 strata. It added 5.9 to 11.9 KiB of Redis payload in every stratum. Request-time intervals were above zero in seven strata, below zero in one and included zero in ten. CPU intervals were above zero in seven, below zero in five and included zero in six. The adaptive rule therefore selected a workload-dependent position between the fixed actions, but no evaluated efficiency outcome established universal dominance.
 
@@ -129,9 +162,9 @@ This study separates two questions that are often combined under cache adaptatio
 
 The repair result gives application designers a concrete choice. Event invalidation without repair is inexpensive when delivery is reliable, but a lost message can extend stale residence until another event changes the entry. A bounded maximum age converts that open-ended risk into periodic work. The data show both sides of this choice: freshness gains reproduced across all three applications and both Redis modes, while request time and CPU increased in nearly every stratum. Repair is therefore a reliability mechanism with a measured operating cost, not a cost-free enhancement to invalidation.
 
-The write-reactive result extends the analytical update-or-invalidate tradeoff into complete application responses [@mao2024cachefreshness]. For large query-complete replacements, avoiding updates substantially reduced publisher and Redis bytes and lowered CPU, but subsequent misses moved work onto the request path. For small product objects, fixed updating avoided those misses at comparatively low message cost. This explains why a rule that minimizes a declared byte-cost expression can reduce some resource measures while increasing request wall time. A deployment must choose which resource is constrained rather than treating adaptation itself as the objective.
+The confirmatory write-reactive result extends the analytical update-or-invalidate tradeoff into complete application responses under reliable notification delivery [@mao2024cachefreshness]. For large query-complete replacements, avoiding updates substantially reduced publisher and Redis bytes and lowered CPU, but subsequent misses moved work onto the request path. For small product objects, fixed updating avoided those misses at comparatively low message cost. This explains why a rule that minimizes a declared byte-cost expression can reduce some resource measures while increasing request wall time. A deployment must choose which resource is constrained. The confirmatory comparison is scoped to reliable delivery. Loss-condition executions provide descriptive context.
 
-The conclusions are bounded by the experimental design. The three workloads cover object, feed and joined-dashboard responses, but they do not represent the frequency of production cache patterns. The traces are synthetic and bounded, so the estimates describe the declared request/update regimes rather than population prevalence. GitHub-hosted runners and local Redis instances control software and allocation identity but do not reproduce wide-area networks or multi-region failover. The treatments inject exact delivery faults at the study adapter; they do not estimate native Pub/Sub or Streams failure rates. Prospective partitions, complete-content oracles, matched traces, two Redis modes and distinct workloads reduce several internal-validity risks, but deployment-specific rates and costs still require local measurement.
+The experimental design sets the scope of the conclusions. The three workloads cover object, feed and joined-dashboard responses. The frequency of production cache patterns lies outside the study estimand. The synthetic bounded traces estimate effects within the declared request/update regimes. GitHub-hosted runners and local Redis instances represent a controlled single-host network, while wide-area networks and multi-region failover remain outside this setting. The treatments prescribe delivery faults at the study adapter, leaving native Pub/Sub and Streams failure rates outside the estimand. Prospective partitions, complete-content oracles, matched traces, two Redis modes and distinct workloads reduce internal-validity risks. Deployment-specific rates and costs still require local measurement.
 
 Within those boundaries, the evidence changes the practical order of evaluation. A cache policy should first demonstrate semantic freshness under the delivery failures it can experience. Efficiency comparisons become meaningful only after that gate. Once freshness is controlled, update, invalidation and repair distribute cost differently across messages, origin work and the request path. Reporting those quantities separately is more informative than collapsing them into one reward or utility score.
 
@@ -141,7 +174,7 @@ Lost update notifications turn event-driven cache invalidation into a freshness 
 
 ## Data and code availability
 
-Analysis-ready paired estimates, figure-source data, the confirmatory analysis artifact and archive inventory are available in Zenodo at [https://doi.org/10.5281/zenodo.23843162](https://doi.org/10.5281/zenodo.23843162). All 4,824 raw execution archives are available in the associated [GitHub release](https://github.com/shravaniparsi/Reinforcement-Learning-Framework/releases/tag/freshness-caching-study-v1.0.0). The checksum manifest authenticates the release assets and the package records the exact source revision used to build them.
+Supplementary Data S1 provides descriptive summaries for all eight policies and five outcomes. Supplementary Data S2 provides the post hoc familywise repair-freshness sensitivity. Analysis-ready paired estimates, source data for figures, confirmatory analysis outputs and the archive inventory are available in Zenodo at [https://doi.org/10.5281/zenodo.23843162](https://doi.org/10.5281/zenodo.23843162). All 4,824 raw execution archives are available in the associated [GitHub release](https://github.com/shravaniparsi/Reinforcement-Learning-Framework/releases/tag/freshness-caching-study-v1.0.0). The checksum manifest authenticates the release assets and the package records the exact source revision used to build them.
 
 Study code, prespecified protocols, selected parameter files and the analysis implementation are available in the [project repository](https://github.com/shravaniparsi/Reinforcement-Learning-Framework) at tag `freshness-caching-study-v1.0.0`.
 

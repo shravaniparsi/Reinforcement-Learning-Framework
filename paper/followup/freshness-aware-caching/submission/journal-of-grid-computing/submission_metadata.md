@@ -9,7 +9,7 @@
 
 ## Title
 
-Bounded Repair Controls Cache Staleness under Lost Invalidation Messages: A Controlled Study across Web Applications
+Bounded Repair Reduces Cache Staleness under Lost Invalidation Messages: A Controlled Study across Web Applications
 
 ## Short title
 
@@ -17,7 +17,7 @@ Bounded Repair for Lost Cache Invalidations
 
 ## Abstract
 
-Distributed application caches for mutable web data depend on update information that may arrive late or not at all. We evaluated eight cache policies in a controlled laboratory study spanning a mutable product service, an article feed and an administrative dashboard. The experiment used bounded synthetic request and update traces, page- or query-level responses, Redis Pub/Sub and Streams, and injected notification loss at 1%, 5% and 10%. The confirmatory campaign comprised 4,824 matched allocation blocks and 38,592 full policy executions, with 67 independent paired traces in each stratum. Compared with event-driven invalidation alone, bounded repair reduced freshness violations by 0.090 to 0.699 percentage points at 1% loss, 0.851 to 3.600 points at 5% loss and 1.478 to 7.654 points at 10% loss, while adding 6.6 to 131.2 microseconds to mean request wall time. Under reliable delivery, a write-reactive update-or-invalidate rule preserved the same freshness as fixed update and fixed invalidation, but reduced update traffic at the cost of higher request wall time relative to fixed update and showed workload-dependent CPU and origin-byte effects. These results identify bounded repair as an explicit reliability tradeoff and show that adaptive action selection moves cost between the request path, origin and notification channel without producing a universally superior policy.
+Distributed application caches for mutable web data depend on update information that may arrive late or not at all. We evaluated eight cache policies in a controlled laboratory study spanning a mutable product service, an article feed and an administrative dashboard. The experiment used bounded synthetic request and update traces, page- or query-level responses, Redis Pub/Sub and Streams, and injected notification loss at 1%, 5% and 10%. The confirmatory campaign comprised 4,824 matched allocation blocks and 38,592 full policy executions, with 67 independent paired traces in each stratum. Across loss treatments, mean freshness-violation rates ranged from 0.119% to 7.755% with event-driven invalidation alone and from 0% to 0.388% with bounded repair. Relative to invalidation alone, repair reduced violations by 0.090 to 0.699 percentage points at 1% loss, 0.851 to 3.600 points at 5% loss and 1.478 to 7.654 points at 10% loss, while adding 6.6 to 131.2 microseconds to mean request wall time. Under reliable delivery, a write-reactive update-or-invalidate rule preserved the same freshness as fixed update and fixed invalidation, but reduced update traffic at the cost of higher request wall time relative to fixed update and showed workload-dependent CPU and origin-byte effects. These results identify bounded repair as an explicit reliability tradeoff and show that adaptive action selection moves cost between the request path, origin and notification channel without producing a universally superior policy.
 
 ## Keywords
 

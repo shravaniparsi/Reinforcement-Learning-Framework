@@ -1,0 +1,16 @@
+{
+  "absolute_outcome_summary_count": 2880,
+  "absolute_summary_count": 576,
+  "block_count": 4824,
+  "descriptive_interval_confidence": 0.95,
+  "descriptive_interval_resamples": 10000,
+  "familywise_sensitivity_confidence": 0.95,
+  "familywise_sensitivity_critical_value": 2.668444224943646,
+  "familywise_sensitivity_estimate_count": 54,
+  "familywise_sensitivity_resamples": 10000,
+  "measurement_kind": "descriptive-reporting-verification",
+  "policy_execution_count": 38592,
+  "primary_estimates_exactly_reproduced": true,
+  "raw_tar_sha256": "598be5e50c7644e9acc2ec5b32438d0460f3d40b4419bb9d958323037dd6e590",
+  "reproduced_primary_estimate_count": 450
+}

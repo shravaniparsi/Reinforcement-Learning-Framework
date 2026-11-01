@@ -70,3 +70,22 @@ dependency tracking refines invalidation granularity, and that the transparent
 query cache provides strong consistency. The revised manuscript claim is
 therefore confirmed. Ji et al. remains documented above as a historically
 verified source but no longer appears in the submission bibliography.
+
+## Related-work expansion, 2026-10-31
+
+Two primary sources were added after external review:
+
+- Gray and Cheriton, “Leases: An Efficient Fault-Tolerant Mechanism for
+  Distributed File Cache Consistency,” SOSP 1989, pp. 202--210, DOI
+  `10.1145/74850.74870`. The primary paper defines leases as time-bounded
+  cache rights and analyzes consistency under communication and host failures.
+- Nishtala et al., “Scaling Memcache at Facebook,” NSDI 2013, pp. 385--398.
+  The primary paper describes a production invalidation pipeline backed by
+  reliable logs, replay of invalidations that were lost or misrouted, and
+  observed invalidation latency.
+
+The Introduction no longer claims that no prior study evaluates the complete
+combination. It now states the paper's positive contribution: a matched,
+controlled evaluation of complete application responses under exact loss
+schedules with request, origin and messaging costs kept separate. This wording
+does not require an exhaustive negative literature claim.

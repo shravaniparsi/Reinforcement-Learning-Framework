@@ -5,7 +5,7 @@ Journal of Grid Computing
 
 Dear Editors-in-Chief,
 
-Please consider our Research Article, "Bounded Repair Controls Cache Staleness under Lost Invalidation Messages: A Controlled Study across Web Applications," for publication in the Journal of Grid Computing.
+Please consider our Research Article, "Bounded Repair Reduces Cache Staleness under Lost Invalidation Messages: A Controlled Study across Web Applications," for publication in the Journal of Grid Computing.
 
 The manuscript reports a controlled experimental study of reliability and performance tradeoffs in distributed application caches. Across three mutable web applications, two Redis delivery modes and matched notification-fault schedules, we compare eight cache policies using complete-content freshness oracles. The confirmatory campaign contains 4,824 matched allocation blocks and 38,592 full policy executions. The results show that bounded repair consistently recovers freshness lost after missing invalidation messages, with measurable request-time and CPU costs. They also show that write-reactive selection shifts work between the request path, origin and notification channel without universally dominating fixed update or invalidation.
 
