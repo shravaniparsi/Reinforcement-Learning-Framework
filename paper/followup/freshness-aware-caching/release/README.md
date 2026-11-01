@@ -52,6 +52,13 @@ upstream commits and retains their original notices.
 
 ## Citation
 
-Use the DOI assigned to the independent Zenodo dataset record. Until that DOI
-exists, cite the versioned GitHub release and repository commit recorded in the
-package. Do not use the earlier contextual-rendering dataset DOI for this study.
+Cite the independent Zenodo dataset record:
+
+Thatikonda, V., & Parsi, S. (2026). *Cache Freshness under Lost Invalidation
+Messages: Confirmatory Data and Reproducibility Package* (Version 1.0.0)
+[Dataset]. Zenodo. https://doi.org/10.5281/zenodo.23843162
+
+The Zenodo record contains the analysis-ready core package and checksum
+manifest. The associated versioned GitHub release contains the complete raw
+archive bundle. Do not use the earlier contextual-rendering dataset DOI for
+this study.

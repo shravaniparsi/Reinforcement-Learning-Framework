@@ -1,6 +1,7 @@
 {
   "title": "Cache Freshness under Lost Invalidation Messages: Confirmatory Data and Reproducibility Package",
   "version": "1.0.0",
+  "doi": "10.5281/zenodo.23843162",
   "upload_type": "dataset",
   "access_right": "open",
   "license": "cc-by-4.0",
@@ -17,7 +18,7 @@
       "orcid": "0009-0004-0084-4657"
     }
   ],
-  "description": "Confirmatory data and reproducibility materials for a controlled study of application-cache freshness under lost invalidation messages. The deposit contains 450 prespecified paired estimates from 4,824 matched allocation blocks and 38,592 complete policy executions across three web workloads, three request/update regimes, Redis Pub/Sub and Streams, and no-fault plus 1%, 5% and 10% notification-loss conditions. It includes analysis-ready data, figure source data, the frozen protocol and analyzer, archive inventories and all raw GitHub Actions artifacts.",
+  "description": "Confirmatory data and reproducibility materials for a controlled study of application-cache freshness under lost invalidation messages. The Zenodo deposit contains the analysis-ready core package with 450 prespecified paired estimates from 4,824 matched allocation blocks and 38,592 complete policy executions across three web workloads, three request/update regimes, Redis Pub/Sub and Streams, and no-fault plus 1%, 5% and 10% notification-loss conditions. It includes analysis-ready data, figure source data, the frozen protocol and analyzer, and archive inventories. The complete set of 4,824 raw GitHub Actions artifact archives is available in the associated GitHub release linked under Related works; its SHA-256 checksum is included in the deposited checksum manifest.",
   "keywords": [
     "application caching",
     "cache invalidation",
@@ -28,7 +29,7 @@
   ],
   "related_identifiers": [
     {
-      "identifier": "https://github.com/shravaniparsi/Reinforcement-Learning-Framework",
+      "identifier": "https://github.com/shravaniparsi/Reinforcement-Learning-Framework/releases/tag/freshness-caching-study-v1.0.0",
       "relation": "isSupplementTo",
       "scheme": "url"
     }
