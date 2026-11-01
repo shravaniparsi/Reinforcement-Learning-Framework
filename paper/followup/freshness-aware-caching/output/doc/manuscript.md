@@ -141,7 +141,7 @@ Lost update notifications turn event-driven cache invalidation into a freshness 
 
 ## Data and code availability
 
-Analysis-ready paired estimates, figure-source data, the confirmatory analysis artifact, archive inventory and all 4,824 raw execution archives are publicly available in the [Cache Freshness Confirmatory Data v1.0.0 release](https://github.com/shravaniparsi/Reinforcement-Learning-Framework/releases/tag/freshness-caching-study-v1.0.0). The release provides SHA-256 checksums and records the exact source revision used to build the package.
+Analysis-ready paired estimates, figure-source data, the confirmatory analysis artifact and archive inventory are available in Zenodo at [https://doi.org/10.5281/zenodo.23843162](https://doi.org/10.5281/zenodo.23843162). All 4,824 raw execution archives are available in the associated [GitHub release](https://github.com/shravaniparsi/Reinforcement-Learning-Framework/releases/tag/freshness-caching-study-v1.0.0). The checksum manifest authenticates the release assets and the package records the exact source revision used to build them.
 
 Study code, prespecified protocols, selected parameter files and the analysis implementation are available in the [project repository](https://github.com/shravaniparsi/Reinforcement-Learning-Framework) at tag `freshness-caching-study-v1.0.0`.
 
