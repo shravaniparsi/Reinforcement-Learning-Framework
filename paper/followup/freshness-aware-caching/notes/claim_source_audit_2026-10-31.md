@@ -58,3 +58,15 @@ abstract record; full text was not required for the limited claim made in the
 manuscript. Ji et al. is cited as a preprint rather than as peer-reviewed final
 publication. No source in the audited set was fabricated, and no author-order or
 wrong-population error was found.
+
+## Peer-reviewed replacement, 2026-10-31
+
+The final submission audit removed the arXiv-only Ji et al. citation from the
+active manuscript. It was replaced by Amza, Soundararajan and Cecchet,
+"Transparent Caching with Strong Consistency in Dynamic Content Web Sites,"
+ICS 2005, pp. 264--273, DOI `10.1145/1088149.1088185`. The paper's abstract and
+full text state that database writes trigger automatic invalidation, that
+dependency tracking refines invalidation granularity, and that the transparent
+query cache provides strong consistency. The revised manuscript claim is
+therefore confirmed. Ji et al. remains documented above as a historically
+verified source but no longer appears in the submission bibliography.

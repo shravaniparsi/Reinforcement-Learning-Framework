@@ -80,7 +80,7 @@ and measurement passed during this audit.
   cache policies.
 - Cho et al. support deep reinforcement learning for TTL utility control under
   changing request conditions.
-- Ji et al. support database-assisted precise invalidation of query caches.
+- Amza et al. support write-driven transparent invalidation of query caches with strong consistency.
 - Mao et al. support the cost comparison used for the update-or-invalidate rule.
 - Official Redis documentation supports Pub/Sub at-most-once delivery and
   Streams persistence, acknowledgment and recovery.
