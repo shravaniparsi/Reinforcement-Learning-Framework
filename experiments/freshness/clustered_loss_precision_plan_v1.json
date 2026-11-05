@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "plan_id": "clustered-loss-precision-plan-v1",
+  "protocol": "clustered-loss-protocol-v0.1",
+  "planning_stage": "extension-precision-planning",
+  "planning_seed_start": 2100,
+  "planning_seed_count": 10,
+  "independent_unit": "trace_seed",
+  "strata_per_seed": 18,
+  "profile_contrast": [
+    "single-burst-10",
+    "dispersed-10"
+  ],
+  "primary_policy": "event-invalidate-with-repair",
+  "interaction_reference_policy": "always-invalidate",
+  "recovery_horizon_requests": 10,
+  "confidence_level": 0.95,
+  "variance_upper_confidence": 0.90,
+  "candidate_final_seed_counts": [
+    12,
+    18,
+    24,
+    30,
+    36,
+    48
+  ],
+  "precision_targets_full_width": {
+    "repair_profile_freshness": 0.01,
+    "repair_vs_always_freshness_interaction": 0.01,
+    "repair_profile_persistence10": 0.10,
+    "repair_vs_always_persistence10_interaction": 0.10
+  },
+  "bootstrap": {
+    "unit": "trace_seed",
+    "replicates": 10000,
+    "seed": 20261104
+  },
+  "reserved_final_seed_start": 2200,
+  "final_collection_authorized": false
+}
