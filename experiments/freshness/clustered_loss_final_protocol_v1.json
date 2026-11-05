@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "protocol_id": "clustered-loss-final-protocol-v1",
+  "status": "authorized-prospective",
+  "collection_authorized": true,
+  "protocol": "clustered-loss-protocol-v0.1",
+  "planning_provenance": {
+    "workflow_run_id": 42074768539,
+    "planning_plan_sha256": "0ab0ab0e286bec8af52bad1e72ec221ed33581a764c5387f8c9413ccc6965954",
+    "planning_report_sha256": "0d6b7c341420b3c7bb1eeac4785859250f309881a782eb5b6ad56bd1c091d2a7",
+    "planning_seed_start": 2100,
+    "planning_seed_count": 10,
+    "planning_seed_reuse": false
+  },
+  "independent_unit": "trace_seed",
+  "final_seed_start": 2200,
+  "final_seed_count": 84,
+  "final_seed_stop_exclusive": 2284,
+  "strata_per_seed": 18,
+  "workloads": [
+    "mutable-product-v1",
+    "react-admin-dashboard-v1",
+    "svelte-realworld-feed-v1"
+  ],
+  "regimes": [
+    "balanced",
+    "read-heavy",
+    "write-intensive"
+  ],
+  "transports": [
+    "redis-pubsub",
+    "redis-streams"
+  ],
+  "fault_profiles": [
+    "no-fault",
+    "dispersed-10",
+    "single-burst-10",
+    "repeated-bursts-10"
+  ],
+  "policies": [
+    "conditional-validation",
+    "fixed-ttl",
+    "always-invalidate",
+    "event-invalidate-with-repair"
+  ],
+  "primary_policy": "event-invalidate-with-repair",
+  "interaction_reference_policy": "always-invalidate",
+  "profile_contrast": [
+    "single-burst-10",
+    "dispersed-10"
+  ],
+  "recovery_horizon_requests": 10,
+  "primary_estimands": [
+    "repair_profile_freshness",
+    "repair_vs_always_freshness_interaction",
+    "repair_profile_persistence10",
+    "repair_vs_always_persistence10_interaction"
+  ],
+  "confidence_level": 0.95,
+  "precision_targets_full_width": {
+    "repair_profile_freshness": 0.01,
+    "repair_vs_always_freshness_interaction": 0.01,
+    "repair_profile_persistence10": 0.10,
+    "repair_vs_always_persistence10_interaction": 0.10
+  },
+  "sample_size_rule": {
+    "variance_upper_confidence": 0.90,
+    "family_variance_envelope": {
+      "freshness": 0.021403538900218184,
+      "persistence10": 0.20435953592760125
+    },
+    "minimum_seed_count_from_nonzero_planning_variance": 73,
+    "buffer_fraction": 0.15,
+    "selected_seed_count": 84,
+    "projected_full_width_at_selected_count": {
+      "freshness_family_envelope": 0.009289705366527224,
+      "persistence10_family_envelope": 0.08869747598553893
+    },
+    "zero_variance_rule": "Use the largest stable upper standard-deviation bound within the same endpoint family; do not assign a projected width of zero."
+  },
+  "interval_policy": {
+    "coverage": "individual",
+    "simultaneous_familywise_coverage_claimed": false,
+    "binary_significance_testing": false,
+    "interpretation": "effect-size estimation with individual uncertainty intervals"
+  },
+  "bootstrap": {
+    "unit": "trace_seed",
+    "replicates": 10000,
+    "seed": 20261105
+  },
+  "collection_shards": [
+    {"shard": 1, "seed_start": 2200, "seed_count": 14},
+    {"shard": 2, "seed_start": 2214, "seed_count": 14},
+    {"shard": 3, "seed_start": 2228, "seed_count": 14},
+    {"shard": 4, "seed_start": 2242, "seed_count": 14},
+    {"shard": 5, "seed_start": 2256, "seed_count": 14},
+    {"shard": 6, "seed_start": 2270, "seed_count": 14}
+  ],
+  "jobs_per_shard": 252,
+  "total_jobs": 1512,
+  "interim_analysis": false,
+  "early_stopping": false,
+  "analysis_code_must_be_frozen_before_collection": true,
+  "final_results_may_be_examined_only_after_all_shards_pass_integrity_checks": true
+}

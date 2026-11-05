@@ -49,12 +49,19 @@ def _download(
         if not valid_archive(temporary, expected_files):
             raise ValueError(f"invalid downloaded archive: {artifact['name']}")
         os.replace(temporary, destination)
+    archive_sha256 = hashlib.sha256(destination.read_bytes()).hexdigest()
+    github_digest = artifact.get('digest')
+    if github_digest is not None:
+        expected_sha256 = github_digest.removeprefix('sha256:')
+        if archive_sha256 != expected_sha256:
+            raise ValueError(f"GitHub digest mismatch: {artifact['name']}")
     return {
         'artifact_id': artifact['id'],
         'name': artifact['name'],
         'github_size_in_bytes': artifact['size_in_bytes'],
         'archive_size_in_bytes': destination.stat().st_size,
-        'archive_sha256': hashlib.sha256(destination.read_bytes()).hexdigest(),
+        'archive_sha256': archive_sha256,
+        'github_digest': github_digest,
     }
 
 
