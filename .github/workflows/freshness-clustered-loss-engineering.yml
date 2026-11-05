@@ -2,6 +2,9 @@ name: Freshness Clustered-Loss Engineering
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - codex/clustered-loss-engineering-run-v1
 
 permissions:
   contents: read
