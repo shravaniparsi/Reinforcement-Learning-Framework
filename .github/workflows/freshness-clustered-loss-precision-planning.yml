@@ -2,6 +2,9 @@ name: Freshness Clustered-Loss Precision Planning
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - codex/clustered-loss-precision-run-v1
 
 permissions:
   contents: read
