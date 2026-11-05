@@ -3,10 +3,9 @@ import math
 import unittest
 from pathlib import Path
 
-from scipy.stats import t
-
 
 ROOT = Path(__file__).resolve().parents[1]
+T_CRITICAL_95_DF83 = 1.988959780175162
 
 
 class ClusteredLossFinalProtocolTests(unittest.TestCase):
@@ -59,7 +58,7 @@ class ClusteredLossFinalProtocolTests(unittest.TestCase):
         targets = self.protocol["precision_targets_full_width"]
         projected = rule["projected_full_width_at_selected_count"]
         for family, sigma in rule["family_variance_envelope"].items():
-            width = 2.0 * t.ppf(0.975, n - 1) * sigma / math.sqrt(n)
+            width = 2.0 * T_CRITICAL_95_DF83 * sigma / math.sqrt(n)
             self.assertAlmostEqual(
                 width, projected[f"{family}_family_envelope"], places=15
             )
