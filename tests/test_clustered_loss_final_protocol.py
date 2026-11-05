@@ -3,7 +3,6 @@ import math
 import unittest
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 T_CRITICAL_95_DF83 = 1.988959780175162
 
