@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "design_id": "freshness-clustered-loss-final-v1",
+  "protocol": "clustered-loss-protocol-v0.1",
+  "final_protocol_id": "clustered-loss-final-protocol-v1",
+  "base_trace_design": "freshness-bounded-synthetic-v2",
+  "stage": "extension-final",
+  "seed_start": 2200,
+  "seed_count": 84,
+  "updates_per_trace": 100,
+  "protected_prefix_updates": 20,
+  "protected_suffix_updates": 20,
+  "loss_count": 10,
+  "fault_profiles": [
+    "no-fault",
+    "dispersed-10",
+    "single-burst-10",
+    "repeated-bursts-10"
+  ],
+  "workloads": [
+    "mutable-product-v1",
+    "svelte-realworld-feed-v1",
+    "react-admin-dashboard-v1"
+  ],
+  "regimes": ["read-heavy", "balanced", "write-intensive"],
+  "transports": ["redis-pubsub", "redis-streams"],
+  "policies": [
+    "conditional-validation",
+    "fixed-ttl",
+    "always-invalidate",
+    "event-invalidate-with-repair"
+  ],
+  "confirmatory_final_test": true,
+  "final_extension_collection": true
+}
